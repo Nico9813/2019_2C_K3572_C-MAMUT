@@ -65,6 +65,9 @@ namespace TGC.Examples.Camara
         {
             TGCVector3 targetCenter;
             CalculatePositionTarget(out position, out targetCenter);
+
+
+
             SetCamera(position, targetCenter);
         }
 

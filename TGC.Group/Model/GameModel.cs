@@ -1,14 +1,20 @@
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using TGC.Core.BulletPhysics;
+using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Examples.Camara;
+using TGC.Examples.Optimization.Quadtree;
 
 namespace TGC.Group.Model
 {
@@ -22,120 +28,190 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-		private const float VELOCIDAD_ROTACION = 1f;
-		private const float VELOCIDAD_MOVIMIENTO = 5f;
+		private const float VELOCIDAD_ROTACION = 3f;
+		private const float VELOCIDAD_MOVIMIENTO = 750f;
 
 		private TGCBox Box;
-		private TgcPlane Piso;
-		private TgcScene Scene;
-		private TgcFpsCamera CamaraPrincipal;
+		private TgcPlane Plano;
+		private TgcMesh Personaje;
+		private TgcMesh PinoOriginal;
+
+		private TgcSkyBox skyBox;
+
+		private List<TgcMesh> Pinos;
+
+		private List<TgcMesh> MeshTotales;
+		private List<TgcMesh> MeshRecolectables;
+
+		private TgcMesh MeshPlano;
+		private TgcSimpleTerrain terreno;
+		private float currentScaleXZ;
+		private float currentScaleY;
+
+		private Quadtree quadtree;
+		private MamutCamara camaraInterna;
 
 		public override void Init()
-        {
+		{
 			BackgroundColor = Color.Black;
 			var d3dDevice = D3DDevice.Instance.Device;
 			var Loader = new TgcSceneLoader();
-			
+			System.Windows.Forms.Cursor.Hide();
 
-			Scene = Loader.loadSceneFromFile(MediaDir + "UltimaChance.xml");
+			Pinos = new List<TgcMesh>();
+			MeshTotales = new List<TgcMesh>();
+			MeshRecolectables = new List<TgcMesh>();
 
-			foreach (var mesh in Scene.Meshes) {
-				mesh.Move(TGCVector3.Empty);
+			var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Montes.jpg");
+			Plano = new TgcPlane(TGCVector3.Empty, new TGCVector3(5000, 0, 5000), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f); ;
+
+			var scene2 = Loader.loadSceneFromFile(MediaDir + "Buggy-TgcScene.xml");
+			Personaje = scene2.Meshes[0];
+			Personaje.Scale = new TGCVector3(0.7f, 0.7f, 0.7f);
+			var scene3 = Loader.loadSceneFromFile(MediaDir + "Pino-TgcScene.xml");
+			PinoOriginal = scene3.Meshes[0];
+
+			for (var i = 0; i < 4; i++)
+			{
+				var instance = PinoOriginal.createMeshInstance(PinoOriginal.Name + i);
+				Pinos.Add(instance);
+				MeshTotales.Add(Pinos[i]);
 			}
 
-			//Box = TGCBox.fromSize(new TGCVector3(0, 5, 0), new TGCVector3(5,5,5) ,Color.Yellow);
-			//Box.AutoTransformEnable = true;
+			Pinos[0].Move(150, 0, 150);
+			Pinos[1].Move(-150, 0, 150);
+			Pinos[2].Move(150, 0, -150);
+			Pinos[3].Move(-150, 0, -150);
 
-			CamaraPrincipal = new TgcFpsCamera(TGCVector3.Empty, 200f, 200f, Input);
-			CamaraPrincipal.SetCamera(TGCVector3.Empty, TGCVector3.Empty);
-			//CamaraPrincipal = new TgcThirdPersonCamera(Box.Position, 10f, 10f);
-			Camara = CamaraPrincipal;
-			
-        }
+			Pinos[0].Transform = TGCMatrix.Translation(150, 0, 150);
+			Pinos[1].Transform = TGCMatrix.Translation(-150, 0, 150);
+			Pinos[2].Transform = TGCMatrix.Translation(150, 0, -150);
+			Pinos[3].Transform = TGCMatrix.Translation(-150, 0, -150);
 
-        public override void Update()
+			MeshPlano = Plano.toMesh("Plano");
+			MeshPlano.Move(-2500, 0, -2500);
+			MeshPlano.Transform = TGCMatrix.Translation(-2500,0, -2500);
+
+			terreno = new TgcSimpleTerrain();
+			var pathTextura = MediaDir + "Textures\\Montes.jpg";
+			var pathHeighmap = MediaDir + "montanias.jpg";
+			currentScaleXZ = 50f;
+			currentScaleY = 1.5f;
+			terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -10, 0));
+			terreno.loadTexture(pathTextura);
+			terreno.AlphaBlendEnable = true;
+
+			quadtree = new Quadtree();
+			quadtree.create(MeshTotales, MeshPlano.BoundingBox);
+			//quadtree.createDebugQuadtreeMeshes();
+
+			skyBox = new TgcSkyBox();
+			skyBox.Center = TGCVector3.Empty;
+			skyBox.Size = new TGCVector3(10000, 10000, 10000);
+
+			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, MediaDir + "cielo.jpg");
+			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, MediaDir + "cielo.jpg");
+			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, MediaDir + "cielo.jpg");
+			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, MediaDir + "cielo.jpg");
+
+			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, MediaDir + "cielo.jpg");
+			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, MediaDir + "cielo.jpg");
+			skyBox.SkyEpsilon = 25f;
+
+			skyBox.Init();
+
+			//camaraInterna = new MamutCamara(Personaje.Position,100,100, Input); //primera persona
+			camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
+			Camara = camaraInterna;
+
+		}
+
+		public override void Update()
         {
             PreUpdate();
-			/*
-			var velocidadCaminar = VELOCIDAD_MOVIMIENTO * ElapsedTime;
-			var velocidadRotar = VELOCIDAD_ROTACION * ElapsedTime;
 
-			//Calcular proxima posicion de personaje segun Input
-			var moving = false;
-			var rotating = false;
-			var rotate = 0f;
+			var input = Input;
 			var movement = TGCVector3.Empty;
+			var rotation = 0f;
 
-			//Adelante
-			if (Input.keyDown(Key.W))
+			if (input.keyDown(Key.Left) || input.keyDown(Key.A))
 			{
-				movement.Z = velocidadCaminar;
-				moving = true;
+				rotation = -1f;
 			}
-
-			//Atras
-			if (Input.keyDown(Key.S))
+			else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
 			{
-				movement.Z = -velocidadCaminar;
-				moving = true;
+				rotation = 1f;
 			}
 
-			//Derecha
-			if (Input.keyDown(Key.D))
+			if (input.keyDown(Key.Up) || input.keyDown(Key.W))
 			{
-				rotate = velocidadRotar;
-				rotating = true;
+				movement.Z = -1;
+			}
+			else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
+			{
+				movement.Z = 1;
 			}
 
-			//Izquierda
-			if (Input.keyDown(Key.A))
-			{
-				rotate = -velocidadRotar;
-				rotating = true;
+			var originalPos = Personaje.Position;
+
+			movement *= VELOCIDAD_MOVIMIENTO * ElapsedTime;
+			rotation = rotation * VELOCIDAD_ROTACION * ElapsedTime;
+
+			
+			if (FastMath.Abs(Personaje.Position.X + movement.X) <= 2500 || FastMath.Abs(Personaje.Position.Z + movement.Z) <= 2500) {
+				Personaje.RotateY(rotation);
+				Personaje.MoveOrientedY(movement.Z);
 			}
-			//Salto
-			if (Input.keyDown(Key.Space))
+			
+			var collisionFound = false;
+			TgcMesh meshColisionado = null;
+
+			foreach (var mesh in MeshTotales)
 			{
-				movement.Y = velocidadCaminar;
-				moving = true;
+				var mainMeshBoundingBox = Personaje.BoundingBox;
+				var sceneMeshBoundingBox = mesh.BoundingBox;
+
+				var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+				if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+				{
+					collisionFound = true;
+					meshColisionado = mesh;
+					break;
+				}
 			}
-			//Agachar
-			if (Input.keyDown(Key.LeftControl))
+
+			//Si hubo alguna colisión, entonces restaurar la posición original del mesh
+			if (collisionFound)
 			{
-				movement.Y = -velocidadCaminar;
-				moving = true;
+				Personaje.Position = originalPos;
+				if (Input.keyPressed(Key.F) && MeshRecolectables.Contains(meshColisionado)) 
+				{
+					MeshTotales.Remove(meshColisionado);
+					meshColisionado.Dispose();
+				}
 			}
-			//Si hubo desplazamiento
-			if (moving)
-			{
-				//Aplicar movimiento, internamente suma valores a la posicion actual del mesh.
-				Box.Move(movement);
-			}
-			if (rotating)
-			{
-				//Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-				var rotAngle = Geometry.DegreeToRadian(rotate);
-				Box.RotateY(rotAngle);
-				CamaraPrincipal.rotateY(rotAngle);
-			}
-			CamaraPrincipal.Target = Box.Position;
-			*/
+
+			//var heighmapRigid = BulletRigidBodyFactory.Instance.CreateSurfaceFromHeighMap(terreno.getData());
+
+
+			camaraInterna.Target = Personaje.Position;
+			camaraInterna.rotateY(rotation);
+
 			PostUpdate();
         }
 
-        public override void Render()
-        {
-           
-            PreRender();
+		public override void Render()
+		{
 
-			Scene.RenderAll();
-			/*
-			foreach (var mesh in Scene.Meshes)
-			{
-				mesh.BoundingBox.Render();
-			}
-			*/
-			//Box.Render();
+			PreRender();
+			terreno.Render();
+			MeshPlano.Render();
+			skyBox.Render();
+			
+
+			Personaje.Render();
+			quadtree.render(Frustum, true);
 
 			PostRender();
         }
@@ -143,10 +219,12 @@ namespace TGC.Group.Model
 
         public override void Dispose()
         {
-			//Dispose de la caja.
-			Scene.DisposeAll();
-            //Box.Dispose();
-			//Piso.Dispose();
-        }
+			Plano.Dispose();
+			terreno.Dispose();
+			Personaje.Dispose();
+			PinoOriginal.Dispose();
+			//Montes.DisposeAll();
+			//Piso.DisposeAll();
+		}
     }
 }

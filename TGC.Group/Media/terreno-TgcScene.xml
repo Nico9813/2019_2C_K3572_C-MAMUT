@@ -1,0 +1,18 @@
+<tgcScene>
+  <name>terreno</name>
+  <texturesExport enabled="True" dir="Textures" />
+  <lightmapExport enabled="True" dir="LightMaps" />
+  <sceneBoundingBox min="[340282300000000000000000000000000000000,340282300000000000000000000000000000000,340282300000000000000000000000000000000]" max="[-340282300000000000000000000000000000000,-340282300000000000000000000000000000000,-340282300000000000000000000000000000000]" />
+  <materials count="1" />
+  <m name='material' type='Multimaterial'>
+    <subM name='mat_0' type='Standardmaterial'>
+      <ambient>[51.0,51.0,51.0,255.0]</ambient>
+      <diffuse>[43,122,107,255]</diffuse>
+      <specular>[51.0,51.0,51.0,255.0]</specular>
+      <opacity>100.0</opacity>
+      <alphaBlendEnable>false</alphaBlendEnable>
+      <bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>pool3d_3e.jpg</bitmap>
+    </subM>
+  </m>
+  <meshes count="1" />
+</tgcScene>
