@@ -3,6 +3,7 @@ using Microsoft.DirectX.DirectInput;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Collision;
 using TGC.Core.Direct3D;
@@ -15,6 +16,8 @@ using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Examples.Camara;
 using TGC.Examples.Optimization.Quadtree;
+using TGC.Core.BulletPhysics;
+using BulletSharp;
 
 namespace TGC.Group.Model
 {
@@ -47,12 +50,16 @@ namespace TGC.Group.Model
 		private TgcSimpleTerrain terreno;
 		private float currentScaleXZ;
 		private float currentScaleY;
+        private float tamanioMapa = 5000;
+
+        //private TGCVector3 vectorPruebas;
 
 		private Quadtree quadtree;
 		private MamutCamara camaraInterna;
 
-		public override void Init()
-		{
+        public override void Init()
+        { 
+            
 			BackgroundColor = Color.Black;
 			var d3dDevice = D3DDevice.Instance.Device;
 			var Loader = new TgcSceneLoader();
@@ -89,8 +96,8 @@ namespace TGC.Group.Model
 			Pinos[3].Transform = TGCMatrix.Translation(-150, 0, -150);
 
 			MeshPlano = Plano.toMesh("Plano");
-			MeshPlano.Move(-2500, 0, -2500);
-			MeshPlano.Transform = TGCMatrix.Translation(-2500,0, -2500);
+			MeshPlano.Move(-tamanioMapa/2, 0, -tamanioMapa/2);
+			MeshPlano.Transform = TGCMatrix.Translation(-tamanioMapa/2, 0, -tamanioMapa/2);
 
 			terreno = new TgcSimpleTerrain();
 			var pathTextura = MediaDir + "Textures\\Montes.jpg";
@@ -99,7 +106,7 @@ namespace TGC.Group.Model
 			currentScaleY = 1.5f;
 			terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -10, 0));
 			terreno.loadTexture(pathTextura);
-			terreno.AlphaBlendEnable = true;
+            terreno.AlphaBlendEnable = true;
 
 			quadtree = new Quadtree();
 			quadtree.create(MeshTotales, MeshPlano.BoundingBox);
@@ -120,8 +127,11 @@ namespace TGC.Group.Model
 
 			skyBox.Init();
 
-			//camaraInterna = new MamutCamara(Personaje.Position,100,100, Input); //primera persona
-			camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
+            //var heighmapRigid = BulletRigidBodyFactory.Instance.CreateSurfaceFromHeighMap(terreno.getData());
+
+
+            //camaraInterna = new MamutCamara(Personaje.Position,100,100, Input); //primera persona
+            camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
 			Camara = camaraInterna;
 
 		}
@@ -179,10 +189,18 @@ namespace TGC.Group.Model
 					meshColisionado = mesh;
 					break;
 				}
-			}
+               
+            }
+            TgcBoundingAxisAlignBox limiteMapa = new TgcBoundingAxisAlignBox(new TGCVector3(-tamanioMapa/2, 0, -tamanioMapa/2), new TGCVector3(tamanioMapa / 2, 100, tamanioMapa / 2));
+            var collisionResult2 = TgcCollisionUtils.classifyBoxBox(Personaje.BoundingBox, limiteMapa);
+            if (collisionResult2 == TgcCollisionUtils.BoxBoxResult.Afuera)
+            {
+                collisionFound = true;
+            }
 
-			//Si hubo alguna colisión, entonces restaurar la posición original del mesh
-			if (collisionFound)
+
+            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+            if (collisionFound)
 			{
 				Personaje.Position = originalPos;
 				if (Input.keyPressed(Key.F) && MeshRecolectables.Contains(meshColisionado)) 
@@ -192,7 +210,7 @@ namespace TGC.Group.Model
 				}
 			}
 
-			//var heighmapRigid = BulletRigidBodyFactory.Instance.CreateSurfaceFromHeighMap(terreno.getData());
+			
 
 
 			camaraInterna.Target = Personaje.Position;
@@ -205,7 +223,9 @@ namespace TGC.Group.Model
 		{
 
 			PreRender();
-			terreno.Render();
+            DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(Personaje.Position), 5, 20, Color.Red);
+            //DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
+            terreno.Render();
 			MeshPlano.Render();
 			skyBox.Render();
 			
