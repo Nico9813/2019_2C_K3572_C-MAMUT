@@ -147,5 +147,10 @@ namespace TGC.Examples.Camara
 		{
 			RotationY += angle;
 		}
-	}
+
+        internal void RotateY(float v)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

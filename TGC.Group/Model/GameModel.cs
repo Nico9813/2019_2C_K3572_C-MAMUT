@@ -16,8 +16,9 @@ using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Examples.Camara;
 using TGC.Examples.Optimization.Quadtree;
-using TGC.Core.BulletPhysics;
 using BulletSharp;
+using TGC.Examples.Physics.CubePhysic;
+
 
 namespace TGC.Group.Model
 {
@@ -57,10 +58,17 @@ namespace TGC.Group.Model
 		private Quadtree quadtree;
 		private MamutCamara camaraInterna;
 
+        private Fisicas physicsExample;
+
+        private TgcScene scene; 
+
+
+
         public override void Init()
-        { 
-            
-			BackgroundColor = Color.Black;
+        {
+
+            /*
+            BackgroundColor = Color.Black;
 			var d3dDevice = D3DDevice.Instance.Device;
 			var Loader = new TgcSceneLoader();
 			System.Windows.Forms.Cursor.Hide();
@@ -70,7 +78,7 @@ namespace TGC.Group.Model
 			MeshRecolectables = new List<TgcMesh>();
 
 			var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Montes.jpg");
-			Plano = new TgcPlane(TGCVector3.Empty, new TGCVector3(5000, 0, 5000), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f); ;
+			Plano = new TgcPlane(TGCVector3.Empty, new TGCVector3(5000, 0, 5000), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f); 
 
 			var scene2 = Loader.loadSceneFromFile(MediaDir + "Buggy-TgcScene.xml");
 			Personaje = scene2.Meshes[0];
@@ -78,7 +86,7 @@ namespace TGC.Group.Model
 			var scene3 = Loader.loadSceneFromFile(MediaDir + "Pino-TgcScene.xml");
 			PinoOriginal = scene3.Meshes[0];
 
-			for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 4; i++)
 			{
 				var instance = PinoOriginal.createMeshInstance(PinoOriginal.Name + i);
 				Pinos.Add(instance);
@@ -111,8 +119,9 @@ namespace TGC.Group.Model
 			quadtree = new Quadtree();
 			quadtree.create(MeshTotales, MeshPlano.BoundingBox);
 			//quadtree.createDebugQuadtreeMeshes();
-
-			skyBox = new TgcSkyBox();
+            
+            
+            skyBox = new TgcSkyBox();
 			skyBox.Center = TGCVector3.Empty;
 			skyBox.Size = new TGCVector3(10000, 10000, 10000);
 
@@ -125,21 +134,96 @@ namespace TGC.Group.Model
 			skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, MediaDir + "cielo.jpg");
 			skyBox.SkyEpsilon = 25f;
 
+
 			skyBox.Init();
 
-            //var heighmapRigid = BulletRigidBodyFactory.Instance.CreateSurfaceFromHeighMap(terreno.getData());
+            terreno = new TgcSimpleTerrain();
+            var position = TGCVector3.Empty;
+            terreno = new TgcSimpleTerrain();
+            var pathTextura = MediaDir + "Textures\\Montes.jpg";
+            var pathHeighmap = MediaDir + "montanias.jpg";
+            currentScaleXZ = 50f;
+            currentScaleY = 1.5f;
+            terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -10, 0));
+            terreno.loadTexture(pathTextura);
+            terreno.AlphaBlendEnable = true;
+            */
+
+            var loader = new TgcSceneLoader();
+
+            BackgroundColor = Color.Black;
+            var d3dDevice = D3DDevice.Instance.Device;
+            var Loader = new TgcSceneLoader();
+            System.Windows.Forms.Cursor.Hide();
+
+            Pinos = new List<TgcMesh>();
+            MeshTotales = new List<TgcMesh>();
+            MeshRecolectables = new List<TgcMesh>();
+
+            var scene3 = loader.loadSceneFromFile(MediaDir + "Pino-TgcScene.xml");
+            PinoOriginal = scene3.Meshes[0];
+
+            for (var i = 0; i < 4; i++)
+            {
+                var instance = PinoOriginal.createMeshInstance(PinoOriginal.Name + i);
+                Pinos.Add(instance);
+                MeshTotales.Add(Pinos[i]);
+            }
+
+            Pinos[0].Move(150, 0, 150);
+            Pinos[1].Move(-150, 0, 150);
+            Pinos[2].Move(150, 0, -150);
+            Pinos[3].Move(-150, 0, -150);
+
+            Pinos[0].Transform = TGCMatrix.Translation(150, 0, 150);
+            Pinos[1].Transform = TGCMatrix.Translation(-150, 0, 150);
+            Pinos[2].Transform = TGCMatrix.Translation(150, 0, -150);
+            Pinos[3].Transform = TGCMatrix.Translation(-150, 0, -150);
+            
+            
 
 
+            skyBox = new TgcSkyBox();
+            skyBox.Center = TGCVector3.Empty;
+            skyBox.Size = new TGCVector3(10000, 10000, 10000);
+
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, MediaDir + "cielo.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, MediaDir + "cielo.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, MediaDir + "cielo.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, MediaDir + "cielo.jpg");
+
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, MediaDir + "cielo.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, MediaDir + "cielo.jpg");
+            skyBox.SkyEpsilon = 25f;
+
+
+            skyBox.Init();
+
+
+            physicsExample = new Fisicas();
+            physicsExample.setBuildings(MeshTotales);
+            physicsExample.Init(MediaDir);
+
+
+
+
+            //Vamos a utilizar la camara en 3ra persona para que siga al objeto principal a medida que se mueve
+                                 
             //camaraInterna = new MamutCamara(Personaje.Position,100,100, Input); //primera persona
-            camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
-			Camara = camaraInterna;
+            //camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
 
-		}
+
+            camaraInterna = new MamutCamara(new TGCVector3(0,0,0), 100, 300, Input);
+            Camara = camaraInterna;
+
+
+            
+        }
 
 		public override void Update()
         {
             PreUpdate();
-
+            /*
 			var input = Input;
 			var movement = TGCVector3.Empty;
 			var rotation = 0f;
@@ -215,16 +299,31 @@ namespace TGC.Group.Model
 
 			camaraInterna.Target = Personaje.Position;
 			camaraInterna.rotateY(rotation);
+            */
+            physicsExample.Update(Input);
 
-			PostUpdate();
+            if (Input.keyDown(Key.A))
+            {
+                camaraInterna.rotateY(-0.005f);
+            }
+
+            if (Input.keyDown(Key.D))
+            {
+                camaraInterna.rotateY(0.5f * 0.01f);
+            }
+
+            camaraInterna.Target = physicsExample.getPersonaje().Position;
+
+            PostUpdate();
         }
 
 		public override void Render()
 		{
 
 			PreRender();
-            DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(Personaje.Position), 5, 20, Color.Red);
-            //DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
+            DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
+            DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
+            /*
             terreno.Render();
 			MeshPlano.Render();
 			skyBox.Render();
@@ -232,19 +331,28 @@ namespace TGC.Group.Model
 
 			Personaje.Render();
 			quadtree.render(Frustum, true);
+            */
+            skyBox.Render();
+            physicsExample.Render(ElapsedTime);
 
-			PostRender();
+            //terreno.Render();
+            PostRender();
         }
 
 
         public override void Dispose()
         {
-			Plano.Dispose();
+            /*Plano.Dispose();
 			terreno.Dispose();
 			Personaje.Dispose();
 			PinoOriginal.Dispose();
-			//Montes.DisposeAll();
-			//Piso.DisposeAll();
-		}
+            //Montes.DisposeAll();
+            //Piso.DisposeAll();
+            */
+            skyBox.Dispose();
+            physicsExample.Dispose();
+            //terreno.Dispose();
+        }
     }
 }
+ 
