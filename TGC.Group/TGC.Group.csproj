@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camara\MamutCamara.cs" />
+    <Compile Include="Camara\Modificadores.cs" />
     <Compile Include="Camara\TgcFpsCamera.cs" />
     <Compile Include="Camara\TgcRotationalCamera.cs" />
     <Compile Include="Camara\TgcSpringThirdPersonCamera.cs" />
@@ -106,6 +107,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Iluminacion\Linterna.cs" />
     <Compile Include="Physics\Fisicas.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Optimization\Quadtree\Quadtree.cs" />
@@ -332,6 +334,12 @@
     <Content Include="Media\Textures\[Metal_Rusted]1.jpg" />
     <Content Include="Media\Textures\[Metal_Seamed]1.jpg" />
     <Content Include="Media\Textures\_10.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Downloads\tgc-viewer-2.3.1\tgc-viewer-2.3.1\TGC.Examples\TGC.Examples.csproj">
+      <Project>{0A4E6948-AB74-48A5-99E1-6BD1C3949006}</Project>
+      <Name>TGC.Examples</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

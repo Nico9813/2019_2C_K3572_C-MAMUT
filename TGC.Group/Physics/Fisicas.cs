@@ -42,7 +42,7 @@ namespace TGC.Examples.Physics.CubePhysic
         private float currentScaleY;
 
         private TgcMesh MeshPlano;
-        private float tamanioMapa = 5000;
+        private float tamanioMapa = 10000;
 
         public void setPersonaje(TgcMesh personaje)
         {
@@ -107,8 +107,8 @@ namespace TGC.Examples.Physics.CubePhysic
             floorBody.UserObject = "floorBody";
             dynamicsWorld.AddRigidBody(floorBody);
 
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Montes.jpg");
-            Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(5000, 0, 5000), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
+            Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
 
             
             //TERRENO(HEIGHMAP)
@@ -117,16 +117,15 @@ namespace TGC.Examples.Physics.CubePhysic
             terreno = new TgcSimpleTerrain();
             var pathTextura = MediaDir + "Textures\\Montes.jpg";
             var pathHeighmap = MediaDir + "montanias.jpg";
-            currentScaleXZ = 50f;
-            currentScaleY = 1.5f;
+            currentScaleXZ = 100f;
+            currentScaleY = 3f;
             terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -15, 0));
             terreno.loadTexture(pathTextura);
+
             terreno.AlphaBlendEnable = true;
 
             var meshRigidBody = BulletRigidBodyFactory.Instance.CreateSurfaceFromHeighMap(terreno.getData());
             dynamicsWorld.AddRigidBody(meshRigidBody);
-
-
 
             var loader = new TgcSceneLoader();
             ///Se crea una caja para que haga las veces del personaje dentro del modelo físico
@@ -147,11 +146,7 @@ namespace TGC.Examples.Physics.CubePhysic
             //Se carga el modelo del personaje
             personaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 
-
-            
             director = new TGCVector3(0, 0, 1);
-
-
         }
 
         public void Update(TgcD3dInput input)
