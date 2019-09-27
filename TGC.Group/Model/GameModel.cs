@@ -204,11 +204,13 @@ namespace TGC.Group.Model
             physicsExample.setBuildings(MeshTotales);
             physicsExample.Init(MediaDir);
 
-
+            quadtree = new Quadtree();
+            MeshPlano = physicsExample.getPlano().toMesh("MeshPlano");
+            quadtree.create(MeshTotales, MeshPlano.BoundingBox);
 
 
             //Vamos a utilizar la camara en 3ra persona para que siga al objeto principal a medida que se mueve
-                                 
+
             //camaraInterna = new MamutCamara(Personaje.Position,100,100, Input); //primera persona
             //camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
 
@@ -334,7 +336,8 @@ namespace TGC.Group.Model
             */
             skyBox.Render();
             physicsExample.Render(ElapsedTime);
-
+            quadtree.render(Frustum, true);
+            DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
             //terreno.Render();
             PostRender();
         }

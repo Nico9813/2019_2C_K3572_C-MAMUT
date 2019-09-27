@@ -67,6 +67,11 @@ namespace TGC.Examples.Physics.CubePhysic
         {
             return this.director;
         }
+        public TgcPlane getPlano()
+        {
+            return this.Plano;
+        }
+
         public void Init(string MediaDir)
         {
             #region Configuracion Basica de World

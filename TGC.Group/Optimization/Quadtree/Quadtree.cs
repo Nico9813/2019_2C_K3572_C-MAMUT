@@ -21,6 +21,12 @@ namespace TGC.Examples.Optimization.Quadtree
         private List<TgcMesh> modelos;
         private QuadtreeNode quadtreeRootNode;
         private TgcBoundingAxisAlignBox sceneBounds;
+        private int cantModelosRender;
+
+        public int cantModelosRenderizados()
+        {
+            return cantModelosRender;
+        }
 
         public Quadtree()
         {
@@ -60,6 +66,7 @@ namespace TGC.Examples.Optimization.Quadtree
         /// </summary>
         public void render(TgcFrustum frustum, bool debugEnabled)
         {
+            cantModelosRender = 0;
             var pMax = sceneBounds.PMax;
             var pMin = sceneBounds.PMin;
             findVisibleMeshes(frustum, quadtreeRootNode,
@@ -73,6 +80,7 @@ namespace TGC.Examples.Optimization.Quadtree
                 {
 					mesh.Render();
                     mesh.Enabled = false;
+                    cantModelosRender++;
                 }
             }
 			/*
