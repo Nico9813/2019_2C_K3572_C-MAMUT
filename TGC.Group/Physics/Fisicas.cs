@@ -12,6 +12,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Example;
 using TGC.Core.Terrain;
+using TGC.Core.Shaders;
 
 namespace TGC.Examples.Physics.CubePhysic
 {
@@ -26,6 +27,7 @@ namespace TGC.Examples.Physics.CubePhysic
         private BroadphaseInterface overlappingPairCache;
 
         private List<TgcMesh> meshes = new List<TgcMesh>();
+        
         private RigidBody floorBody;
 
         private TgcMesh personaje;
@@ -35,6 +37,7 @@ namespace TGC.Examples.Physics.CubePhysic
         private TGCVector3 director;
 
         private TgcPlane Plano;
+        private TgcMesh PlanoMesh;
 
         private TgcSimpleTerrain terreno;
 
@@ -44,7 +47,7 @@ namespace TGC.Examples.Physics.CubePhysic
         private TgcMesh MeshPlano;
         private float tamanioMapa = 10000;
 
-
+        private TGCBox lightMesh;
 
         public void setPersonaje(TgcMesh personaje)
         {
@@ -111,12 +114,15 @@ namespace TGC.Examples.Physics.CubePhysic
 
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
             Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
-
+            PlanoMesh = Plano.toMesh("PlanoMesh");
+            meshes.Add(PlanoMesh);
+            var PlanoBody = BulletRigidBodyFactory.Instance.CreateRigidBodyFromTgcMesh(PlanoMesh);
+            dynamicsWorld.AddRigidBody(PlanoBody);
             
             //TERRENO(HEIGHMAP)
             terreno = new TgcSimpleTerrain();
             var position = TGCVector3.Empty;
-            terreno = new TgcSimpleTerrain();
+            
             var pathTextura = MediaDir + "Textures\\Montes.jpg";
             var pathHeighmap = MediaDir + "montanias.jpg";
             currentScaleXZ = 100f;
@@ -140,7 +146,7 @@ namespace TGC.Examples.Physics.CubePhysic
             //Se crea el cuerpo rígido de la caja, en la definicio de CreateBox el ultimo parametro representa si se quiere o no
             //calcular el momento de inercia del cuerpo. No calcularlo lo que va a hacer es que la caja que representa el personaje
             //no rote cuando colicione contra el mundo.
-            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(100,0,-1000) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
+            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(100,50,-1000) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
             personajeBody.Restitution = 0;
             personajeBody.Gravity = new TGCVector3(0, -100, 0).ToBulletVector3();
             dynamicsWorld.AddRigidBody(personajeBody);
@@ -149,6 +155,14 @@ namespace TGC.Examples.Physics.CubePhysic
             personaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 
             director = new TGCVector3(0, 0, 1);
+            
+            //Mesh para la luz
+            lightMesh = TGCBox.fromSize(new TGCVector3(10, 10, 10), Color.Red);
+
+            
+            
+
+            
         }
 
         public void Update(TgcD3dInput input)
@@ -195,8 +209,62 @@ namespace TGC.Examples.Physics.CubePhysic
             #endregion Comportamiento
         }
 
-        public void Render(float time)
+        public void Render(float time,TGCVector3 lookAtCamera)
         {
+            foreach (var mesh in meshes)
+            {
+                mesh.Effect = TGCShaders.Instance.TgcMeshSpotLightShader; 
+                //El Technique depende del tipo RenderType del mesh
+                mesh.Technique = TGCShaders.Instance.GetTGCMeshTechnique(mesh.RenderType);
+            }
+            terreno.Effect = TGCShaders.Instance.TgcMeshSpotLightShader;
+            terreno.Technique = "DIFFUSE_MAP";
+
+            var desplazamiento = this.getDirector();
+            desplazamiento.Multiply(-350f);
+            var lightPos = lookAtCamera;
+            lightPos.Add(desplazamiento);
+            lightMesh.Position = lightPos;
+            var lightDir = this.getDirector();
+            
+
+            foreach (var mesh in meshes)
+            {
+
+                //Cargar variables shader de la luz
+                mesh.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
+                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(lightPos));
+                mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(lookAtCamera));
+                mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
+                mesh.Effect.SetValue("lightIntensity", 35f);
+                mesh.Effect.SetValue("lightAttenuation", 0.3f);
+                mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(39));
+                mesh.Effect.SetValue("spotLightExponent", 7f);
+
+                //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(12, 12, 12)));
+                mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
+                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
+                mesh.Effect.SetValue("materialSpecularExp", 9f);
+
+            }
+            //Cargar variables shader de la luz
+            terreno.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
+            terreno.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(lightPos));
+            terreno.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(lookAtCamera));
+            terreno.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
+            terreno.Effect.SetValue("lightIntensity", 35f);
+            terreno.Effect.SetValue("lightAttenuation", 0.3f);
+            terreno.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(39));
+            terreno.Effect.SetValue("spotLightExponent", 7f);
+
+            //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+            terreno.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(12, 12, 12)));
+            terreno.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
+            terreno.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+            terreno.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
+            terreno.Effect.SetValue("materialSpecularExp", 9f);
             //Hacemos render de la escena.
             foreach (var mesh in meshes) mesh.Render();
 
@@ -205,7 +273,7 @@ namespace TGC.Examples.Physics.CubePhysic
             personaje.Transform = TGCMatrix.Translation(personajeBody.CenterOfMassPosition.X, personajeBody.CenterOfMassPosition.Y, personajeBody.CenterOfMassPosition.Z);
             
             personaje.Render();
-            Plano.Render();
+            
             terreno.Render();
         }
 
@@ -227,7 +295,7 @@ namespace TGC.Examples.Physics.CubePhysic
             }
 
             personaje.Dispose();
-            Plano.Dispose();
+           
             terreno.Dispose();
 
         }
