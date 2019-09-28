@@ -1,4 +1,5 @@
-﻿using Microsoft.DirectX.Direct3D;
+﻿/*
+using Microsoft.DirectX.Direct3D;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -133,3 +134,4 @@ namespace TGC.Group.Iluminacion
 		}
 	}
 }
+*/

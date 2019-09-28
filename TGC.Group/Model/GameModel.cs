@@ -18,8 +18,9 @@ using TGC.Examples.Camara;
 using TGC.Examples.Optimization.Quadtree;
 using BulletSharp;
 using TGC.Examples.Physics.CubePhysic;
-using TGC.Examples.UserControls.Modifier;
-using TGC.Group.Iluminacion;
+using TGC.Core.Shaders;
+//using TGC.Examples.UserControls.Modifier;
+//using TGC.Group.Iluminacion;
 
 namespace TGC.Group.Model
 {
@@ -36,7 +37,7 @@ namespace TGC.Group.Model
 		private const float VELOCIDAD_ROTACION = 3f;
 		private const float VELOCIDAD_MOVIMIENTO = 750f;
 
-		private Linterna Linterna;
+		//private Linterna Linterna;
 		private TGCBox Box;
 		private TgcPlane Plano;
 		private TgcMesh Personaje;
@@ -64,7 +65,8 @@ namespace TGC.Group.Model
 
         private TgcScene scene;
 
-		public override void Init()
+        private TGCBox lightMesh;
+        public override void Init()
         {
             var loader = new TgcSceneLoader();
 
@@ -76,7 +78,7 @@ namespace TGC.Group.Model
             Pinos = new List<TgcMesh>();
             MeshTotales = new List<TgcMesh>();
             MeshRecolectables = new List<TgcMesh>();
-			Linterna = new Linterna();
+			//Linterna = new Linterna();
 
             var scene3 = loader.loadSceneFromFile(MediaDir + "Pino-TgcScene.xml");
             PinoOriginal = scene3.Meshes[0];
@@ -121,6 +123,8 @@ namespace TGC.Group.Model
             MeshPlano = physicsExample.getPlano().toMesh("MeshPlano");
             quadtree.create(MeshTotales, MeshPlano.BoundingBox);
 
+            //Mesh para la luz
+            lightMesh = TGCBox.fromSize(new TGCVector3(10, 10, 10), Color.Red);
 
             //Vamos a utilizar la camara en 3ra persona para que siga al objeto principal a medida que se mueve
 
@@ -162,11 +166,48 @@ namespace TGC.Group.Model
             DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
             DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
             skyBox.Render();
+            //Linterna.Render(MeshTotales,camaraInterna);
+            foreach (var mesh in MeshTotales)
+            {
+                mesh.Effect = TGCShaders.Instance.TgcMeshSpotLightShader; ;
+                //El Technique depende del tipo RenderType del mesh
+                mesh.Technique = TGCShaders.Instance.GetTGCMeshTechnique(mesh.RenderType);
+            }
+            var desplazamiento = physicsExample.getDirector();
+            desplazamiento.Multiply(-350f);
+            
+            var lightPos = camaraInterna.LookAt;
+            lightPos.Add(desplazamiento);
+            lightMesh.Position = lightPos;
+            var lightDir = physicsExample.getDirector();
+
+            foreach (var mesh in MeshTotales)
+            {
+               
+                    //Cargar variables shader de la luz
+                    mesh.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
+                    mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(lightPos));
+                    mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(camaraInterna.Position));
+                    mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
+                    mesh.Effect.SetValue("lightIntensity", 35f);
+                    mesh.Effect.SetValue("lightAttenuation", 0.3f);
+                    mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(39));
+                    mesh.Effect.SetValue("spotLightExponent", 7f);
+
+                    //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+                    mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(12,12,12)));
+                    mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
+                    mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                    mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
+                    mesh.Effect.SetValue("materialSpecularExp", 9f);
+                
+            }
+
             physicsExample.Render(ElapsedTime);
             quadtree.render(Frustum, true);
             DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
 
-			Linterna.Render(MeshTotales,camaraInterna);
+            
 
             PostRender();
         }

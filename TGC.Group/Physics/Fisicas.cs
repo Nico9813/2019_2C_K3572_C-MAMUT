@@ -44,6 +44,8 @@ namespace TGC.Examples.Physics.CubePhysic
         private TgcMesh MeshPlano;
         private float tamanioMapa = 10000;
 
+
+
         public void setPersonaje(TgcMesh personaje)
         {
             this.personaje = personaje;
