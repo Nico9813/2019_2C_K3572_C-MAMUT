@@ -91,7 +91,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camara\MamutCamara.cs" />
-    <Compile Include="Camara\Modificadores.cs" />
     <Compile Include="Camara\TgcFpsCamera.cs" />
     <Compile Include="Camara\TgcRotationalCamera.cs" />
     <Compile Include="Camara\TgcSpringThirdPersonCamera.cs" />
@@ -107,7 +106,13 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Iluminacion\SinLuz.cs" />
+    <Compile Include="Iluminacion\Vela.cs" />
+    <Compile Include="Iluminacion\Iluminador.cs" />
     <Compile Include="Iluminacion\Linterna.cs" />
+    <Compile Include="Model\Item.cs" />
+    <Compile Include="Model\Pieza.cs" />
+    <Compile Include="Model\Personaje.cs" />
     <Compile Include="Physics\Fisicas.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Optimization\Quadtree\Quadtree.cs" />

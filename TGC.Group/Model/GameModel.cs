@@ -19,6 +19,7 @@ using TGC.Examples.Optimization.Quadtree;
 using BulletSharp;
 using TGC.Examples.Physics.CubePhysic;
 using TGC.Core.Shaders;
+using TGC.Group.Iluminacion;
 //using TGC.Examples.UserControls.Modifier;
 //using TGC.Group.Iluminacion;
 
@@ -40,7 +41,8 @@ namespace TGC.Group.Model
 		//private Linterna Linterna;
 		private TGCBox Box;
 		private TgcPlane Plano;
-		private TgcMesh Personaje;
+		private Personaje Personaje;
+		private TgcMesh MeshPersonaje;
 		private TgcMesh PinoOriginal;
 
 		private TgcSkyBox skyBox;
@@ -54,14 +56,16 @@ namespace TGC.Group.Model
 		private TgcSimpleTerrain terreno;
 		private float currentScaleXZ;
 		private float currentScaleY;
-        private float tamanioMapa = 5000;
+		private float tamanioMapa = 10000;
 
-        //private TGCVector3 vectorPruebas;
+		//private TGCVector3 vectorPruebas;
 
 		private Quadtree quadtree;
 		private MamutCamara camaraInterna;
 
-        private Fisicas physicsExample;
+		private Linterna linterna;
+
+		private Fisicas physicsExample;
 
         private TgcScene scene;
 
@@ -78,9 +82,26 @@ namespace TGC.Group.Model
             Pinos = new List<TgcMesh>();
             MeshTotales = new List<TgcMesh>();
             MeshRecolectables = new List<TgcMesh>();
-			//Linterna = new Linterna();
 
-            var scene3 = loader.loadSceneFromFile(MediaDir + "Pino-TgcScene.xml");
+			//Instancio el terreno (Heigthmap)
+			terreno = new TgcSimpleTerrain();
+			var position = TGCVector3.Empty;
+			var pathTextura = MediaDir + "Textures\\Montes.jpg";
+			var pathHeighmap = MediaDir + "montanias.jpg";
+			currentScaleXZ = 100f;
+			currentScaleY = 3f;
+			terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -15, 0));
+			terreno.loadTexture(pathTextura);
+			terreno.AlphaBlendEnable = true;
+
+			//Instancio el piso
+			var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
+			Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
+			MeshPlano = Plano.toMesh("MeshPlano");
+			MeshTotales.Add(MeshPlano);
+
+			//Instancio los arboles y los pongo en su posicion inicial
+			var scene3 = loader.loadSceneFromFile(MediaDir + "Pino-TgcScene.xml");
             PinoOriginal = scene3.Meshes[0];
 
 			for (var i = 0; i < 4; i++)
@@ -99,8 +120,14 @@ namespace TGC.Group.Model
             Pinos[1].Transform = TGCMatrix.Translation(-150, 0, 150);
             Pinos[2].Transform = TGCMatrix.Translation(150, 0, -150);
             Pinos[3].Transform = TGCMatrix.Translation(-150, 0, -150);
-            
-            skyBox = new TgcSkyBox();
+
+			//Instancia del personaje
+			MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
+			Personaje = new Personaje();
+			Personaje.Init(MeshPersonaje);
+
+			//Instancia de skybox
+			skyBox = new TgcSkyBox();
             skyBox.Center = TGCVector3.Empty;
             skyBox.Size = new TGCVector3(10000, 10000, 10000);
 
@@ -115,22 +142,21 @@ namespace TGC.Group.Model
 
             skyBox.Init();
 
+			//Instancia de motor de fisica para colisiones con mesh y terreno
             physicsExample = new Fisicas();
-            physicsExample.setBuildings(MeshTotales);
+			physicsExample.setTerrain(terreno);
+			physicsExample.setPersonaje(Personaje.mesh);
+			physicsExample.setBuildings(MeshTotales);
             physicsExample.Init(MediaDir);
 
+			//Instancia de linterna
+			linterna = new Linterna();
+
+			//Instancia del quadTree (optimizacion)
             quadtree = new Quadtree();
-            MeshPlano = physicsExample.getPlano().toMesh("MeshPlano");
             quadtree.create(MeshTotales, MeshPlano.BoundingBox);
 
-            
-
-            //Vamos a utilizar la camara en 3ra persona para que siga al objeto principal a medida que se mueve
-
-            //camaraInterna = new MamutCamara(Personaje.Position,100,100, Input); //primera persona
-            //camaraInterna = new MamutCamara(Personaje.Position, 100, 300, Input);
-
-
+			//Instancia de la camara (primera persona)
             camaraInterna = new MamutCamara(new TGCVector3(0,0,0), 50, 50, Input);
             Camara = camaraInterna;
             
@@ -139,7 +165,7 @@ namespace TGC.Group.Model
 		public override void Update()
         {
             PreUpdate();
-
+			Personaje.Update(Input);
             physicsExample.Update(Input);
 
             if (Input.keyDown(Key.A))
@@ -159,21 +185,22 @@ namespace TGC.Group.Model
 
 		public override void Render()
 		{
-
 			PreRender();
 
-            DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
-            DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
-            skyBox.Render();
-           
+			skyBox.Render();
 
-            physicsExample.Render(ElapsedTime,camaraInterna.LookAt);
-            quadtree.render(Frustum, true);
-            DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
+			quadtree.render(Frustum, true);
 
-            
+			physicsExample.Render();
+			var direccionLuz =  physicsExample.getDirector();
 
-            PostRender();
+			Personaje.Render(MeshTotales, terreno, camaraInterna.LookAt, direccionLuz);
+
+			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
+			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
+			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
+
+			PostRender();
         }
 
 
