@@ -191,5 +191,10 @@ namespace TGC.Examples.Optimization.Quadtree
                 m.Enabled = true;
             }
         }
-    }
+
+		internal void actualizarModelos(List<TgcMesh> meshARenderizar)
+		{
+			this.modelos = meshARenderizar;
+		}
+	}
 }

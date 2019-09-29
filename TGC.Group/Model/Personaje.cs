@@ -66,5 +66,10 @@ namespace TGC.Group.Model
 		{
 			iluminadorPrincipal = iluminador;
 		}
+
+		internal void agregarItem(object objetoColisiano)
+		{
+			this.items.Add(objetoColisiano);
+		}
 	}
 }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace TGC.Group.Model
 {
-	class Item
+	abstract class Item
 	{
+		public String descripcion;
 	}
 }
