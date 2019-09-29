@@ -51,7 +51,7 @@ namespace TGC.Group.Model
 		private List<Pieza> Piezas;
 		private List<TgcMesh> Objetos;
 		private List<TgcMesh> MeshARenderizar;
-		List<TgcMesh> MeshTotales;
+		private List<TgcMesh> MeshTotales;
 
 		private TgcMesh MeshPlano;
 		private TgcMesh MeshLago;
@@ -99,16 +99,21 @@ namespace TGC.Group.Model
 			MeshARenderizar.Add(MeshPlano);
 
 			//Instancio la vegetacion
-			MeshLago = loader.loadSceneFromFile(MediaDir + @"River-TgcScene.xml").Meshes[0];
-			MeshLago.Scale = new TGCVector3(20,5,20);
-			MeshLago.Move(-4800, -11.283f, -400);
-			Objetos.Add(MeshLago);
-			MeshARenderizar.Add(MeshLago);
+			var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
+			foreach (var Mesh in scene.Meshes)
+			{
+				Mesh.Scale = new TGCVector3(5, 5, 5);
+				Objetos.Add(Mesh);
+				MeshARenderizar.Add(Mesh);
+			}
 
 			//Instancio la Cabania
 			var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
 			foreach (var Mesh in sceneCabania.Meshes) {
-				Mesh.Scale = new TGCVector3(5, 5, 5);
+				Mesh.Move(-500,0,500);
+				Mesh.Scale = new TGCVector3(2.5f, 2.5f, 2.5f);
+
+				Mesh.updateBoundingBox();
 				Objetos.Add(Mesh);
 				MeshARenderizar.Add(Mesh);
 			}
