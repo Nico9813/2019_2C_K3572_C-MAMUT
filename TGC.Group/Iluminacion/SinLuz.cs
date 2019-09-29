@@ -17,5 +17,9 @@ namespace TGC.Group.Iluminacion
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.FromArgb(12, 12, 12);
 		}
+		public override void accion(Model.Personaje personaje,float elapsedTime)
+		{
+			personaje.setIluminador(this);
+		}
 	}
 }

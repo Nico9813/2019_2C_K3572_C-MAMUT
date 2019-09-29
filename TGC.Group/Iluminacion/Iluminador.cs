@@ -10,13 +10,16 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
 using TGC.Core.Terrain;
+using TGC.Group.Model;
 
 namespace TGC.Group.Iluminacion
 {
-	class Iluminador
+	abstract class Iluminador : Item
 	{
 		protected TGCBox lightMesh;
 		protected Color colorLuz;
+
+		public abstract override void accion(Personaje personaje, float elapsedTime);
 
 		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 camaraDir, TGCVector3 direccionLuz)
 		{

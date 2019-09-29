@@ -18,43 +18,33 @@ namespace TGC.Group.Model
 		private List<Item> items;
 		private List<Pieza> piezas;
 		private Iluminador iluminadorPrincipal;
+		private Item itemSelecionado;
 
 		private Boolean ilumnacionActiva;
 
 		public void Init(TgcMesh meshPersonaje) {
 			mesh = meshPersonaje;
 			iluminadorPrincipal = new SinLuz();
+
+			items = new List<Item>();
+			piezas = new List<Pieza>();
+			items.Add(new SinLuz());
+			itemSelecionado = items.ElementAt(0);
+
+			items.Add(new Vela());
 			ilumnacionActiva = false;
 		}
 
-		public void Update(TgcD3dInput Input)
+		public void Update(TgcD3dInput Input,float elapsedTime)
 		{
-			if (Input.keyPressed(Key.F))
+
+			if (Input.keyPressed(Key.Tab))
 			{
-				if (ilumnacionActiva)
-				{
-					iluminadorPrincipal = new SinLuz();
-					ilumnacionActiva = false;
-				}
-				else
-				{
-					iluminadorPrincipal = new Linterna();
-					ilumnacionActiva = true;
-				}
+				var index = items.IndexOf(itemSelecionado);
+				itemSelecionado = items.ElementAtOrDefault((index + 1) % items.Count);
+				itemSelecionado.accion(this, elapsedTime);
 			}
-			if (Input.keyPressed(Key.G))
-			{
-				if (ilumnacionActiva)
-				{
-					iluminadorPrincipal = new SinLuz();
-					ilumnacionActiva = false;
-				}
-				else
-				{
-					iluminadorPrincipal = new Vela();
-					ilumnacionActiva = true;
-				}
-			}
+
 		}
 
 		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 lookAt, TGCVector3 direccionLuz)
@@ -67,7 +57,7 @@ namespace TGC.Group.Model
 			iluminadorPrincipal = iluminador;
 		}
 
-		internal void agregarItem(object objetoColisiano)
+		internal void agregarItem(Item objetoColisiano)
 		{
 			this.items.Add(objetoColisiano);
 		}

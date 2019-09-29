@@ -19,11 +19,19 @@ namespace TGC.Group.Iluminacion
 {
 	class Linterna : Iluminador
 	{
-		public Linterna()
+		private int DuracionBateria;
+		private int Bateria;
+
+		public Linterna(TgcMesh mesh)
 		{
 			//Mesh para la luz
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.White;
+			this.mesh = mesh;
+		}
+
+		public override void accion(Model.Personaje personaje, float elapsedTime) {
+			personaje.setIluminador(this);
 		}
 	}
 }
