@@ -99,21 +99,22 @@ namespace TGC.Group.Model
 			MeshARenderizar.Add(MeshPlano);
 
 			//Instancio la vegetacion
-			var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
+			/*var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
 			foreach (var Mesh in scene.Meshes)
 			{
 				Mesh.Scale = new TGCVector3(5, 5, 5);
 				Objetos.Add(Mesh);
 				MeshARenderizar.Add(Mesh);
-			}
+			}*/
 
 			//Instancio la Cabania
 			var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
 			foreach (var Mesh in sceneCabania.Meshes) {
-				Mesh.Move(-500,0,500);
-				Mesh.Scale = new TGCVector3(2.5f, 2.5f, 2.5f);
-
-				Mesh.updateBoundingBox();
+                Mesh.Move(-500, -50, 500);
+				Mesh.Scale = new TGCVector3(5f, 5f, 5f);
+                
+                Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
+				
 				Objetos.Add(Mesh);
 				MeshARenderizar.Add(Mesh);
 			}

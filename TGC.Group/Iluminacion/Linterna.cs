@@ -12,8 +12,6 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Examples.Camara;
-using TGC.Examples.Example;
-using TGC.Examples.UserControls.Modifier;
 
 namespace TGC.Group.Iluminacion
 {

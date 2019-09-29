@@ -85,9 +85,13 @@ namespace TGC.Examples.Physics.CubePhysic
 
             foreach (var mesh in meshes)
             {
-                var buildingbody = BulletRigidBodyFactory.Instance.CreateRigidBodyFromTgcMesh(mesh);
-                buildingbody.Translate(mesh.Position.ToBulletVector3());
+                var childTriangleMesh = construirTriangleMeshShape(mesh);
+                var buildingbody = construirRigidBodyDeChildTriangleMeshShape(childTriangleMesh, mesh.Position, mesh.Scale);
+
+
+                //buildingbody.Translate(mesh.Position.ToBulletVector3());
                 dynamicsWorld.AddRigidBody(buildingbody);
+                
             }
 
             //Se crea un plano ya que esta escena tiene problemas
@@ -193,6 +197,7 @@ namespace TGC.Examples.Physics.CubePhysic
             personaje.Dispose();
            
             terreno.Dispose();
+            
 
         }
 
@@ -205,6 +210,52 @@ namespace TGC.Examples.Physics.CubePhysic
         {
             return personaje.Position;
         }
+
+        private BvhTriangleMeshShape construirTriangleMeshShape(TgcMesh mesh)
+        {
+            var vertexCoords = mesh.getVertexPositions();
+
+            TriangleMesh triangleMesh = new TriangleMesh();
+            for (int i = 0; i < vertexCoords.Length; i = i + 3)
+            {
+                triangleMesh.AddTriangle(vertexCoords[i].ToBulletVector3(), vertexCoords[i + 1].ToBulletVector3(), vertexCoords[i + 2].ToBulletVector3());
+            }
+            return new BvhTriangleMeshShape(triangleMesh, false);
+        }
+
+        private RigidBody construirRigidBodyDeTriangleMeshShape(BvhTriangleMeshShape triangleMeshShape)
+        {
+            var transformationMatrix = TGCMatrix.RotationYawPitchRoll(0, 0, 0).ToBsMatrix;
+            DefaultMotionState motionState = new DefaultMotionState(transformationMatrix);
+
+            var boxLocalInertia = triangleMeshShape.CalculateLocalInertia(0);
+            var bodyInfo = new RigidBodyConstructionInfo(0, motionState, triangleMeshShape, boxLocalInertia);
+            var rigidBody = new RigidBody(bodyInfo);
+            rigidBody.Friction = 0.4f;
+            rigidBody.RollingFriction = 1;
+            rigidBody.Restitution = 1f;
+
+            return rigidBody;
+        }
+
+        private RigidBody construirRigidBodyDeChildTriangleMeshShape(BvhTriangleMeshShape triangleMeshShape, TGCVector3 posicion, TGCVector3 escalado)
+        {
+            var transformationMatrix = TGCMatrix.RotationYawPitchRoll(0, 0, 0);
+            transformationMatrix.Origin = posicion;
+            DefaultMotionState motionState = new DefaultMotionState(transformationMatrix.ToBsMatrix);
+
+            var bulletShape = new ScaledBvhTriangleMeshShape(triangleMeshShape, escalado.ToBulletVector3());
+            var boxLocalInertia = bulletShape.CalculateLocalInertia(0);
+
+            var bodyInfo = new RigidBodyConstructionInfo(0, motionState, bulletShape, boxLocalInertia);
+            var rigidBody = new RigidBody(bodyInfo);
+            rigidBody.Friction = 0.4f;
+            rigidBody.RollingFriction = 1;
+            rigidBody.Restitution = 1f;
+
+            return rigidBody;
+        }
+
     }
 }
 
