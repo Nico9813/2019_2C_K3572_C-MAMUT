@@ -12,24 +12,50 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Examples.Camara;
+using TGC.Group.Model;
 
 namespace TGC.Group.Iluminacion
 {
 	class Linterna : Iluminador
 	{
-		private int DuracionBateria;
-		private int Bateria;
+		private float DuracionBateria;
+		private float BateriaConsumida;
 
 		public Linterna(TgcMesh mesh)
 		{
 			//Mesh para la luz
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.White;
+			DuracionBateria = 10;
+			BateriaConsumida = 0;
 			this.mesh = mesh;
 		}
 
-		public override void accion(Model.Personaje personaje, float elapsedTime) {
-			personaje.setIluminador(this);
+		public override void accion(Personaje personaje) {
+			if (BateriaConsumida < DuracionBateria)
+				personaje.setIluminador(this);
+			else
+				Console.WriteLine("La linterna se quedo sin bateria");
+		}
+
+		public override void update(Personaje personaje, float elapsedTime)
+		{
+			if (BateriaConsumida + elapsedTime <= DuracionBateria)
+			{
+				BateriaConsumida += elapsedTime;
+			}
+			else
+			{
+				personaje.quitarIluminacion();
+			}
+		}
+
+		public void recargarBateria() {
+			BateriaConsumida = 0;
+		}
+
+		public void vaciarBateria() {
+			BateriaConsumida = DuracionBateria;
 		}
 	}
 }

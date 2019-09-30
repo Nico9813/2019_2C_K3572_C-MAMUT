@@ -12,6 +12,7 @@ namespace TGC.Group.Model
 		public String descripcion;
 		public TgcMesh mesh;
 
-		public abstract void accion(Personaje personaje, float elapsedTime);
+		public abstract void accion(Personaje personaje);
+		public abstract void update(Personaje personaje, float elapsedTime);
 	}
 }

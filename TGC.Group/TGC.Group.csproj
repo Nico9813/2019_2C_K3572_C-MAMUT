@@ -106,10 +106,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Iluminacion\Bateria.cs" />
     <Compile Include="Iluminacion\SinLuz.cs" />
     <Compile Include="Iluminacion\Vela.cs" />
     <Compile Include="Iluminacion\Iluminador.cs" />
     <Compile Include="Iluminacion\Linterna.cs" />
+    <Compile Include="Model\HUD.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Pieza.cs" />
     <Compile Include="Model\Personaje.cs" />

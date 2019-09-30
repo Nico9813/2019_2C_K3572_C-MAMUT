@@ -19,7 +19,7 @@ namespace TGC.Group.Iluminacion
 		protected TGCBox lightMesh;
 		protected Color colorLuz;
 
-		public abstract override void accion(Personaje personaje, float elapsedTime);
+		public abstract override void accion(Personaje personaje);
 
 		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 camaraDir, TGCVector3 direccionLuz)
 		{

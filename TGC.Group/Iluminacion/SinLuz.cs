@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
+using TGC.Group.Model;
 
 namespace TGC.Group.Iluminacion
 {
@@ -17,9 +18,14 @@ namespace TGC.Group.Iluminacion
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.FromArgb(12, 12, 12);
 		}
-		public override void accion(Model.Personaje personaje,float elapsedTime)
+		public override void accion(Model.Personaje personaje)
 		{
 			personaje.setIluminador(this);
+		}
+
+		public override void update(Personaje personaje, float elapsedTime)
+		{
+
 		}
 	}
 }

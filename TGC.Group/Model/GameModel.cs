@@ -62,7 +62,7 @@ namespace TGC.Group.Model
 
 		private Quadtree quadtree;
 		private MamutCamara camaraInterna;
-		private Linterna linterna;
+		private Bateria bateria;
 
 		private Fisicas physicsExample;
 
@@ -111,7 +111,7 @@ namespace TGC.Group.Model
 			var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
 			foreach (var Mesh in sceneCabania.Meshes) {
                 Mesh.Move(-500, -50, 500);
-				Mesh.Scale = new TGCVector3(5f, 5f, 5f);
+				Mesh.Scale = new TGCVector3(6f, 6f, 6f);
                 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 				
@@ -150,9 +150,11 @@ namespace TGC.Group.Model
 			//Instancia de linterna
 			var scene4 = loader.loadSceneFromFile(MediaDir + "Canon.max-TgcScene.xml");
 			var Canon = scene4.Meshes[0];
-			linterna = new Linterna(Canon);
-			Items.Add(linterna);
+			bateria = new Bateria(Canon);
+			Items.Add(bateria);
 			MeshARenderizar.Add(Canon);
+
+			//Instancia de fogatas
 
 			//Instancia del quadTree (optimizacion)
             quadtree = new Quadtree();
@@ -161,6 +163,7 @@ namespace TGC.Group.Model
 			//Instancia de la camara (primera persona)
             camaraInterna = new MamutCamara(new TGCVector3(0,0,-1), 50, 50, Input);
             Camara = camaraInterna;
+
             
         }
 
