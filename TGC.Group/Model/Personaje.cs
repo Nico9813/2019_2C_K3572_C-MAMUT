@@ -26,6 +26,7 @@ namespace TGC.Group.Model
 		private float tiempoDesprotegido;
 		private HUD HUD;
 		private Boolean ilumnacionActiva;
+        private Boolean perdio;
 
 		public void Init(TgcMesh meshPersonaje) {
 			mesh = meshPersonaje;
@@ -50,8 +51,8 @@ namespace TGC.Group.Model
 			if (ilumnacionActiva == false)
 				tiempoDesprotegido += elapsedTime;
 
-			if(tiempoDesprotegido >= 5)
-				Console.WriteLine("Fin del juego");
+            if (tiempoDesprotegido >= 5)
+                this.perdio = true;
 
 			if (Input.keyPressed(Key.Tab))
 			{
@@ -95,5 +96,26 @@ namespace TGC.Group.Model
 		{
 			linterna.recargarBateria();
 		}
-	}
+        public List<Item> getItems()
+        {
+            return this.items;
+        }
+        public Item getItemSeleccionado()
+        {
+            return this.itemSelecionado;
+        }
+        public String getDescripcionesItems()
+        {
+            String descripciones = "";
+            foreach (var item in items)
+            {
+                descripciones = descripciones + item.getDescripcion() + "|";
+            }
+            return descripciones.TrimStart('|').TrimEnd('|');
+        }
+        public Boolean perdioJuego()
+        {
+            return this.perdio;
+        }
+    }
 }

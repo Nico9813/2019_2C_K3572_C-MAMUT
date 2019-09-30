@@ -76,6 +76,7 @@ namespace TGC.Group.Iluminacion
 			terreno.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(colorLuz));
 			terreno.Effect.SetValue("materialSpecularExp", 9f);
 		}
-	}
+     
+    }
 }
 

@@ -14,5 +14,13 @@ namespace TGC.Group.Model
 
 		public abstract void accion(Personaje personaje);
 		public abstract void update(Personaje personaje, float elapsedTime);
-	}
+        public String getDescripcion()
+        {
+            return this.descripcion;
+        }
+        public virtual String getDuracionRestante()
+        {
+            return " (1 uso)";
+        }
+    }
 }

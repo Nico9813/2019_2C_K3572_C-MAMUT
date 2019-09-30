@@ -22,7 +22,8 @@ namespace TGC.Group.Iluminacion
 			colorLuz = Color.Orange;
 			duracionVela = 5;
 			tiempoUsada = 0;
-		}
+            this.descripcion = "Vela";
+        }
 
 		public override void accion(Personaje personaje)
 		{
@@ -41,5 +42,9 @@ namespace TGC.Group.Iluminacion
 				personaje.removerItem(this);
 			}
 		}
-	}
+        public override string getDuracionRestante()
+        {
+            return "Duracion: " + Math.Truncate(duracionVela - tiempoUsada).ToString();
+        }
+    }
 }

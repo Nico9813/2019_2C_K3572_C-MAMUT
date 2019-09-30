@@ -66,6 +66,10 @@ namespace TGC.Group.Model
 
 		private Fisicas physicsExample;
 
+        private float giroMuerte;
+        private TgcMesh monstruo;
+        private TGCVector3 posPersonaje;
+
         public override void Init()
         {
             var loader = new TgcSceneLoader();
@@ -91,6 +95,7 @@ namespace TGC.Group.Model
 			terreno.loadTexture(pathTextura);
 			terreno.AlphaBlendEnable = true;
 
+           
 			//Instancio el piso
 			var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
 			Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
@@ -164,14 +169,20 @@ namespace TGC.Group.Model
             camaraInterna = new MamutCamara(new TGCVector3(0,0,-1), 50, 50, Input);
             Camara = camaraInterna;
 
+            giroMuerte = 0;
+            monstruo = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
+            monstruo.RotateY(FastMath.PI_HALF);
             
+
         }
 
 		public override void Update()
         {
             PreUpdate();
 			Personaje.Update(Input,ElapsedTime);
-			physicsExample.Update(Input);
+			physicsExample.Update(Input,monstruo);
+
+            
 
             if (Input.keyDown(Key.A))
             {
@@ -182,8 +193,19 @@ namespace TGC.Group.Model
             {
                 camaraInterna.rotateY(0.5f * 0.01f);
             }
+            if (Personaje.perdioJuego()) 
+            {
 
-			var colision = false;
+                camaraInterna.rotateY(FastMath.PI/180);
+                this.giroMuerte += 1f;
+                if (giroMuerte >= 180f)
+                {
+                    camaraInterna.RotationSpeed = 0;
+                    physicsExample.strength = 0;
+                    physicsExample.angle = 0;
+                }
+            }
+            var colision = false;
 			Item objetoColisionado = null;
 			foreach (var item in Items)
 			{
@@ -194,7 +216,8 @@ namespace TGC.Group.Model
 					objetoColisionado = item;
 					break;
 				}
-			}
+              
+            }
 
 			//Si hubo colision, restaurar la posicion anterior
 			if (colision)
@@ -210,27 +233,39 @@ namespace TGC.Group.Model
 
 			camaraInterna.Target = physicsExample.getPersonaje().Position;
 
+            
+
             PostUpdate();
         }
 
-		public override void Render()
-		{
-			PreRender();
+        public override void Render()
+        {
+            PreRender();
 
-			skyBox.Render();
+            skyBox.Render();
 
-			quadtree.render(Frustum, true);
+            quadtree.render(Frustum, true);
 
-			physicsExample.Render();
-			var direccionLuz =  physicsExample.getDirector();
+            physicsExample.Render();
+            var direccionLuz = physicsExample.getDirector();
 
-			Personaje.Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
+            Personaje.Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
+            
+            var desplazamiento = physicsExample.getDirector() * (180f);
+            monstruo.Position = new TGCVector3(camaraInterna.Position.X + desplazamiento.X, camaraInterna.Position.Y -60 + desplazamiento.Y, camaraInterna.Position.Z + desplazamiento.Z);
+            monstruo.Scale= new TGCVector3(0.8f, 0.8f, 0.8f);
+            monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X,camaraInterna.Position.Y , camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f,0.8f,0.8f));
+            if (giroMuerte >= 180)
+            {
+
+                monstruo.Render();
+            }
 
 			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
 			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
-
-			PostRender();
+            
+            PostRender();
         }
 
 
@@ -245,6 +280,7 @@ namespace TGC.Group.Model
             */
             skyBox.Dispose();
             physicsExample.Dispose();
+            monstruo.Dispose();
             //terreno.Dispose();
         }
     }

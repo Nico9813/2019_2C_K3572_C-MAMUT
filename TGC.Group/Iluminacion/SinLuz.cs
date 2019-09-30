@@ -27,5 +27,9 @@ namespace TGC.Group.Iluminacion
 		{
 
 		}
-	}
+        public override string getDuracionRestante()
+        {
+            return "";
+        }
+    }
 }

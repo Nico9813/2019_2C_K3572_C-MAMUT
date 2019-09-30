@@ -29,6 +29,7 @@ namespace TGC.Group.Iluminacion
 			DuracionBateria = 10;
 			BateriaConsumida = 0;
 			this.mesh = mesh;
+            this.descripcion = "Linterna";
 		}
 
 		public override void accion(Personaje personaje) {
@@ -57,5 +58,9 @@ namespace TGC.Group.Iluminacion
 		public void vaciarBateria() {
 			BateriaConsumida = DuracionBateria;
 		}
+        public override String getDuracionRestante()
+        {
+            return "Duracion: " + Math.Truncate(DuracionBateria - BateriaConsumida).ToString();
+        }
 	}
 }

@@ -43,6 +43,9 @@ namespace TGC.Examples.Physics.CubePhysic
         private TGCBox lightMesh;
 		private TGCVector3 director;
 
+        public float strength;
+        public float angle;
+
 		public void setPersonaje(TgcMesh personaje)
         {
             this.personaje = personaje;
@@ -82,6 +85,9 @@ namespace TGC.Examples.Physics.CubePhysic
             dynamicsWorld.Gravity = new TGCVector3(0, -100f, 0).ToBulletVector3();
 
             #endregion Configuracion Basica de World
+
+            strength = 12.30f;
+            angle = 0.5f;
 
             foreach (var mesh in meshes)
             {
@@ -123,14 +129,14 @@ namespace TGC.Examples.Physics.CubePhysic
 			director = new TGCVector3(0, 0, 1);
 		}
 
-        public void Update(TgcD3dInput input)
+        public void Update(TgcD3dInput input, TgcMesh monstruo)
         {
-            var strength = 12.30f;
+            
             dynamicsWorld.StepSimulation(1 / 60f, 100);
-            var angle = 0.5f;
+            
 
             #region Comportamiento
-
+            
             if (input.keyDown(Key.W))
             {
                 //Activa el comportamiento de la simulacion fisica para la capsula
@@ -153,6 +159,7 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angle * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
                 personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
                 personaje.RotateY(-angle * 0.01f);
+                monstruo.RotateY(-angle * 0.01f);
             }
 
             if (input.keyDown(Key.D))
@@ -161,8 +168,10 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(angle * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
                 personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
                 personaje.RotateY(angle * 0.01f);
+                monstruo.RotateY(angle * 0.01f);
             }
-
+            
+          
             #endregion Comportamiento
         }
 

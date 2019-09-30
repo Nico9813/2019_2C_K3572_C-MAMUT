@@ -145,12 +145,17 @@ namespace TGC.Examples.Camara
 		}
 		public void rotateY(float angle)
 		{
-			RotationY += angle;
+			RotationY += (angle * RotationSpeed);
 		}
 
         internal void RotateY(float v)
         {
             throw new NotImplementedException();
         }
+        public TGCVector3 getPosicion()
+        {
+            return this.position;
+        }
+        
     }
 }
