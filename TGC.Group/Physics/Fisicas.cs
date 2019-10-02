@@ -121,12 +121,12 @@ namespace TGC.Examples.Physics.CubePhysic
             //Se crea el cuerpo rígido de la caja, en la definicio de CreateBox el ultimo parametro representa si se quiere o no
             //calcular el momento de inercia del cuerpo. No calcularlo lo que va a hacer es que la caja que representa el personaje
             //no rote cuando colicione contra el mundo.
-            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(100,50,-1000) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
-            personajeBody.Restitution = 0;
+            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(-4000,50,532) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
+			personajeBody.Restitution = 0;
             personajeBody.Gravity = new TGCVector3(0, -100, 0).ToBulletVector3();
             dynamicsWorld.AddRigidBody(personajeBody);
 
-			director = new TGCVector3(0, 0, 1);
+			director = new TGCVector3(-1, 0, 0);
 		}
 
         public void Update(TgcD3dInput input, TgcMesh monstruo)

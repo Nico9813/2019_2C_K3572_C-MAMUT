@@ -22,5 +22,7 @@ namespace TGC.Group.Model
         {
             return " (1 uso)";
         }
-    }
+
+		internal abstract void desactivar(Personaje personaje);
+	}
 }

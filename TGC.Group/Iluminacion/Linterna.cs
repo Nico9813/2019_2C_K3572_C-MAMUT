@@ -38,6 +38,10 @@ namespace TGC.Group.Iluminacion
 			else
 				Console.WriteLine("La linterna se quedo sin bateria");
 		}
+		internal override void desactivar(Personaje personaje)
+		{
+			personaje.quitarIluminacion();
+		}
 
 		public override void update(Personaje personaje, float elapsedTime)
 		{

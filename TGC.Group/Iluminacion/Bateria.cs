@@ -18,10 +18,15 @@ namespace TGC.Group.Iluminacion
 		public override void accion(Personaje personaje)
 		{
 			personaje.agregarBateria();
+			personaje.itemSelecionado = new SinLuz();
 			personaje.removerItem(this);
 		}
 
 		public override void update(Personaje personaje, float elapsedTime)
+		{
+		}
+
+		internal override void desactivar(Personaje personaje)
 		{
 		}
 	}

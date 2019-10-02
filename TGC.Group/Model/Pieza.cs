@@ -11,5 +11,7 @@ namespace TGC.Group.Model
 	{
 		public String descripcion;
 		public TgcMesh mesh;
+
+		public String getDescripcion() { return descripcion; }
 	}
 }

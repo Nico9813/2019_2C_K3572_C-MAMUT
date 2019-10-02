@@ -21,7 +21,7 @@ namespace TGC.Group.Iluminacion
 
 		public abstract override void accion(Personaje personaje);
 
-		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 camaraDir, TGCVector3 direccionLuz)
+		public virtual void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 camaraDir, TGCVector3 direccionLuz)
 		{
 			foreach (var mesh in meshTotales)
 			{
@@ -76,7 +76,6 @@ namespace TGC.Group.Iluminacion
 			terreno.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(colorLuz));
 			terreno.Effect.SetValue("materialSpecularExp", 9f);
 		}
-     
-    }
+	}
 }
 

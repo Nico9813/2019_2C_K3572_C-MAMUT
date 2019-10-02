@@ -23,6 +23,7 @@ using TGC.Group.Iluminacion;
 //using TGC.Examples.UserControls.Modifier;
 //using TGC.Group.Iluminacion;
 
+
 namespace TGC.Group.Model
 {
 
@@ -51,7 +52,12 @@ namespace TGC.Group.Model
 		private List<Pieza> Piezas;
 		private List<TgcMesh> Objetos;
 		private List<TgcMesh> MeshARenderizar;
+
+		private List<Fogata> IluminacionEscenario;
+
 		private List<TgcMesh> MeshTotales;
+		private Boolean itemCerca = false;
+		Item objetoColisionado = null;
 
 		private TgcMesh MeshPlano;
 		private TgcMesh MeshLago;
@@ -63,6 +69,7 @@ namespace TGC.Group.Model
 		private Quadtree quadtree;
 		private MamutCamara camaraInterna;
 		private Bateria bateria;
+		private Vela vela;
 
 		private Fisicas physicsExample;
 
@@ -83,6 +90,7 @@ namespace TGC.Group.Model
 			Piezas = new List<Pieza>();
 			Objetos = new List<TgcMesh>();
 			MeshARenderizar = new List<TgcMesh>();
+			IluminacionEscenario = new List<Fogata>();
 
 			//Instancio el terreno (Heigthmap)
 			terreno = new TgcSimpleTerrain();
@@ -104,18 +112,25 @@ namespace TGC.Group.Model
 			MeshARenderizar.Add(MeshPlano);
 
 			//Instancio la vegetacion
-			/*var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
+			var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
+			var i = 0;
+			var ultimaPos = TGCVector3.Empty;
 			foreach (var Mesh in scene.Meshes)
 			{
-				Mesh.Scale = new TGCVector3(5, 5, 5);
+				Mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+				TGCVector3 nuevaPos = Mesh.Position + ultimaPos * FastMath.Pow(-1,i);
+				Mesh.Transform = TGCMatrix.Translation(nuevaPos);
+				Mesh.Move(nuevaPos);
 				Objetos.Add(Mesh);
 				MeshARenderizar.Add(Mesh);
-			}*/
+				i++;
+				ultimaPos = Mesh.Position;
+			}
 
 			//Instancio la Cabania
 			var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
 			foreach (var Mesh in sceneCabania.Meshes) {
-                Mesh.Move(-500, -50, 500);
+                Mesh.Move(-500, -20, 500);
 				Mesh.Scale = new TGCVector3(6f, 6f, 6f);
                 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
@@ -128,6 +143,8 @@ namespace TGC.Group.Model
 			MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 			Personaje = new Personaje();
 			Personaje.Init(MeshPersonaje);
+			Personaje.mesh.RotateY(-FastMath.PI_HALF);
+			Personaje.mesh.Transform = TGCMatrix.RotationY(-FastMath.PI_HALF);
 
 			//Instancia de skybox
 			skyBox = new TgcSkyBox();
@@ -145,35 +162,66 @@ namespace TGC.Group.Model
 
             skyBox.Init();
 
+			//Instancia de baterias
+			var scene4 = loader.loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
+			var BateriaMesh = scene4.Meshes[0];
+			BateriaMesh.Move(-3400,10,530);
+			BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+			BateriaMesh.Transform = TGCMatrix.Translation(-3400, 10, 530);
+			bateria = new Bateria(BateriaMesh);
+			Items.Add(bateria);
+			MeshARenderizar.Add(BateriaMesh);
+
+			//Instancia de velas
+			var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
+			var VelasMesh = scene5.Meshes[0];
+			VelasMesh.Move(-3400, 10, 400);
+			VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
+			VelasMesh.Transform = TGCMatrix.Translation(-3400, 10, 400);
+			vela = new Vela(VelasMesh);
+			Items.Add(vela);
+			MeshARenderizar.Add(VelasMesh);
+
+			//Instancia de fogatas
+			/*
+			var scene5 = loader.loadSceneFromFile(MediaDir + "Canon.max-TgcScene.xml");
+			var fogataMesh = scene5.Meshes[0];
+			Fogata fogata1 = new Fogata(Canon.createMeshInstance("Fogata1"), new TGCVector3(100, 70, -1000));
+			Fogata fogata2 = new Fogata(Canon.createMeshInstance("Fogata2"), new TGCVector3(0, 70, -350));
+			Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
+			Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
+			IluminacionEscenario.Add(fogata1);
+			IluminacionEscenario.Add(fogata2);
+			IluminacionEscenario.Add(fogata3);
+			IluminacionEscenario.Add(fogata4);
+			MeshARenderizar.Add(fogata1.mesh);
+			MeshARenderizar.Add(fogata2.mesh);
+			MeshARenderizar.Add(fogata3.mesh);
+			MeshARenderizar.Add(fogata4.mesh);
+			foreach (var fog in IluminacionEscenario) {
+				fog.mesh.Move(fog.getPosicion());
+				fog.mesh.Transform = TGCMatrix.Translation(fog.getPosicion());
+			}
+			*/
+
 			//Instancia de motor de fisica para colisiones con mesh y terreno
-            physicsExample = new Fisicas();
+			physicsExample = new Fisicas();
 			physicsExample.setTerrain(terreno);
 			physicsExample.setPersonaje(Personaje.mesh);
 			physicsExample.setBuildings(Objetos);
-            physicsExample.Init(MediaDir);
-
-			//Instancia de linterna
-			var scene4 = loader.loadSceneFromFile(MediaDir + "Canon.max-TgcScene.xml");
-			var Canon = scene4.Meshes[0];
-			bateria = new Bateria(Canon);
-			Items.Add(bateria);
-			MeshARenderizar.Add(Canon);
-
-			//Instancia de fogatas
+			physicsExample.Init(MediaDir);
 
 			//Instancia del quadTree (optimizacion)
-            quadtree = new Quadtree();
+			quadtree = new Quadtree();
             quadtree.create(MeshARenderizar, MeshPlano.BoundingBox);
 
 			//Instancia de la camara (primera persona)
             camaraInterna = new MamutCamara(new TGCVector3(0,0,-1), 50, 50, Input);
-            Camara = camaraInterna;
+			camaraInterna.rotateY(-FastMath.PI_HALF);
+			Camara = camaraInterna;
 
-            giroMuerte = 0;
+			giroMuerte = 0;
             monstruo = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
-            monstruo.RotateY(FastMath.PI_HALF);
-            
-
         }
 
 		public override void Update()
@@ -182,9 +230,10 @@ namespace TGC.Group.Model
 			Personaje.Update(Input,ElapsedTime);
 			physicsExample.Update(Input,monstruo);
 
-            
+			itemCerca = false;
+			objetoColisionado = null;
 
-            if (Input.keyDown(Key.A))
+			if (Input.keyDown(Key.A))
             {
                 camaraInterna.rotateY(-0.005f);
             }
@@ -205,35 +254,29 @@ namespace TGC.Group.Model
                     physicsExample.angle = 0;
                 }
             }
-            var colision = false;
-			Item objetoColisionado = null;
+	
 			foreach (var item in Items)
 			{
-				var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 150;
+				var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
 				if (result)
 				{
-					colision = true;
+					itemCerca = true;
 					objetoColisionado = item;
 					break;
 				}
-              
             }
 
-			//Si hubo colision, restaurar la posicion anterior
-			if (colision)
+			if (itemCerca)
 			{
 				if (Input.keyPressed(Key.E)){
 					MeshARenderizar.Remove(objetoColisionado.mesh);
+                    Items.Remove(objetoColisionado);
 					Personaje.agregarItem(objetoColisionado);
 					quadtree.actualizarModelos(MeshARenderizar);
 				}
 			}
 
-
-
 			camaraInterna.Target = physicsExample.getPersonaje().Position;
-
-            
 
             PostUpdate();
         }
@@ -242,22 +285,29 @@ namespace TGC.Group.Model
         {
             PreRender();
 
-            skyBox.Render();
+			if (itemCerca) DrawText.drawText("Presionar E para agarrar [" + objetoColisionado.getDescripcion() + "]", 700, 700, Color.Red);
+
+			skyBox.Render();
 
             quadtree.render(Frustum, true);
 
             physicsExample.Render();
             var direccionLuz = physicsExample.getDirector();
 
+			foreach (var iluminador in IluminacionEscenario) {
+				iluminador.Render(MeshARenderizar, terreno);
+			}
+
+			
             Personaje.Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
             
             var desplazamiento = physicsExample.getDirector() * (180f);
             monstruo.Position = new TGCVector3(camaraInterna.Position.X + desplazamiento.X, camaraInterna.Position.Y -60 + desplazamiento.Y, camaraInterna.Position.Z + desplazamiento.Z);
             monstruo.Scale= new TGCVector3(0.8f, 0.8f, 0.8f);
             monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X,camaraInterna.Position.Y , camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f,0.8f,0.8f));
-            if (giroMuerte >= 180)
-            {
 
+			if (giroMuerte >= 180)
+            {
                 monstruo.Render();
             }
 
@@ -283,6 +333,5 @@ namespace TGC.Group.Model
             monstruo.Dispose();
             //terreno.Dispose();
         }
-    }
+	}
 }
- 

@@ -21,12 +21,16 @@ namespace TGC.Group.Model
 		private List<Item> items;
 		private List<Pieza> piezas;
 		private Iluminador iluminadorPrincipal;
-		private Item itemSelecionado;
+		public Item itemSelecionado;
 		private Linterna linterna;
-		private float tiempoDesprotegido;
+		public float tiempoDesprotegido;
+		public float tiempoLimiteDesprotegido = 30;
 		private HUD HUD;
-		private Boolean ilumnacionActiva;
-        private Boolean perdio;
+		public Boolean ilumnacionActiva;
+		private Boolean objetoEquipado;
+        private Boolean perdio = false;
+		private Boolean itemSelecionadoActivo;
+		private Boolean inicio = false;
 
 		public void Init(TgcMesh meshPersonaje) {
 			mesh = meshPersonaje;
@@ -34,16 +38,17 @@ namespace TGC.Group.Model
 
 			HUD = new HUD();
 			linterna = new Linterna(null);
-			linterna.vaciarBateria();
+			//linterna.vaciarBateria();
 			items = new List<Item>();
 			piezas = new List<Pieza>();
 
-			items.Add(new SinLuz());
 			items.Add(linterna);
+			items.Add(new Vela(null));
 			itemSelecionado = items.ElementAt(0);
 
-			items.Add(new Vela());
+			objetoEquipado = false;
 			ilumnacionActiva = false;
+			itemSelecionadoActivo = false;
 		}
 
 		public void Update(TgcD3dInput Input,float elapsedTime)
@@ -51,16 +56,40 @@ namespace TGC.Group.Model
 			if (ilumnacionActiva == false)
 				tiempoDesprotegido += elapsedTime;
 
-            if (tiempoDesprotegido >= 5)
+            if (tiempoDesprotegido >= tiempoLimiteDesprotegido)
                 this.perdio = true;
 
 			if (Input.keyPressed(Key.Tab))
 			{
+				objetoEquipado = false;
 				var index = items.IndexOf(itemSelecionado);
 				itemSelecionado = items.ElementAtOrDefault((index + 1) % items.Count);
-				itemSelecionado.accion(this);
+				if (itemSelecionadoActivo)
+				{
+					itemSelecionado.desactivar(this);
+					objetoEquipado = true;
+					itemSelecionadoActivo = false;
+				}
 			}
-			itemSelecionado.update(this, elapsedTime);
+
+			if (Input.keyPressed(Key.F))
+			{
+				if (itemSelecionadoActivo)
+				{
+					itemSelecionado.desactivar(this);
+					objetoEquipado = true;
+					itemSelecionadoActivo = false;
+				}
+				else
+				{
+					itemSelecionado.accion(this);
+					objetoEquipado = true;
+					itemSelecionadoActivo = true;
+				}
+			}
+
+			if (objetoEquipado && itemSelecionadoActivo)
+				itemSelecionado.update(this, elapsedTime);
 
 		}
 
@@ -72,8 +101,11 @@ namespace TGC.Group.Model
 
 		internal void quitarIluminacion()
 		{
-			setIluminador(new SinLuz());
+			var sinLuz = new SinLuz();
+			setIluminador(sinLuz);
 			ilumnacionActiva = false;
+			itemSelecionadoActivo = false;
+			tiempoDesprotegido = 0;
 		}
 
 		public void setIluminador(Iluminador iluminador)
@@ -113,7 +145,17 @@ namespace TGC.Group.Model
             }
             return descripciones.TrimStart('|').TrimEnd('|');
         }
-        public Boolean perdioJuego()
+
+		public String getDescripcionPiezas()
+		{
+			String descripciones = "";
+			foreach (var item in piezas)
+			{
+				descripciones = descripciones + item.getDescripcion() + "|";
+			}
+			return descripciones.TrimStart('|').TrimEnd('|');
+		}
+		public Boolean perdioJuego()
         {
             return this.perdio;
         }

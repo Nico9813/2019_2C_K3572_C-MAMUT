@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 using TGC.Group.Model;
 
 namespace TGC.Group.Iluminacion
@@ -15,9 +16,10 @@ namespace TGC.Group.Iluminacion
 	{
 		public float duracionVela;
 		public float tiempoUsada;
-		public Vela()
+		public Vela(TgcMesh mesh)
 		{
 			//Mesh para la luz
+			this.mesh = mesh;
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.Orange;
 			duracionVela = 5;
@@ -29,6 +31,10 @@ namespace TGC.Group.Iluminacion
 		{
 			personaje.setIluminador(this);
 		}
+		internal override void desactivar(Personaje personaje)
+		{
+			personaje.quitarIluminacion();
+		}
 
 		public override void update(Personaje personaje, float elapsedTime)
 		{
@@ -39,6 +45,7 @@ namespace TGC.Group.Iluminacion
 			else
 			{
 				personaje.quitarIluminacion();
+				personaje.itemSelecionado = new SinLuz();
 				personaje.removerItem(this);
 			}
 		}
