@@ -21,7 +21,7 @@ namespace TGC.Group.Iluminacion
 		}
 		public override void accion(Model.Personaje personaje)
 		{
-			personaje.setIluminador(this);
+			personaje.setIluminador(this,false);
 		}
 
 		public override void update(Personaje personaje, float elapsedTime)

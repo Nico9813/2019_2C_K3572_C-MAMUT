@@ -33,10 +33,13 @@ namespace TGC.Group.Iluminacion
 		}
 
 		public override void accion(Personaje personaje) {
-			if (BateriaConsumida < DuracionBateria)
-				personaje.setIluminador(this);
-			else
-				Console.WriteLine("La linterna se quedo sin bateria");
+            if (BateriaConsumida < DuracionBateria)
+            { 
+                personaje.setIluminador(this, true);
+                
+            }
+            else
+            Console.WriteLine("La linterna se quedo sin bateria");
 		}
 		internal override void desactivar(Personaje personaje)
 		{

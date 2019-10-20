@@ -29,8 +29,9 @@ namespace TGC.Group.Iluminacion
 
 		public override void accion(Personaje personaje)
 		{
-			personaje.setIluminador(this);
-		}
+		personaje.setIluminador(this,true);
+        
+        }
 		internal override void desactivar(Personaje personaje)
 		{
 			personaje.quitarIluminacion();

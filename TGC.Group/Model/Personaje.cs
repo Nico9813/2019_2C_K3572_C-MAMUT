@@ -102,16 +102,16 @@ namespace TGC.Group.Model
 		internal void quitarIluminacion()
 		{
 			var sinLuz = new SinLuz();
-			setIluminador(sinLuz);
+			setIluminador(sinLuz,false);
 			ilumnacionActiva = false;
 			itemSelecionadoActivo = false;
-			tiempoDesprotegido = 0;
+			
 		}
 
-		public void setIluminador(Iluminador iluminador)
+		public void setIluminador(Iluminador iluminador, Boolean iluminacionAct)
 		{
 			iluminadorPrincipal = iluminador;
-			ilumnacionActiva = true;
+			ilumnacionActiva = iluminacionAct;
 		}
         public Iluminador getIluminadorPrincipal()
         {

@@ -190,18 +190,18 @@ namespace TGC.Group.Model
 
 			//Instancia de fogatas
 			
-			var scene6 = loader.loadSceneFromFile(MediaDir + "Canon.max-TgcScene.xml");
+			var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
 			var fogataMesh = scene6.Meshes[0];
-			Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(100, 70, -1000));
-			//Fogata fogata2 = new Fogata(Canon.createMeshInstance("Fogata2"), new TGCVector3(0, 70, -350));
+			Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(100, 0, -1000));
+			Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(0, 0, -350));
 			//Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
 			//Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
 			IluminacionEscenario.Add(fogata1);
-			//IluminacionEscenario.Add(fogata2);
+			IluminacionEscenario.Add(fogata2);
 			//IluminacionEscenario.Add(fogata3);
 			//IluminacionEscenario.Add(fogata4);
 			meshFogatas.Add(fogata1.mesh);
-			//MeshARenderizar.Add(fogata2.mesh);
+			meshFogatas.Add(fogata2.mesh);
 			//MeshARenderizar.Add(fogata3.mesh);
 			//MeshARenderizar.Add(fogata4.mesh);
 			foreach (var fog in IluminacionEscenario) {
@@ -283,24 +283,31 @@ namespace TGC.Group.Model
 					quadtree.actualizarModelos(MeshARenderizar);
 				}
 			}
-
-            foreach (var meshFog in meshFogatas)
+            var fogatasLejos = 0;
+            foreach (var iluminador in IluminacionEscenario)
             {
-                var result = FastMath.Sqrt(TGCVector3.LengthSq(meshFog.Position - Personaje.mesh.Position)) < 300;
-                if (result)
+                var distancia = FastMath.Sqrt(TGCVector3.LengthSq(new TGCVector3(50,0,50) + iluminador.mesh.Position - Personaje.mesh.Position));//50 en xz es porque no esta centrada la hoguera
+                var dentroFogata = distancia < 300;
+                var entroFogata = distancia > 300 && distancia < 310;
+                if (entroFogata) Personaje.quitarIluminacion();
+                if (dentroFogata)
                 {
                     fogataCerca = true;
-                    turnoIluminacion = 1;
+                    turnoIluminacion = IluminacionEscenario.IndexOf(iluminador)+1;
                     Personaje.ilumnacionActiva = true;
+                    
                     break;
                 }
+
                 else
                 {
-                    turnoIluminacion = 0;
+                    fogatasLejos++;
+
                    
-                    break;
                 }
+                if (fogatasLejos == IluminacionEscenario.Count) turnoIluminacion = 0;
             }
+
 
             camaraInterna.Target = physicsExample.getPersonaje().Position;
 
@@ -319,12 +326,10 @@ namespace TGC.Group.Model
 
             physicsExample.Render();
             var direccionLuz = physicsExample.getDirector();
-            if (turnoIluminacion ==1)
+            if (turnoIluminacion != 0)
             {
-                foreach (var iluminador in IluminacionEscenario)
-                {
-                    iluminador.Render(MeshARenderizar, terreno);
-                }
+                    IluminacionEscenario[turnoIluminacion - 1].Render(MeshARenderizar, terreno);
+                
                
             }
             if (turnoIluminacion == 0)
