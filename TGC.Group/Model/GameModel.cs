@@ -79,7 +79,8 @@ namespace TGC.Group.Model
         private TgcMesh monstruo;
         private TGCVector3 posPersonaje;
         int turnoIluminacion;
-        
+        TgcBoundingAxisAlignBox cabaniaBoundingBox;
+
         public override void Init()
         {
             var loader = new TgcSceneLoader();
@@ -144,9 +145,11 @@ namespace TGC.Group.Model
 				Objetos.Add(Mesh);
 				MeshARenderizar.Add(Mesh);
 			}
+            cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, -5, 520), new TGCVector3(0, 1001, 1080));
+            
 
-			//Instancia del personaje
-			MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
+            //Instancia del personaje
+            MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 			Personaje = new Personaje();
 			Personaje.Init(MeshPersonaje);
 			Personaje.mesh.RotateY(-FastMath.PI_HALF);
@@ -308,6 +311,12 @@ namespace TGC.Group.Model
                 if (fogatasLejos == IluminacionEscenario.Count) turnoIluminacion = 0;
             }
 
+            //Cabania es lugar seguro
+            if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
+            {
+                Personaje.tiempoDesprotegido = 0;
+            }
+
 
             camaraInterna.Target = physicsExample.getPersonaje().Position;
 
@@ -359,7 +368,11 @@ namespace TGC.Group.Model
 			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
 			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
-            
+            DrawText.drawText("BoundingBoxPj" + Personaje.mesh.BoundingBox.ToString(), 5, 240, Color.GreenYellow);
+            DrawText.drawText("BoundingBoxPj" + cabaniaBoundingBox.ToString(), 5, 260, Color.GreenYellow);
+
+            cabaniaBoundingBox.Render();
+            Personaje.mesh.Render();
             PostRender();
         }
 
