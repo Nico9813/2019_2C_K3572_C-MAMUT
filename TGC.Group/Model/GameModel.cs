@@ -52,12 +52,14 @@ namespace TGC.Group.Model
 		private List<Pieza> Piezas;
 		private List<TgcMesh> Objetos;
 		private List<TgcMesh> MeshARenderizar;
+        private List<TgcMesh> meshFogatas;
 
 		private List<Fogata> IluminacionEscenario;
 
 		private List<TgcMesh> MeshTotales;
 		private Boolean itemCerca = false;
-		Item objetoColisionado = null;
+        private Boolean fogataCerca = false;
+        Item objetoColisionado = null;
 
 		private TgcMesh MeshPlano;
 		private TgcMesh MeshLago;
@@ -76,10 +78,13 @@ namespace TGC.Group.Model
         private float giroMuerte;
         private TgcMesh monstruo;
         private TGCVector3 posPersonaje;
-
+        int turnoIluminacion;
+        
         public override void Init()
         {
             var loader = new TgcSceneLoader();
+
+            turnoIluminacion = 0;
 
             BackgroundColor = Color.Black;
             var d3dDevice = D3DDevice.Instance.Device;
@@ -90,7 +95,8 @@ namespace TGC.Group.Model
 			Piezas = new List<Pieza>();
 			Objetos = new List<TgcMesh>();
 			MeshARenderizar = new List<TgcMesh>();
-			IluminacionEscenario = new List<Fogata>();
+            meshFogatas= new List<TgcMesh>();
+            IluminacionEscenario = new List<Fogata>();
 
 			//Instancio el terreno (Heigthmap)
 			terreno = new TgcSimpleTerrain();
@@ -130,7 +136,7 @@ namespace TGC.Group.Model
 			//Instancio la Cabania
 			var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
 			foreach (var Mesh in sceneCabania.Meshes) {
-                Mesh.Move(-500, -20, 500);
+                Mesh.Move(-500, -28, 500);
 				Mesh.Scale = new TGCVector3(6f, 6f, 6f);
                 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
@@ -183,26 +189,26 @@ namespace TGC.Group.Model
 			MeshARenderizar.Add(VelasMesh);
 
 			//Instancia de fogatas
-			/*
-			var scene5 = loader.loadSceneFromFile(MediaDir + "Canon.max-TgcScene.xml");
-			var fogataMesh = scene5.Meshes[0];
-			Fogata fogata1 = new Fogata(Canon.createMeshInstance("Fogata1"), new TGCVector3(100, 70, -1000));
-			Fogata fogata2 = new Fogata(Canon.createMeshInstance("Fogata2"), new TGCVector3(0, 70, -350));
-			Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
-			Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
+			
+			var scene6 = loader.loadSceneFromFile(MediaDir + "Canon.max-TgcScene.xml");
+			var fogataMesh = scene6.Meshes[0];
+			Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(100, 70, -1000));
+			//Fogata fogata2 = new Fogata(Canon.createMeshInstance("Fogata2"), new TGCVector3(0, 70, -350));
+			//Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
+			//Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
 			IluminacionEscenario.Add(fogata1);
-			IluminacionEscenario.Add(fogata2);
-			IluminacionEscenario.Add(fogata3);
-			IluminacionEscenario.Add(fogata4);
-			MeshARenderizar.Add(fogata1.mesh);
-			MeshARenderizar.Add(fogata2.mesh);
-			MeshARenderizar.Add(fogata3.mesh);
-			MeshARenderizar.Add(fogata4.mesh);
+			//IluminacionEscenario.Add(fogata2);
+			//IluminacionEscenario.Add(fogata3);
+			//IluminacionEscenario.Add(fogata4);
+			meshFogatas.Add(fogata1.mesh);
+			//MeshARenderizar.Add(fogata2.mesh);
+			//MeshARenderizar.Add(fogata3.mesh);
+			//MeshARenderizar.Add(fogata4.mesh);
 			foreach (var fog in IluminacionEscenario) {
 				fog.mesh.Move(fog.getPosicion());
 				fog.mesh.Transform = TGCMatrix.Translation(fog.getPosicion());
 			}
-			*/
+			
 
 			//Instancia de motor de fisica para colisiones con mesh y terreno
 			physicsExample = new Fisicas();
@@ -266,6 +272,8 @@ namespace TGC.Group.Model
 				}
             }
 
+            
+
 			if (itemCerca)
 			{
 				if (Input.keyPressed(Key.E)){
@@ -276,7 +284,25 @@ namespace TGC.Group.Model
 				}
 			}
 
-			camaraInterna.Target = physicsExample.getPersonaje().Position;
+            foreach (var meshFog in meshFogatas)
+            {
+                var result = FastMath.Sqrt(TGCVector3.LengthSq(meshFog.Position - Personaje.mesh.Position)) < 300;
+                if (result)
+                {
+                    fogataCerca = true;
+                    turnoIluminacion = 1;
+                    Personaje.ilumnacionActiva = true;
+                    break;
+                }
+                else
+                {
+                    turnoIluminacion = 0;
+                   
+                    break;
+                }
+            }
+
+            camaraInterna.Target = physicsExample.getPersonaje().Position;
 
             PostUpdate();
         }
@@ -293,13 +319,27 @@ namespace TGC.Group.Model
 
             physicsExample.Render();
             var direccionLuz = physicsExample.getDirector();
+            if (turnoIluminacion ==1)
+            {
+                foreach (var iluminador in IluminacionEscenario)
+                {
+                    iluminador.Render(MeshARenderizar, terreno);
+                }
+               
+            }
+            if (turnoIluminacion == 0)
+            {
+                Personaje.getIluminadorPrincipal().Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
+             
+            }
+           
 
-			foreach (var iluminador in IluminacionEscenario) {
-				iluminador.Render(MeshARenderizar, terreno);
-			}
+            foreach(TgcMesh meshFog in meshFogatas)
+            {
+                meshFog.Render();
+            }
 
-			
-            Personaje.Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
+            Personaje.Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz, turnoIluminacion);
             
             var desplazamiento = physicsExample.getDirector() * (180f);
             monstruo.Position = new TGCVector3(camaraInterna.Position.X + desplazamiento.X, camaraInterna.Position.Y -60 + desplazamiento.Y, camaraInterna.Position.Z + desplazamiento.Z);

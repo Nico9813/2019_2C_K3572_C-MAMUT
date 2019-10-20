@@ -24,7 +24,7 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 30;
+		public float tiempoLimiteDesprotegido = 15;
 		private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
@@ -93,10 +93,10 @@ namespace TGC.Group.Model
 
 		}
 
-		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 lookAt, TGCVector3 direccionLuz)
+		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 lookAt, TGCVector3 direccionLuz,int turnoIluminacion)
 		{
 			HUD.Render(this);
-			iluminadorPrincipal.Render(meshTotales, terreno, lookAt, direccionLuz);
+            
 		}
 
 		internal void quitarIluminacion()
@@ -113,6 +113,10 @@ namespace TGC.Group.Model
 			iluminadorPrincipal = iluminador;
 			ilumnacionActiva = true;
 		}
+        public Iluminador getIluminadorPrincipal()
+        {
+            return this.iluminadorPrincipal;
+        }
 
 		internal void agregarItem(Item objetoColisiano)
 		{

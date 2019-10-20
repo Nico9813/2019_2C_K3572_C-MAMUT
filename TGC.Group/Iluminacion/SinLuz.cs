@@ -16,7 +16,7 @@ namespace TGC.Group.Iluminacion
 		{
 			//Mesh para la luz
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
-			colorLuz = Color.FromArgb(12, 12, 12);
+			colorLuz = Color.FromArgb(3, 1, 4);
 			descripcion = "";
 		}
 		public override void accion(Model.Personaje personaje)
