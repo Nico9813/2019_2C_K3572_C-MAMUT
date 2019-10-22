@@ -50,9 +50,15 @@ namespace TGC.Group.Iluminacion
 				personaje.removerItem(this);
 			}
 		}
-        public override string getDuracionRestante()
-        {
-            return "Duracion: " + Math.Truncate(duracionVela - tiempoUsada).ToString();
-        }
-    }
+
+		public override float getDuracionTotal()
+		{
+			return duracionVela;
+		}
+
+		public override float getDuracionRestante()
+		{
+			return duracionVela - tiempoUsada;
+		}
+	}
 }

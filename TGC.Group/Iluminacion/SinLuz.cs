@@ -28,13 +28,19 @@ namespace TGC.Group.Iluminacion
 		{
 
 		}
-        public override string getDuracionRestante()
-        {
-            return "";
-        }
 
 		internal override void desactivar(Personaje personaje)
 		{
+		}
+
+		public override float getDuracionTotal()
+		{
+			return 1;
+		}
+
+		public override float getDuracionRestante()
+		{
+			return 1;
 		}
 	}
 }

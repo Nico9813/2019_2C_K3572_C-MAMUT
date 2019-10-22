@@ -20,7 +20,8 @@ namespace TGC.Group.Iluminacion
 		protected Color colorLuz;
 
 		public abstract override void accion(Personaje personaje);
-
+		public abstract float getDuracionRestante();
+		public abstract float getDuracionTotal();
 		public virtual void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 camaraDir, TGCVector3 direccionLuz)
 		{
 			foreach (var mesh in meshTotales)

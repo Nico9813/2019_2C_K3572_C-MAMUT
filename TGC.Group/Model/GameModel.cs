@@ -227,9 +227,6 @@ namespace TGC.Group.Model
 
 			giroMuerte = 0;
             monstruo = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
-
-            HUDBarras.Instance.Init(MediaDir);
-
         }
 
 		public override void Update()
@@ -364,8 +361,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
             Personaje.mesh.Render();
-
-            HUDBarras.Instance.Render();
 
 			PostRender();
 		}

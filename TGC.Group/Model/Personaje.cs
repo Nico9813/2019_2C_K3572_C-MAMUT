@@ -51,9 +51,8 @@ namespace TGC.Group.Model
 			itemSelecionadoActivo = false;
 		}
 
-		public void InitHUD(String media) {
-			//HUD = new HUD();
-			//HUD.Init(this,media);
+		public void InitHUD(String MediaDir) {
+			HUD.Instance.Init(MediaDir, this);
 		}
 
 		public void Update(TgcD3dInput Input,float elapsedTime)
@@ -97,11 +96,12 @@ namespace TGC.Group.Model
 			if (objetoEquipado && itemSelecionadoActivo)
 				itemSelecionado.update(this, elapsedTime);
 
+			HUD.Instance.Update();
 		}
 
 		public void Render(float ElapsedTime, TgcD3dInput input)
 		{
-			//HUD.Render(ElapsedTime, input);
+			HUD.Instance.Render();
 		}
 
 		internal void quitarIluminacion()
@@ -110,7 +110,6 @@ namespace TGC.Group.Model
 			setIluminador(sinLuz,false);
 			ilumnacionActiva = false;
 			itemSelecionadoActivo = false;
-			
 		}
 
 		public void setIluminador(Iluminador iluminador, Boolean iluminacionAct)

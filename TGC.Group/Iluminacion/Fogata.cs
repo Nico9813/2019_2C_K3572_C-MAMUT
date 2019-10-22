@@ -46,5 +46,15 @@ namespace TGC.Group.Iluminacion
 		{
 			throw new NotImplementedException();
 		}
+
+		public override float getDuracionRestante()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override float getDuracionTotal()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

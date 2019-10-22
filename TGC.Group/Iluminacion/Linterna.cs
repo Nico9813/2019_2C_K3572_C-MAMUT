@@ -65,9 +65,14 @@ namespace TGC.Group.Iluminacion
 		public void vaciarBateria() {
 			BateriaConsumida = DuracionBateria;
 		}
-        public override String getDuracionRestante()
-        {
-            return "Duracion: " + Math.Truncate(DuracionBateria - BateriaConsumida).ToString();
-        }
+
+		public override float getDuracionTotal()
+		{
+			return DuracionBateria;
+		}
+
+		public override float getDuracionRestante() {
+			return DuracionBateria - BateriaConsumida;
+		}
 	}
 }
