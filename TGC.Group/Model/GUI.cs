@@ -7,7 +7,7 @@ using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Examples.Camara;
-
+/*
 namespace TgcViewer.Utils.Gui
 {
     public enum tipoCursor
@@ -188,7 +188,7 @@ namespace TgcViewer.Utils.Gui
         public float delay_move0 = 0.5f;
 
         // Camara TGC
-        public TgcFpsCamera camera;
+       // public TgcFpsCamera camera;
 
         // Parametros srcoll automatico
         public float vel_scroll = 500;           // pixeles por segundo
@@ -1579,4 +1579,4 @@ namespace TgcViewer.Utils.Gui
             return rta;
         }
     }
-}
+}*/

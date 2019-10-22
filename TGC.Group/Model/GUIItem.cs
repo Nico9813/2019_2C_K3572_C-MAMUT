@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-
+/*
 namespace TgcViewer.Utils.Gui
 {
     // item generico, con soporte de texto, bitmap, etc
@@ -736,4 +736,4 @@ namespace TgcViewer.Utils.Gui
             }
         }
     }
-}
+}*/

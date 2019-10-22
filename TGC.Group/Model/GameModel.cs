@@ -21,7 +21,7 @@ using TGC.Examples.Physics.CubePhysic;
 using TGC.Group.Iluminacion;
 using TGC.Core.Interpolation;
 using Device = Microsoft.DirectX.Direct3D.Device;
-using TgcViewer.Utils.Gui;
+// using TgcViewer.Utils.Gui;
 using TGC.Core.Example;
 //using TGC.Examples.UserControls.Modifier;
 //using TGC.Group.Iluminacion;
@@ -227,6 +227,9 @@ namespace TGC.Group.Model
 
 			giroMuerte = 0;
             monstruo = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
+
+            HUDBarras.Instance.Init(MediaDir);
+
         }
 
 		public override void Update()
@@ -358,8 +361,11 @@ namespace TGC.Group.Model
 			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
 			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
+            DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
-			Personaje.mesh.Render();
+            Personaje.mesh.Render();
+
+            HUDBarras.Instance.Render();
 
 			PostRender();
 		}

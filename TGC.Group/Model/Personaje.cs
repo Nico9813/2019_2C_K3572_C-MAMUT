@@ -24,8 +24,8 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 150;
-		private HUD HUD;
+		public float tiempoLimiteDesprotegido = 15;
+		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
         private Boolean perdio = false;
@@ -52,14 +52,15 @@ namespace TGC.Group.Model
 		}
 
 		public void InitHUD(String media) {
-			HUD = new HUD();
-			HUD.Init(this,media);
+			//HUD = new HUD();
+			//HUD.Init(this,media);
 		}
 
 		public void Update(TgcD3dInput Input,float elapsedTime)
 		{
-			if (ilumnacionActiva == false)
-				tiempoDesprotegido += elapsedTime;
+            if (ilumnacionActiva == false)
+                tiempoDesprotegido += elapsedTime;
+            else tiempoDesprotegido = 0;
 
             if (tiempoDesprotegido >= tiempoLimiteDesprotegido)
                 this.perdio = true;
@@ -100,7 +101,7 @@ namespace TGC.Group.Model
 
 		public void Render(float ElapsedTime, TgcD3dInput input)
 		{
-			HUD.Render(ElapsedTime, input);
+			//HUD.Render(ElapsedTime, input);
 		}
 
 		internal void quitarIluminacion()

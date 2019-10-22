@@ -108,6 +108,7 @@
     <Compile Include="Iluminacion\Vela.cs" />
     <Compile Include="Iluminacion\Iluminador.cs" />
     <Compile Include="Iluminacion\Linterna.cs" />
+    <Compile Include="Model\HUDBarras.cs" />
     <Compile Include="Model\GUI.cs" />
     <Compile Include="Model\GUIItem.cs" />
     <Compile Include="Model\HUD.cs" />
@@ -121,6 +122,9 @@
     <Compile Include="Optimization\Quadtree\QuadtreeNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sprites\Drawer2D.cs" />
+    <Compile Include="Sprites\CustomSprite.cs" />
+    <Compile Include="Sprites\CustomBitmap.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Text;
-using TgcViewer.Utils.Gui;
-
+//using TgcViewer.Utils.Gui;
+/*
 namespace TGC.Group.Model
 {
 	class HUD
@@ -41,7 +41,7 @@ namespace TGC.Group.Model
 			GUIItem item = gui.InsertImage("transformers\\10.png", x0, y0, MediaDir);
 			item.image_centrada = false;
 			y0 += dy;
-			gui.InsertItem(new static_text(gui, "SCOUT", x0, y0, 400, 25));
+			//gui.InsertItem(new static_text(gui, "SCOUT", x0, y0, 400, 25));
 		}
 
         public void Render2(Personaje personaje) {
@@ -83,3 +83,4 @@ namespace TGC.Group.Model
 		}
 	}
 }
+*/
