@@ -91,10 +91,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camara\MamutCamara.cs" />
-    <Compile Include="Camara\TgcFpsCamera.cs" />
-    <Compile Include="Camara\TgcRotationalCamera.cs" />
-    <Compile Include="Camara\TgcSpringThirdPersonCamera.cs" />
-    <Compile Include="Camara\TgcThirdPersonCamera.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,6 +108,8 @@
     <Compile Include="Iluminacion\Vela.cs" />
     <Compile Include="Iluminacion\Iluminador.cs" />
     <Compile Include="Iluminacion\Linterna.cs" />
+    <Compile Include="Model\GUI.cs" />
+    <Compile Include="Model\GUIItem.cs" />
     <Compile Include="Model\HUD.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Pieza.cs" />
@@ -301,6 +299,7 @@
     <Content Include="Media\Textures\CMan020.jpg" />
     <Content Include="Media\Textures\defaultMat.jpg" />
     <Content Include="Media\Textures\drop-result.jpg" />
+    <Content Include="Media\Textures\efecto_alarma.png" />
     <Content Include="Media\Textures\Google Earth Snapshot.jpg" />
     <Content Include="Media\Textures\Grass low#1.jpg" />
     <Content Include="Media\Textures\Groundcover_Wood_Mix.jpg" />
@@ -342,6 +341,7 @@
     <Content Include="Media\Textures\[Metal_Rusted]1.jpg" />
     <Content Include="Media\Textures\[Metal_Seamed]1.jpg" />
     <Content Include="Media\Textures\_10.jpg" />
+    <Content Include="Shaders\PostProcess.fx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Downloads\tgc-viewer-2.3.1\tgc-viewer-2.3.1\TGC.Examples\TGC.Examples.csproj">

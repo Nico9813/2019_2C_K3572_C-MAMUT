@@ -24,7 +24,7 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 15;
+		public float tiempoLimiteDesprotegido = 150;
 		private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
@@ -36,11 +36,11 @@ namespace TGC.Group.Model
 			mesh = meshPersonaje;
 			iluminadorPrincipal = new SinLuz();
 
-			HUD = new HUD();
 			linterna = new Linterna(null);
 			//linterna.vaciarBateria();
 			items = new List<Item>();
 			piezas = new List<Pieza>();
+
 
 			items.Add(linterna);
 			items.Add(new Vela(null));
@@ -49,6 +49,11 @@ namespace TGC.Group.Model
 			objetoEquipado = false;
 			ilumnacionActiva = false;
 			itemSelecionadoActivo = false;
+		}
+
+		public void InitHUD(String media) {
+			HUD = new HUD();
+			HUD.Init(this,media);
 		}
 
 		public void Update(TgcD3dInput Input,float elapsedTime)
@@ -93,10 +98,9 @@ namespace TGC.Group.Model
 
 		}
 
-		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, TGCVector3 lookAt, TGCVector3 direccionLuz,int turnoIluminacion)
+		public void Render(float ElapsedTime, TgcD3dInput input)
 		{
-			HUD.Render(this);
-            
+			HUD.Render(ElapsedTime, input);
 		}
 
 		internal void quitarIluminacion()
@@ -160,8 +164,8 @@ namespace TGC.Group.Model
 			return descripciones.TrimStart('|').TrimEnd('|');
 		}
 		public Boolean perdioJuego()
-        {
-            return this.perdio;
-        }
-    }
+		{
+			return this.perdio;
+		}
+	}
 }

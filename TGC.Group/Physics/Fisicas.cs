@@ -27,11 +27,11 @@ namespace TGC.Examples.Physics.CubePhysic
         private BroadphaseInterface overlappingPairCache;
 
         private List<TgcMesh> meshes = new List<TgcMesh>();
-        
+
         private RigidBody floorBody;
 
         private TgcMesh personaje;
-        private RigidBody personajeBody;
+        public RigidBody personajeBody;
         private TGCVector3 fowardback;
         private TGCVector3 leftright;
 
@@ -41,12 +41,12 @@ namespace TGC.Examples.Physics.CubePhysic
         private float currentScaleY;
 
         private TGCBox lightMesh;
-		private TGCVector3 director;
+        private TGCVector3 director;
 
         public float strength;
         public float angle;
 
-		public void setPersonaje(TgcMesh personaje)
+        public void setPersonaje(TgcMesh personaje)
         {
             this.personaje = personaje;
         }
@@ -61,12 +61,12 @@ namespace TGC.Examples.Physics.CubePhysic
             this.meshes = meshes;
         }
 
-		public void setTerrain(TgcSimpleTerrain terreno)
-		{
-			this.terreno = terreno;
-		}
+        public void setTerrain(TgcSimpleTerrain terreno)
+        {
+            this.terreno = terreno;
+        }
 
-		public TGCVector3 getBodyPos()
+        public TGCVector3 getBodyPos()
         {
             return new TGCVector3(personajeBody.CenterOfMassPosition.X, personajeBody.CenterOfMassPosition.Y, personajeBody.CenterOfMassPosition.Z);
         }
@@ -86,7 +86,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
             #endregion Configuracion Basica de World
 
-            strength = 12.30f;
+            strength = 20f;
             angle = 0.5f;
 
             foreach (var mesh in meshes)
@@ -97,7 +97,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
                 //buildingbody.Translate(mesh.Position.ToBulletVector3());
                 dynamicsWorld.AddRigidBody(buildingbody);
-                
+
             }
 
             //Se crea un plano ya que esta escena tiene problemas
@@ -107,7 +107,7 @@ namespace TGC.Examples.Physics.CubePhysic
             var floorMotionState = new DefaultMotionState();
             var floorInfo = new RigidBodyConstructionInfo(0, floorMotionState, floorShape);
             floorBody = new RigidBody(floorInfo);
-            floorBody.Friction = 1;
+            floorBody.Friction = 0.5f;
             floorBody.RollingFriction = 1;
             floorBody.Restitution = 1f;
             floorBody.UserObject = "floorBody";
@@ -121,28 +121,41 @@ namespace TGC.Examples.Physics.CubePhysic
             //Se crea el cuerpo rígido de la caja, en la definicio de CreateBox el ultimo parametro representa si se quiere o no
             //calcular el momento de inercia del cuerpo. No calcularlo lo que va a hacer es que la caja que representa el personaje
             //no rote cuando colicione contra el mundo.
-            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(-4000,50,532) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
-			personajeBody.Restitution = 0;
+            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(-4000, 50, 532) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
+
             personajeBody.Gravity = new TGCVector3(0, -100, 0).ToBulletVector3();
+            personajeBody.SetDamping(0.3f, 0f);
+            personajeBody.Restitution = 0.1f;
+            personajeBody.Friction = 1;
+
+
             dynamicsWorld.AddRigidBody(personajeBody);
 
-			director = new TGCVector3(-1, 0, 0);
-		}
+            director = new TGCVector3(-1, 0, 0);
+        }
 
         public void Update(TgcD3dInput input, TgcMesh monstruo)
         {
-            
+
             dynamicsWorld.StepSimulation(1 / 60f, 100);
-            
+
 
             #region Comportamiento
-            
+
             if (input.keyDown(Key.W))
             {
                 //Activa el comportamiento de la simulacion fisica para la capsula
                 personajeBody.ActivationState = ActivationState.ActiveTag;
                 personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
                 personajeBody.ApplyCentralImpulse(-strength * director.ToBulletVector3());
+            }
+            if (input.keyUp(Key.W))
+            {
+                personajeBody.ActivationState = ActivationState.IslandSleeping;
+            }
+            if (input.keyUp(Key.S))
+            {
+                personajeBody.ActivationState = ActivationState.IslandSleeping;
             }
 
             if (input.keyDown(Key.S))
@@ -170,19 +183,19 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.RotateY(angle * 0.01f);
                 monstruo.RotateY(angle * 0.01f);
             }
-            
-          
+
+
             #endregion Comportamiento
         }
 
         public void Render()
         {
             //Se hace el transform a la posicion que devuelve el el Rigid Body del personaje
-            personaje.Position = new TGCVector3(personajeBody.CenterOfMassPosition.X, personajeBody.CenterOfMassPosition.Y -27, personajeBody.CenterOfMassPosition.Z);//-27 para que no toque el piso pero casi (para que toque el piso -30)
+            personaje.Position = new TGCVector3(personajeBody.CenterOfMassPosition.X, personajeBody.CenterOfMassPosition.Y - 27, personajeBody.CenterOfMassPosition.Z);//-27 para que no toque el piso pero casi (para que toque el piso -30)
             personaje.Transform = TGCMatrix.Translation(personajeBody.CenterOfMassPosition.X, personajeBody.CenterOfMassPosition.Y, personajeBody.CenterOfMassPosition.Z);
-            
+
             personaje.Render();
-            
+
             terreno.Render();
         }
 
@@ -204,18 +217,18 @@ namespace TGC.Examples.Physics.CubePhysic
             }
 
             personaje.Dispose();
-           
+
             terreno.Dispose();
-            
+
 
         }
 
-		public TGCVector3 getDirector()
-		{
-			return this.director;
-		}
+        public TGCVector3 getDirector()
+        {
+            return this.director;
+        }
 
-		public TGCVector3 getPositionPersonaje()
+        public TGCVector3 getPositionPersonaje()
         {
             return personaje.Position;
         }
@@ -267,4 +280,5 @@ namespace TGC.Examples.Physics.CubePhysic
 
     }
 }
+
 
