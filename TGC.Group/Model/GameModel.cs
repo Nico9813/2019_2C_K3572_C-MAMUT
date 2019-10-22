@@ -23,6 +23,7 @@ using TGC.Core.Interpolation;
 using Device = Microsoft.DirectX.Direct3D.Device;
 // using TgcViewer.Utils.Gui;
 using TGC.Core.Example;
+using TGC.Group.Sprites;
 //using TGC.Examples.UserControls.Modifier;
 //using TGC.Group.Iluminacion;
 
@@ -40,6 +41,9 @@ namespace TGC.Group.Model
         }
 
 		//private Linterna Linterna;
+		private Boolean Pausa = false;
+		private CustomSprite MenuPausa;
+
 		private TgcPlane Plano;
 		private Personaje Personaje;
 		private TgcMesh MeshPersonaje;
@@ -218,6 +222,16 @@ namespace TGC.Group.Model
 			physicsExample.setBuildings(Objetos);
 			physicsExample.Init(MediaDir);
 
+			//Instancio Menu pausa
+			var width = D3DDevice.Instance.Width;
+			var height = D3DDevice.Instance.Height;
+			MenuPausa = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\menuControles.png", D3DDevice.Instance.Device),
+				Position = new TGCVector2(width * 0.32f, height * 0.20f),
+				Scaling = new TGCVector2(0.6f,0.6f),
+			};
+
 			//Instancia del quadTree (optimizacion)
 			quadtree = new Quadtree();
             quadtree.create(MeshARenderizar, MeshPlano.BoundingBox);
@@ -233,22 +247,33 @@ namespace TGC.Group.Model
 
 		public override void Update()
         {
-            PreUpdate();
-			Personaje.Update(Input,ElapsedTime);
-			physicsExample.Update(Input,monstruo);
+			PreUpdate();
+
+			if (Pausa) ElapsedTime = 0;
+
+			if (!Pausa) {
+				physicsExample.Update(Input, monstruo);
+				Personaje.Update(Input, ElapsedTime);
+
+				if (Input.keyDown(Key.A))
+				{
+					camaraInterna.rotateY(-0.005f);
+				}
+
+				if (Input.keyDown(Key.D))
+				{
+					camaraInterna.rotateY(0.5f * 0.01f);
+				}
+			}
 
 			itemCerca = false;
 			objetoColisionado = null;
 
-			if (Input.keyDown(Key.A))
-            {
-                camaraInterna.rotateY(-0.005f);
-            }
+			if (Input.keyPressed(Key.Escape))
+			{
+				Pausa = !Pausa;
+			}
 
-            if (Input.keyDown(Key.D))
-            {
-                camaraInterna.rotateY(0.5f * 0.01f);
-            }
             if (Personaje.perdioJuego()) 
             {
 
@@ -294,7 +319,7 @@ namespace TGC.Group.Model
                 {
                     fogataCerca = true;
                     turnoIluminacion = IluminacionEscenario.IndexOf(iluminador)+1;
-                    Personaje.ilumnacionActiva = true;
+					Personaje.tiempoDesprotegido = 0;
                     
                     break;
                 }
@@ -339,7 +364,6 @@ namespace TGC.Group.Model
 				Personaje.getIluminadorPrincipal().Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
 			}
 
-
 			foreach (TgcMesh meshFog in meshFogatas)
 			{
 				meshFog.Render();
@@ -363,6 +387,13 @@ namespace TGC.Group.Model
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
             Personaje.mesh.Render();
+
+			if (Pausa) {
+				Drawer2D drawer = new Drawer2D();
+				drawer.BeginDrawSprite();
+				drawer.DrawSprite(MenuPausa);
+				drawer.EndDrawSprite();
+			}
 
 			PostRender();
 		}

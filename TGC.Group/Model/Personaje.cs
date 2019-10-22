@@ -46,6 +46,7 @@ namespace TGC.Group.Model
 			HUD.Instance.Init(mediaDir, this);
 			agregarItem(linterna);
 			agregarItem(new Vela(null, mediaDir + "\\2D\\imgVela.png"));
+			HUD.Instance.seleccionarItem(0);
 
 			objetoEquipado = false;
 			ilumnacionActiva = false;
@@ -78,7 +79,7 @@ namespace TGC.Group.Model
 				}
 			}
 
-			if (Input.keyPressed(Key.F))
+			if (Input.keyPressed(Key.R))
 			{
 				if (itemSelecionadoActivo)
 				{

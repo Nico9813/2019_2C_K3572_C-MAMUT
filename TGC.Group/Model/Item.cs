@@ -19,10 +19,6 @@ namespace TGC.Group.Model
         {
             return this.descripcion;
         }
-        public virtual String getDuracionRestante()
-        {
-            return " (1 uso)";
-        }
 
 		public String getRutaImagen() {
 			return rutaImagen;

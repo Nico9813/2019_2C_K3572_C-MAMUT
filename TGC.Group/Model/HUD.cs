@@ -35,6 +35,7 @@ namespace TGC.Group.Model
 		}
 		public void desasociarObjeto() {
 			libre = true;
+			spriteEspacioInventario.Color = Color.White;
 		}
 
 		public void seleccionar()
@@ -84,7 +85,7 @@ namespace TGC.Group.Model
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\BarraBateria.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.02f, height * 0.85f),
 				Scaling = new TGCVector2(0.5f, 0.5f),
-				Color = Color.Red,
+				Color = Color.DarkMagenta,
 
 			};
 
@@ -92,7 +93,8 @@ namespace TGC.Group.Model
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\Bateria.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.045f, height * 0.85f),
-				Scaling = new TGCVector2(0.5f,0.5f),
+				Scaling = new TGCVector2(0.5f, 0.5f),
+				Color = Color.DarkGoldenrod,
 			};
 
 			espaciosInventario = new List<EspacioObjeto>();
@@ -133,9 +135,9 @@ namespace TGC.Group.Model
 
 		public void seleccionarItem(int indiceItem)
 		{
-			espaciosInventario.ElementAt(indiceSelccionado).deseleccionar();
+			espaciosInventario.ForEach(espacio => espacio.deseleccionar());
 			indiceSelccionado = indiceItem;
-			espaciosInventario.ElementAt(indiceItem).seleccionar();
+			espaciosInventario.FindAll(espacioInventario => !espacioInventario.libre).ElementAt(indiceItem).seleccionar();
 		}
 
 		public void Update()
@@ -147,8 +149,10 @@ namespace TGC.Group.Model
 		public void Render()
 		{
 			drawer.BeginDrawSprite();
-			drawer.DrawSprite(RellenoBateria);
-			drawer.DrawSprite(BarraBateria);
+			if (personaje.ilumnacionActiva) {
+				drawer.DrawSprite(RellenoBateria);
+				drawer.DrawSprite(BarraBateria);
+			}
 			foreach(EspacioObjeto espacio in espaciosInventario) {
 				drawer.DrawSprite(espacio.spriteEspacioInventario);
 				if (!espacio.libre) {
