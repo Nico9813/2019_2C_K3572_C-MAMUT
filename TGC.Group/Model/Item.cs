@@ -10,6 +10,7 @@ namespace TGC.Group.Model
 	abstract class Item
 	{
 		public String descripcion;
+		public String rutaImagen;
 		public TgcMesh mesh;
 
 		public abstract void accion(Personaje personaje);
@@ -22,6 +23,10 @@ namespace TGC.Group.Model
         {
             return " (1 uso)";
         }
+
+		public String getRutaImagen() {
+			return rutaImagen;
+		}
 
 		internal abstract void desactivar(Personaje personaje);
 	}

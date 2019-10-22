@@ -16,7 +16,7 @@ namespace TGC.Group.Iluminacion
 	{
 		public float duracionVela;
 		public float tiempoUsada;
-		public Vela(TgcMesh mesh)
+		public Vela(TgcMesh mesh, string rutaImagen)
 		{
 			//Mesh para la luz
 			this.mesh = mesh;
@@ -25,6 +25,7 @@ namespace TGC.Group.Iluminacion
 			duracionVela = 5;
 			tiempoUsada = 0;
             this.descripcion = "Vela";
+			this.rutaImagen = rutaImagen;
         }
 
 		public override void accion(Personaje personaje)

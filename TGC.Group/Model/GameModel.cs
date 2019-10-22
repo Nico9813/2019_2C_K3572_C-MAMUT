@@ -148,8 +148,7 @@ namespace TGC.Group.Model
             //Instancia del personaje
             MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 			Personaje = new Personaje();
-			Personaje.Init(MeshPersonaje);
-			Personaje.InitHUD(MediaDir);
+			Personaje.Init(MeshPersonaje, MediaDir);
 			Personaje.mesh.RotateY(-FastMath.PI_HALF);
 			Personaje.mesh.Transform = TGCMatrix.RotationY(-FastMath.PI_HALF);
 
@@ -169,13 +168,15 @@ namespace TGC.Group.Model
 
             skyBox.Init();
 
+			String rutaImagen;
 			//Instancia de baterias
 			var scene4 = loader.loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
 			var BateriaMesh = scene4.Meshes[0];
 			BateriaMesh.Move(-3400,10,530);
 			BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
 			BateriaMesh.Transform = TGCMatrix.Translation(-3400, 10, 530);
-			bateria = new Bateria(BateriaMesh);
+			rutaImagen = MediaDir + "\\2D\\imgBateria.png";
+			bateria = new Bateria(BateriaMesh,rutaImagen);
 			Items.Add(bateria);
 			MeshARenderizar.Add(BateriaMesh);
 
@@ -185,7 +186,8 @@ namespace TGC.Group.Model
 			VelasMesh.Move(-3400, 10, 400);
 			VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
 			VelasMesh.Transform = TGCMatrix.Translation(-3400, 10, 400);
-			vela = new Vela(VelasMesh);
+			rutaImagen = MediaDir + "\\2D\\imgVela.png";
+			vela = new Vela(VelasMesh, rutaImagen);
 			Items.Add(vela);
 			MeshARenderizar.Add(VelasMesh);
 

@@ -21,7 +21,7 @@ namespace TGC.Group.Iluminacion
 		private float DuracionBateria;
 		private float BateriaConsumida;
 
-		public Linterna(TgcMesh mesh)
+		public Linterna(TgcMesh mesh, string v)
 		{
 			//Mesh para la luz
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
@@ -30,6 +30,7 @@ namespace TGC.Group.Iluminacion
 			BateriaConsumida = 0;
 			this.mesh = mesh;
             this.descripcion = "Linterna";
+			this.rutaImagen = v;
 		}
 
 		public override void accion(Personaje personaje) {

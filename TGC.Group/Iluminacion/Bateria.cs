@@ -10,9 +10,10 @@ namespace TGC.Group.Iluminacion
 {
 	class Bateria : Item
 	{
-        public Bateria(TgcMesh mesh) {
+        public Bateria(TgcMesh mesh, string rutaImagen) {
             this.mesh = mesh;
             this.descripcion = "Bateria";
+			this.rutaImagen = rutaImagen;
 		}
 
 		public override void accion(Personaje personaje)

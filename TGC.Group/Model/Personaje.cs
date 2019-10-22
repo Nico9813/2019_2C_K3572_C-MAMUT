@@ -17,6 +17,7 @@ namespace TGC.Group.Model
 {
 	class Personaje
 	{
+		String mediaDir;
 		public TgcMesh mesh;
 		private List<Item> items;
 		private List<Pieza> piezas;
@@ -32,27 +33,25 @@ namespace TGC.Group.Model
 		private Boolean itemSelecionadoActivo;
 		private Boolean inicio = false;
 
-		public void Init(TgcMesh meshPersonaje) {
+		public void Init(TgcMesh meshPersonaje, String MediaDir) {
 			mesh = meshPersonaje;
 			iluminadorPrincipal = new SinLuz();
+			mediaDir = MediaDir;
 
-			linterna = new Linterna(null);
 			//linterna.vaciarBateria();
 			items = new List<Item>();
 			piezas = new List<Pieza>();
+			linterna = new Linterna(null, mediaDir + "\\2D\\imgLinterna.png");
 
-
-			items.Add(linterna);
-			items.Add(new Vela(null));
-			itemSelecionado = items.ElementAt(0);
+			HUD.Instance.Init(mediaDir, this);
+			agregarItem(linterna);
+			agregarItem(new Vela(null, mediaDir + "\\2D\\imgVela.png"));
 
 			objetoEquipado = false;
 			ilumnacionActiva = false;
 			itemSelecionadoActivo = false;
-		}
 
-		public void InitHUD(String MediaDir) {
-			HUD.Instance.Init(MediaDir, this);
+			itemSelecionado = items.ElementAt(0);
 		}
 
 		public void Update(TgcD3dInput Input,float elapsedTime)
@@ -68,7 +67,9 @@ namespace TGC.Group.Model
 			{
 				objetoEquipado = false;
 				var index = items.IndexOf(itemSelecionado);
-				itemSelecionado = items.ElementAtOrDefault((index + 1) % items.Count);
+				var indiceObjeto = (index + 1) % items.Count;
+				itemSelecionado = items.ElementAtOrDefault(indiceObjeto);
+				HUD.Instance.seleccionarItem(indiceObjeto);
 				if (itemSelecionadoActivo)
 				{
 					itemSelecionado.desactivar(this);
@@ -125,11 +126,13 @@ namespace TGC.Group.Model
 		internal void agregarItem(Item objetoColisiano)
 		{
 			this.items.Add(objetoColisiano);
+			HUD.Instance.guardarItem(objetoColisiano);
 		}
 
 		internal void removerItem(Item item)
 		{
 			this.items.Remove(item);
+			HUD.Instance.removerItem(item);
 		}
 
 		internal void agregarBateria()
