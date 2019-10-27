@@ -343,6 +343,9 @@
     <Content Include="Media\Textures\[Metal_Seamed]1.jpg" />
     <Content Include="Media\Textures\_10.jpg" />
     <Content Include="Shaders\PostProcess.fx" />
+    <None Include="Shaders\Iluminacion.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Downloads\tgc-viewer-2.3.1\tgc-viewer-2.3.1\TGC.Examples\TGC.Examples.csproj">

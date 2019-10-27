@@ -24,6 +24,8 @@ using Device = Microsoft.DirectX.Direct3D.Device;
 // using TgcViewer.Utils.Gui;
 using TGC.Core.Example;
 using TGC.Group.Sprites;
+using Microsoft.DirectX;
+using Effect = Microsoft.DirectX.Direct3D.Effect;
 //using TGC.Examples.UserControls.Modifier;
 //using TGC.Group.Iluminacion;
 
@@ -80,12 +82,17 @@ namespace TGC.Group.Model
         private float giroMuerte;
         private TgcMesh monstruo;
         private TGCVector3 posPersonaje;
+        private Vector4[] FogatasPos;
         int turnoIluminacion;
         TgcBoundingAxisAlignBox cabaniaBoundingBox;
 
-		public override void Init()
+        private Effect effect;
+
+        public override void Init()
         {
             var loader = new TgcSceneLoader();
+
+            effect = TGCShaders.Instance.LoadEffect(ShadersDir + "Iluminacion.fx");
 
             turnoIluminacion = 0;
 
@@ -95,69 +102,72 @@ namespace TGC.Group.Model
             System.Windows.Forms.Cursor.Hide();
 
             Items = new List<Item>();
-			Piezas = new List<Pieza>();
-			Objetos = new List<TgcMesh>();
-			MeshARenderizar = new List<TgcMesh>();
-            meshFogatas= new List<TgcMesh>();
+            Piezas = new List<Pieza>();
+            Objetos = new List<TgcMesh>();
+            MeshARenderizar = new List<TgcMesh>();
+            meshFogatas = new List<TgcMesh>();
             IluminacionEscenario = new List<Fogata>();
 
-			//Instancio el terreno (Heigthmap)
-			terreno = new TgcSimpleTerrain();
-			var position = TGCVector3.Empty;
-			var pathTextura = MediaDir + "Textures\\Montes.jpg";
-			var pathHeighmap = MediaDir + "montanias.jpg";
-			currentScaleXZ = 100f;
-			currentScaleY = 3f;
-			terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -15, 0));
-			terreno.loadTexture(pathTextura);
-			terreno.AlphaBlendEnable = true;
+            //Instancio el terreno (Heigthmap)
+            terreno = new TgcSimpleTerrain();
+            var position = TGCVector3.Empty;
+            var pathTextura = MediaDir + "Textures\\Montes.jpg";
+            var pathHeighmap = MediaDir + "montanias.jpg";
+            currentScaleXZ = 100f;
+            currentScaleY = 3f;
+            terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -15, 0));
+            terreno.loadTexture(pathTextura);
+            terreno.AlphaBlendEnable = true;
 
-			//Instancio el piso
-			var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
-			Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
-			MeshPlano = Plano.toMesh("MeshPlano");
-			Objetos.Add(MeshPlano);
-			MeshARenderizar.Add(MeshPlano);
+            //Instancio el piso
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
+            Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
+            MeshPlano = Plano.toMesh("MeshPlano");
+            Objetos.Add(MeshPlano);
+           
+            MeshARenderizar.Add(MeshPlano);
 
-			//Instancio la vegetacion
-			var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
-			var i = 0;
-			var ultimaPos = TGCVector3.Empty;
-			foreach (var Mesh in scene.Meshes)
-			{
-				Mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
-				TGCVector3 nuevaPos = Mesh.Position + ultimaPos * FastMath.Pow(-1,i);
-				Mesh.Transform = TGCMatrix.Translation(nuevaPos);
-				Mesh.Move(nuevaPos);
-				Objetos.Add(Mesh);
-				MeshARenderizar.Add(Mesh);
-				i++;
-				ultimaPos = Mesh.Position;
-			}
+           
 
-			//Instancio la Cabania
-			var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
-			foreach (var Mesh in sceneCabania.Meshes) {
+            //Instancio la vegetacion
+            var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
+            var i = 0;
+            var ultimaPos = TGCVector3.Empty;
+            foreach (var Mesh in scene.Meshes)
+            {
+                Mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+                TGCVector3 nuevaPos = Mesh.Position + ultimaPos * FastMath.Pow(-1, i);
+                Mesh.Transform = TGCMatrix.Translation(nuevaPos);
+                Mesh.Move(nuevaPos);
+                Objetos.Add(Mesh);
+                MeshARenderizar.Add(Mesh);
+                i++;
+                ultimaPos = Mesh.Position;
+            }
+
+            //Instancio la Cabania
+            var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
+            foreach (var Mesh in sceneCabania.Meshes) {
                 Mesh.Move(-500, -28, 500);
-				Mesh.Scale = new TGCVector3(6f, 6f, 6f);
-                
+                Mesh.Scale = new TGCVector3(6f, 6f, 6f);
+
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
-				
-				Objetos.Add(Mesh);
-				MeshARenderizar.Add(Mesh);
-			}
+
+                Objetos.Add(Mesh);
+                MeshARenderizar.Add(Mesh);
+            }
             cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, -5, 520), new TGCVector3(0, 1001, 1080));
-            
+
 
             //Instancia del personaje
             MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
-			Personaje = new Personaje();
-			Personaje.Init(MeshPersonaje, MediaDir);
-			Personaje.mesh.RotateY(-FastMath.PI_HALF);
-			Personaje.mesh.Transform = TGCMatrix.RotationY(-FastMath.PI_HALF);
+            Personaje = new Personaje();
+            Personaje.Init(MeshPersonaje, MediaDir);
+            Personaje.mesh.RotateY(-FastMath.PI_HALF);
+            Personaje.mesh.Transform = TGCMatrix.RotationY(-FastMath.PI_HALF);
 
-			//Instancia de skybox
-			skyBox = new TgcSkyBox();
+            //Instancia de skybox
+            skyBox = new TgcSkyBox();
             skyBox.Center = TGCVector3.Empty;
             skyBox.Size = new TGCVector3(10000, 10000, 10000);
 
@@ -172,47 +182,52 @@ namespace TGC.Group.Model
 
             skyBox.Init();
 
-			String rutaImagen;
-			//Instancia de baterias
-			var scene4 = loader.loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
-			var BateriaMesh = scene4.Meshes[0];
-			BateriaMesh.Move(-3400,10,530);
-			BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
-			BateriaMesh.Transform = TGCMatrix.Translation(-3400, 10, 530);
-			rutaImagen = MediaDir + "\\2D\\imgBateria.png";
-			bateria = new Bateria(BateriaMesh,rutaImagen);
-			Items.Add(bateria);
-			MeshARenderizar.Add(BateriaMesh);
+            String rutaImagen;
+            //Instancia de baterias
+            var scene4 = loader.loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
+            var BateriaMesh = scene4.Meshes[0];
+            BateriaMesh.Move(-3400, 10, 530);
+            BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+            BateriaMesh.Transform = TGCMatrix.Translation(-3400, 10, 530);
+            rutaImagen = MediaDir + "\\2D\\imgBateria.png";
+            bateria = new Bateria(BateriaMesh, rutaImagen);
+            Items.Add(bateria);
+            MeshARenderizar.Add(BateriaMesh);
 
-			//Instancia de velas
-			var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
-			var VelasMesh = scene5.Meshes[0];
-			VelasMesh.Move(-3400, 10, 400);
-			VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
-			VelasMesh.Transform = TGCMatrix.Translation(-3400, 10, 400);
-			rutaImagen = MediaDir + "\\2D\\imgVela.png";
-			vela = new Vela(VelasMesh, rutaImagen);
-			Items.Add(vela);
-			MeshARenderizar.Add(VelasMesh);
+            //Instancia de velas
+            var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
+            var VelasMesh = scene5.Meshes[0];
+            VelasMesh.Move(-3400, 10, 400);
+            VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
+            VelasMesh.Transform = TGCMatrix.Translation(-3400, 10, 400);
+            rutaImagen = MediaDir + "\\2D\\imgVela.png";
+            vela = new Vela(VelasMesh, rutaImagen);
+            Items.Add(vela);
+            MeshARenderizar.Add(VelasMesh);
 
-			//Instancia de fogatas
-			var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
-			var fogataMesh = scene6.Meshes[0];
-			Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(100, 0, -1000));
-			Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(0, 0, -350));
-			//Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
-			//Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
-			IluminacionEscenario.Add(fogata1);
-			IluminacionEscenario.Add(fogata2);
-			//IluminacionEscenario.Add(fogata3);
-			//IluminacionEscenario.Add(fogata4);
-			meshFogatas.Add(fogata1.mesh);
-			meshFogatas.Add(fogata2.mesh);
-			//MeshARenderizar.Add(fogata3.mesh);
-			//MeshARenderizar.Add(fogata4.mesh);
-			foreach (var fog in IluminacionEscenario) {
+            //Instancia de fogatas
+            var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
+            var fogataMesh = scene6.Meshes[0];
+            Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(100, 0, -1000));
+            Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(0, 0, -350));
+            //Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
+            //Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
+            IluminacionEscenario.Add(fogata1);
+            IluminacionEscenario.Add(fogata2);
+            //IluminacionEscenario.Add(fogata3);
+            //IluminacionEscenario.Add(fogata4);
+            meshFogatas.Add(fogata1.mesh);
+            meshFogatas.Add(fogata2.mesh);
+            //MeshARenderizar.Add(fogata3.mesh);
+            //MeshARenderizar.Add(fogata4.mesh);
+            
+            int auxF = 0;
+            FogatasPos = new Vector4[meshFogatas.Count];
+            foreach (var fog in IluminacionEscenario) {
 				fog.mesh.Move(fog.getPosicion());
 				fog.mesh.Transform = TGCMatrix.Translation(fog.getPosicion());
+                FogatasPos[auxF] = new Vector4 (fog.getPosicion().X+50, fog.getPosicion().Y-55, fog.getPosicion().Z+50,1) ; //+50 en xz porque no esta centrada la hoguera -55 en y porque no se ilumina el piso sino
+                auxF++;
 			}
 
 			//Instancia de motor de fisica para colisiones con mesh y terreno
@@ -313,12 +328,11 @@ namespace TGC.Group.Model
             {
                 var distancia = FastMath.Sqrt(TGCVector3.LengthSq(new TGCVector3(50,0,50) + iluminador.mesh.Position - Personaje.mesh.Position));//50 en xz es porque no esta centrada la hoguera
                 var dentroFogata = distancia < 300;
-                var entroFogata = distancia > 300 && distancia < 310;
-                if (entroFogata) Personaje.quitarIluminacion();
+             
                 if (dentroFogata)
                 {
                     fogataCerca = true;
-                    turnoIluminacion = IluminacionEscenario.IndexOf(iluminador)+1;
+                    
 					Personaje.tiempoDesprotegido = 0;
                     
                     break;
@@ -328,7 +342,7 @@ namespace TGC.Group.Model
                 {
 					fogatasLejos++;
                 }
-                if (fogatasLejos == IluminacionEscenario.Count) turnoIluminacion = 0;
+               
             }
 
             //Cabania es lugar seguro
@@ -350,20 +364,65 @@ namespace TGC.Group.Model
 			if (itemCerca) DrawText.drawText("Presionar E para agarrar [" + objetoColisionado.getDescripcion() + "]", 700, 700, Color.Red);
 
 			skyBox.Render();
+            foreach (var mesh in MeshARenderizar)
+            {
+                mesh.Effect = effect;
 
-			quadtree.render(Frustum, true);
+                mesh.Technique = "Spotlight";
+
+            }
+            terreno.Effect = effect;
+            terreno.Technique = "Spotlight";
+            var direccionLuz = physicsExample.getDirector();
+
+            var desplazamientoLuz = direccionLuz;
+            desplazamientoLuz.Multiply(-1f);
+            var lightPos = camaraInterna.LookAt;
+            lightPos.Add(desplazamientoLuz);
+           
+            var lightDir = -direccionLuz;
+
+
+            foreach (var mesh in MeshARenderizar)
+            {
+                //Cargar variables shader de la luz FOGATA
+                mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
+                mesh.Effect.SetValue("lightPositionFog", FogatasPos);
+                
+                mesh.Effect.SetValue("lightIntensityFog", 50f);
+                mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
+                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
+
+                //Cargo variables Shader Linterna/Vela "SpotLight"
+                mesh.Effect.SetValue("lightColorPj", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+                //Cargar variables shader de la luz
+                mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
+                mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
+                mesh.Effect.SetValue("lightIntensityPj", 50f);
+                mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
+                mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(5));
+                mesh.Effect.SetValue("spotLightExponent", 17f);
+
+                //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+                mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+                mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+                mesh.Effect.SetValue("materialSpecularExp", 9f);
+            }
+            quadtree.render(Frustum, true);
 
 			physicsExample.Render();
-			var direccionLuz = physicsExample.getDirector();
-			if (turnoIluminacion != 0)
+			
+			/*if (turnoIluminacion != 0)
 			{
-				IluminacionEscenario[turnoIluminacion - 1].Render(MeshARenderizar, terreno);
+				IluminacionEscenario[turnoIluminacion - 1].Render(MeshARenderizar, terreno,ShadersDir);
 			}
 			if (turnoIluminacion == 0)
 			{
-				Personaje.getIluminadorPrincipal().Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz);
+				Personaje.getIluminadorPrincipal().Render(MeshARenderizar, terreno, camaraInterna.LookAt, direccionLuz,ShadersDir);
 			}
-
+            */
 			foreach (TgcMesh meshFog in meshFogatas)
 			{
 				meshFog.Render();

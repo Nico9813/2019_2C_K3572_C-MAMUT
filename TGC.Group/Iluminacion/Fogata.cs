@@ -33,10 +33,10 @@ namespace TGC.Group.Iluminacion
 		{
 			throw new NotImplementedException();
 		}
-		public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno) {
-			base.Render(meshTotales, terreno, new TGCVector3 (posicion.X +50 , posicion.Y +150, posicion.Z + 50), new TGCVector3(0, 1, 0)); //50 en xz es porque no esta centrada la hoguera
+		/*public void Render(List<TgcMesh> meshTotales, TgcSimpleTerrain terreno, string ShadersDir, List<TgcMesh> meshFogatas) {
+			base.Render(meshTotales, terreno, new TGCVector3 (posicion.X +50 , posicion.Y +150, posicion.Z + 50), new TGCVector3(0, 1, 0),ShadersDir,meshFogatas); //50 en xz es porque no esta centrada la hoguera
 		}
-
+        */
 		internal TGCVector3 getPosicion()
 		{
 			return posicion;
