@@ -25,13 +25,12 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 15;
+		public float tiempoLimiteDesprotegido = 150;
 		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
         private Boolean perdio = false;
 		private Boolean itemSelecionadoActivo;
-		private Boolean inicio = false;
 
 		public void Init(TgcMesh meshPersonaje, String MediaDir) {
 			mesh = meshPersonaje;
@@ -44,8 +43,12 @@ namespace TGC.Group.Model
 			linterna = new Linterna(null, mediaDir + "\\2D\\imgLinterna.png");
 
 			HUD.Instance.Init(mediaDir, this);
+			HUD.Instance.HUDpersonaje = true;
+			HUD.Instance.HUDpersonaje_piezas = true;
+
 			agregarItem(linterna);
 			agregarItem(new Vela(null, mediaDir + "\\2D\\imgVela.png"));
+			agregarItem(new Mapa(null, mediaDir + "\\2D\\MapaHud.png"));
 			HUD.Instance.seleccionarItem(0);
 
 			objetoEquipado = false;
@@ -69,11 +72,11 @@ namespace TGC.Group.Model
 				objetoEquipado = false;
 				var index = items.IndexOf(itemSelecionado);
 				var indiceObjeto = (index + 1) % items.Count;
+				itemSelecionado.desactivar(this);
 				itemSelecionado = items.ElementAtOrDefault(indiceObjeto);
 				HUD.Instance.seleccionarItem(indiceObjeto);
 				if (itemSelecionadoActivo)
 				{
-					itemSelecionado.desactivar(this);
 					objetoEquipado = true;
 					itemSelecionadoActivo = false;
 				}
@@ -124,10 +127,19 @@ namespace TGC.Group.Model
             return this.iluminadorPrincipal;
         }
 
-		internal void agregarItem(Item objetoColisiano)
+		internal void agregarRecolectable(Recolectable objetoColisiano)
 		{
-			this.items.Add(objetoColisiano);
-			HUD.Instance.guardarItem(objetoColisiano);
+			objetoColisiano.Agregarse(this);
+		}
+
+		public void agregarItem(Item item) {
+			this.items.Add(item);
+			HUD.Instance.guardarItem(item);
+		}
+
+		public void agregarPieza(Pieza pieza){
+			this.piezas.Add(pieza);
+			HUD.Instance.guardarPieza(pieza);
 		}
 
 		internal void removerItem(Item item)

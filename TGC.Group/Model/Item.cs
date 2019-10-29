@@ -7,21 +7,20 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-	abstract class Item
+	abstract class Item : Recolectable
 	{
 		public String descripcion;
-		public String rutaImagen;
-		public TgcMesh mesh;
 
 		public abstract void accion(Personaje personaje);
 		public abstract void update(Personaje personaje, float elapsedTime);
-        public String getDescripcion()
+        public override String getDescripcion()
         {
             return this.descripcion;
         }
 
-		public String getRutaImagen() {
-			return rutaImagen;
+		public override void Agregarse(Personaje personaje)
+		{
+			personaje.agregarItem(this);
 		}
 
 		internal abstract void desactivar(Personaje personaje);

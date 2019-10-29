@@ -108,6 +108,8 @@
     <Compile Include="Iluminacion\Vela.cs" />
     <Compile Include="Iluminacion\Iluminador.cs" />
     <Compile Include="Iluminacion\Linterna.cs" />
+    <Compile Include="Model\Recolectable.cs" />
+    <Compile Include="Model\Mapa.cs" />
     <Compile Include="Model\HUD.cs" />
     <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Pieza.cs" />

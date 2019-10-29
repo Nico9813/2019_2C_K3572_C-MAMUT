@@ -7,11 +7,21 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-	class Pieza
+	class Pieza : Recolectable
 	{
 		public String descripcion;
-		public TgcMesh mesh;
+		public int numeroPieza;
 
-		public String getDescripcion() { return descripcion; }
+		public Pieza(int np, String descrip, String imagen, String rutaMesh) {
+			numeroPieza = np;
+			descripcion = descrip;
+			rutaImagen = imagen;
+			mesh = (new TgcSceneLoader()).loadSceneFromFile(rutaMesh).Meshes[0];
+		}
+
+		public override String getDescripcion() { return descripcion; }
+		public override void Agregarse(Personaje personaje) {
+			personaje.agregarPieza(this);
+		}
 	}
 }
