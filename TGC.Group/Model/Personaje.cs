@@ -25,7 +25,7 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 150;
+		public float tiempoLimiteDesprotegido = 20;
 		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
@@ -183,5 +183,9 @@ namespace TGC.Group.Model
 		{
 			return this.perdio;
 		}
+        public Boolean estaEnPeligro()
+        {
+            return tiempoDesprotegido >= (0.8 * tiempoLimiteDesprotegido);
+        }
 	}
 }

@@ -81,6 +81,7 @@ namespace TGC.Group.Model
         TgcBoundingAxisAlignBox cabaniaBoundingBox;
 
         private Effect effect;
+        float time = 0;
 
         public override void Init()
         {
@@ -266,6 +267,7 @@ namespace TGC.Group.Model
 		public override void Update()
         {
 			PreUpdate();
+            time += ElapsedTime;
 
 			if (Pausa) ElapsedTime = 0;
 
@@ -350,6 +352,9 @@ namespace TGC.Group.Model
                
             }
 
+            this.effect.SetValue("time", time);
+
+
             //Cabania es lugar seguro
             if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
             {
@@ -358,6 +363,41 @@ namespace TGC.Group.Model
 
 
             camaraInterna.Target = physicsExample.getPersonaje().Position;
+            if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
+            {
+
+                foreach (var mesh in MeshARenderizar)
+                {
+                    mesh.Effect = effect;
+                    mesh.Technique = "Sepia";
+
+                }
+
+                terreno.Effect = effect;
+                terreno.Technique = "Sepia";
+
+                foreach (var mesh in meshFogatas)
+                {
+                    mesh.Effect = effect;
+                    mesh.Technique = "Sepia";
+
+                }
+            }
+            else 
+            {
+                foreach (var mesh in MeshARenderizar)
+                {
+                    mesh.Effect = effect;
+                    mesh.Technique = "Spotlight";
+
+                }
+
+                terreno.Effect = effect;
+                terreno.Technique = "Spotlight";
+            }
+            //Esto activarlo al estar en peligro
+         
+            
 
             PostUpdate();
         }
@@ -370,16 +410,12 @@ namespace TGC.Group.Model
 
 			skyBox.Render();
 
-            foreach (var mesh in MeshARenderizar)
-            {
-                mesh.Effect = effect;
-                mesh.Technique = "Spotlight";
+            
+               
+                ////////
+                ///
 
-            }
-
-            terreno.Effect = effect;
-            terreno.Technique = "Spotlight";
-            var direccionLuz = physicsExample.getDirector();
+                var direccionLuz = physicsExample.getDirector();
 
             var desplazamientoLuz = direccionLuz;
             desplazamientoLuz.Multiply(-1f);
@@ -416,6 +452,8 @@ namespace TGC.Group.Model
                 mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularExp", 9f);
+
+                
             }
             quadtree.render(Frustum, true);
 

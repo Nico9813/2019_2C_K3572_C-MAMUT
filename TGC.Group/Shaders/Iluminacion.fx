@@ -63,6 +63,8 @@ float3 spotLightDir; //Direccion del cono de luz
 float spotLightAngleCos; //Angulo de apertura del cono de luz (en radianes)
 float spotLightExponent; //Exponente de atenuacion dentro del cono de luz
 
+float time = 0;
+
 /**************************************************************************************/
 /* MultiDiffuseLightsTechnique  PARA LAS FOGATAS*/
 /**************************************************************************************/
@@ -177,7 +179,7 @@ struct VS_INPUT_DIFFUSE_MAP
 {
     float4 Position : POSITION0;
     float3 Normal : NORMAL0;
-    float4 Color : COLOR;
+    float4 Color : COLOR0;
     float2 Texcoord : TEXCOORD0;
 };
 
@@ -190,6 +192,7 @@ struct VS_OUTPUT_DIFFUSE_MAP
     float3 WorldNormal : TEXCOORD2;
     float3 LightVec : TEXCOORD3;
     float3 HalfAngleVec : TEXCOORD4;
+    float4 Color : COLOR0;
 };
 
 //Vertex Shader
@@ -219,6 +222,8 @@ VS_OUTPUT_DIFFUSE_MAP vs_DiffuseMap(VS_INPUT_DIFFUSE_MAP input)
 
 	//HalfAngleVec (H): vector de reflexion simplificado de Phong-Blinn (H = |V + L|). Usado en Specular
     output.HalfAngleVec = viewVector + output.LightVec;
+    //Propago el color x vertice
+    output.Color = input.Color;
 
     return output;
 }
@@ -295,3 +300,65 @@ technique Spotlight
 }
 
 
+VS_OUTPUT_DIFFUSE_MAP vs_Sepia(VS_INPUT_DIFFUSE_MAP input)
+{
+    VS_OUTPUT_DIFFUSE_MAP output;
+
+	//Proyectar posicion
+    output.Position = mul(input.Position, matWorldViewProj);
+    output.Position.y -=    5 * sin(10 * time) - 5 * cos(5*time);
+	//Enviar Texcoord directamente
+    output.Texcoord = input.Texcoord;
+
+	//Posicion pasada a World-Space (necesaria para atenuación por distancia)
+    output.WorldPosition = mul(input.Position, matWorld);
+
+	/* Pasar normal a World-Space
+	Solo queremos rotarla, no trasladarla ni escalarla.
+	Por eso usamos matInverseTransposeWorld en vez de matWorld */
+    output.WorldNormal = mul(input.Normal, matInverseTransposeWorld).xyz;
+
+	//LightVec (L): vector que va desde el vertice hacia la luz. Usado en Diffuse y Specular
+    output.LightVec = lightPositionPj.xyz - output.WorldPosition;
+
+	//ViewVec (V): vector que va desde el vertice hacia la camara.
+    float3 viewVector = eyePositionPj.xyz - output.WorldPosition;
+
+	//HalfAngleVec (H): vector de reflexion simplificado de Phong-Blinn (H = |V + L|). Usado en Specular
+    output.HalfAngleVec = viewVector + output.LightVec;
+
+
+	//Propago el color x vertice
+    output.Color = input.Color;
+
+    return output;
+}
+
+
+float4 ps_Sepia(PS_DIFFUSE_MAP input) : COLOR0
+{
+
+    float3 Nn = normalize(input.WorldNormal);
+    float3 diffuseLighting = (0.5,0.5,0.5);
+
+	//Diffuse 0
+    diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 0);
+
+	//Diffuse 1
+    diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 1);
+    float4 outputColor = tex2D(diffuseMap, input.Texcoord);
+    outputColor.r = outputColor.r * abs(sin(1.5*time));
+    outputColor.g *= 0.1;
+    outputColor.b *= 0.1;
+    outputColor.rgb *= diffuseLighting;
+    return outputColor;
+}
+
+technique Sepia
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_Sepia();
+        PixelShader = compile ps_3_0 ps_Sepia();
+    }
+}
