@@ -294,6 +294,7 @@ namespace TGC.Group.Model
 				Pausa = !Pausa;
 				HUD.Instance.MenuControles = !HUD.Instance.MenuControles;
 				HUD.Instance.HUDpersonaje = !HUD.Instance.HUDpersonaje;
+				HUD.Instance.HUDpersonaje_piezas = !HUD.Instance.HUDpersonaje_piezas;
 			}
 
             if (Personaje.perdioJuego()) 
@@ -395,9 +396,6 @@ namespace TGC.Group.Model
                 terreno.Effect = effect;
                 terreno.Technique = "Spotlight";
             }
-            //Esto activarlo al estar en peligro
-         
-            
 
             PostUpdate();
         }
@@ -406,16 +404,19 @@ namespace TGC.Group.Model
         {
 			PreRender();
 
-			if (itemCerca) DrawText.drawText("Presionar E para agarrar [" + objetoColisionado.getDescripcion() + "]", 700, 700, Color.Red);
+			if (itemCerca)
+			{
+				HUD.Instance.Mensaje = true;
+				HUD.Instance.MensajeRecolectable = objetoColisionado;
+			}
+			else {
+				HUD.Instance.Mensaje = false;
+			} 
+
 
 			skyBox.Render();
 
-            
-               
-                ////////
-                ///
-
-                var direccionLuz = physicsExample.getDirector();
+			var direccionLuz = physicsExample.getDirector();
 
             var desplazamientoLuz = direccionLuz;
             desplazamientoLuz.Multiply(-1f);

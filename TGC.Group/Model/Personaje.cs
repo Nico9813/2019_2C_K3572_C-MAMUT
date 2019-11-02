@@ -31,6 +31,7 @@ namespace TGC.Group.Model
 		private Boolean objetoEquipado;
         private Boolean perdio = false;
 		private Boolean itemSelecionadoActivo;
+		private TgcMesh meshEnMano = null;
 
 		public void Init(TgcMesh meshPersonaje, String MediaDir) {
 			mesh = meshPersonaje;
@@ -107,6 +108,13 @@ namespace TGC.Group.Model
 		public void Render(float ElapsedTime, TgcD3dInput input)
 		{
 			HUD.Instance.Render();
+			if (meshEnMano != null) {
+				meshEnMano.Render();
+			}
+		}
+
+		public void equiparMeshEnMano(TgcMesh mesh) {
+			meshEnMano = mesh;
 		}
 
 		internal void quitarIluminacion()

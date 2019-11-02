@@ -26,12 +26,15 @@ namespace TGC.Group.Model
 		private Personaje personaje;
 		private CustomSprite MenuControlesSprite;
 		private CustomSprite MapaPersonajeSprite;
+		private CustomSprite MensajeRecolectableSprite;
 
 		public bool MenuControles = false;
 		public bool MenuPausa = false;
 		public bool HUDpersonaje = false;
 		public bool HUDpersonaje_piezas = false;
 		public bool MapaPersonaje = false;
+		public bool Mensaje = false;
+		public Recolectable MensajeRecolectable;
 
 		private readonly static HUD instance = new HUD();
 
@@ -85,7 +88,11 @@ namespace TGC.Group.Model
 				Scaling = new TGCVector2(0.6f, 0.6f),
 			};
 
-
+			MensajeRecolectableSprite = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioMensaje.png", D3DDevice.Instance.Device),
+				Position = new TGCVector2(width * 0.35f, height * 0.70f),
+			};
 
 			espaciosInventario = new List<EspacioObjeto>();
 			espaciosPiezas = new List<EspacioObjeto>();
@@ -212,6 +219,16 @@ namespace TGC.Group.Model
 
 			if (MenuPausa) {
 
+			}
+
+			if (Mensaje) {
+				drawer.DrawSprite(MensajeRecolectableSprite);
+				CustomSprite imagenRecolectableColisionado = new CustomSprite
+				{
+					Bitmap = new CustomBitmap(MensajeRecolectable.getRutaImagen(), D3DDevice.Instance.Device),
+					Position = MensajeRecolectableSprite.Position ,
+				};
+				drawer.DrawSprite(imagenRecolectableColisionado);
 			}
 
 			drawer.EndDrawSprite();
