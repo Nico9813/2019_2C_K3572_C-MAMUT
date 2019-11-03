@@ -11,7 +11,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
-using TGC.Group.Iluminacion;
+using TGC.Group.Objetos;
 
 namespace TGC.Group.Model
 {

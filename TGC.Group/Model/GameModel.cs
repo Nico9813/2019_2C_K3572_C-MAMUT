@@ -18,7 +18,7 @@ using TGC.Core.Shaders;
 using TGC.Examples.Optimization.Quadtree;
 using BulletSharp;
 using TGC.Examples.Physics.CubePhysic;
-using TGC.Group.Iluminacion;
+using TGC.Group.Objetos;
 using TGC.Core.Interpolation;
 using Device = Microsoft.DirectX.Direct3D.Device;
 using TGC.Core.Example;
@@ -104,62 +104,37 @@ namespace TGC.Group.Model
             //Instancio el terreno (Heigthmap)
             terreno = new TgcSimpleTerrain();
             var position = TGCVector3.Empty;
-            var pathTextura = MediaDir + "Textures\\Montes.jpg";
-            var pathHeighmap = MediaDir + "montanias.jpg";
+            var pathTextura = MediaDir + "Textures\\2.png";
+            var pathHeighmap = MediaDir + "mapa1.jpg";
             currentScaleXZ = 100f;
             currentScaleY = 3f;
-            terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -15, 0));
+            terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -30, 0));
             terreno.loadTexture(pathTextura);
             terreno.AlphaBlendEnable = true;
 
             //Instancio el piso
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\Piso.jpg");
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\water2.jpg");
             Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
             MeshPlano = Plano.toMesh("MeshPlano");
             Objetos.Add(MeshPlano);
 			MeshARenderizar.Add(MeshPlano);
 
-			//Instancio el lago
-			var sceneLago = loader.loadSceneFromFile(MediaDir + "lagoo-TgcScene.xml");
-			foreach (var Mesh in sceneLago.Meshes)
-			{
-				TGCVector3 nuevaPos = Mesh.Position + new TGCVector3(-2500, 7, 200);
-				Mesh.Transform = TGCMatrix.Translation(nuevaPos);
-				Mesh.Scale = new TGCVector3(30f, 0.5f, 30f);
-				Mesh.Move(nuevaPos);
-				Objetos.Add(Mesh);
-				MeshARenderizar.Add(Mesh);
-			}
-
 			//Instancio la vegetacion
-			var scene = loader.loadSceneFromFile(MediaDir + @"vegetacion-TgcScene.xml");
-            var i = 0;
-            var ultimaPos = TGCVector3.Empty;
+			var scene = loader.loadSceneFromFile(MediaDir + @"Vegetacion-TgcScene.xml");
+			int i = 0;
+			List<TGCVector3> posicionesArboles = new List<TGCVector3>();
+
+			posicionesArboles.Add(new TGCVector3(1,1,1));
+
             foreach (var Mesh in scene.Meshes)
             {
                 Mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
-                TGCVector3 nuevaPos = Mesh.Position + ultimaPos * FastMath.Pow(-1, i);
-                Mesh.Transform = TGCMatrix.Translation(nuevaPos);
-                Mesh.Move(nuevaPos);
-                Objetos.Add(Mesh);
+				Mesh.Move(posicionesArboles[i]);
+				Mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
+				Objetos.Add(Mesh);
                 MeshARenderizar.Add(Mesh);
-                i++;
-                ultimaPos = Mesh.Position;
+				i++;
             }
-
-            //Instancio la Cabania
-            var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
-            foreach (var Mesh in sceneCabania.Meshes) {
-                Mesh.Move(-500, -28, 500);
-                Mesh.Scale = new TGCVector3(6f, 6f, 6f);
-
-                Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
-
-                Objetos.Add(Mesh);
-                MeshARenderizar.Add(Mesh);
-            }
-            cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, -5, 520), new TGCVector3(0, 1001, 1080));
-
 
             //Instancia del personaje
             MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
@@ -357,11 +332,12 @@ namespace TGC.Group.Model
 
 
             //Cabania es lugar seguro
+			/*
             if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
             {
                 Personaje.tiempoDesprotegido = 0;
             }
-
+			*/
 
             camaraInterna.Target = physicsExample.getPersonaje().Position;
             if (Personaje.estaEnPeligro())
@@ -428,7 +404,6 @@ namespace TGC.Group.Model
            
             var lightDir = -direccionLuz;
 
-
             foreach (var mesh in MeshARenderizar)
             {
                 //Cargar variables shader de la luz FOGATA
@@ -457,13 +432,13 @@ namespace TGC.Group.Model
                 mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularExp", 9f);
             }
-            //quadtree.render(Frustum, true);
+            quadtree.render(Frustum, true);
 
-			//physicsExample.Render();
+			physicsExample.Render();
 
 			foreach (TgcMesh meshFog in meshFogatas)
 			{
-				//meshFog.Render();
+				meshFog.Render();
 			}
 
 			var desplazamiento = physicsExample.getDirector() * (180f);
@@ -473,7 +448,7 @@ namespace TGC.Group.Model
 
 			if (giroMuerte >= 180)
 			{
-				//monstruo.Render();
+				monstruo.Render();
 			}
 
 			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
@@ -481,7 +456,7 @@ namespace TGC.Group.Model
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
-			//Personaje.Render(ElapsedTime, Input);
+			Personaje.Render(ElapsedTime, Input);
 
 			PostRender();
 		}

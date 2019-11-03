@@ -8,7 +8,7 @@ using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Group.Model;
 
-namespace TGC.Group.Iluminacion
+namespace TGC.Group.Objetos
 {
 	class SinLuz : Iluminador
 	{

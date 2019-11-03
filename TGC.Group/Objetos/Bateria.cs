@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model;
 
-namespace TGC.Group.Iluminacion
+namespace TGC.Group.Objetos
 {
 	class Bateria : Item
 	{

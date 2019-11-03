@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.SceneLoader;
+using TGC.Group.Model;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Objetos
 {
 	abstract class Item : Recolectable
 	{

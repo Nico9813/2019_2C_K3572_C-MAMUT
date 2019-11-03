@@ -10,6 +10,7 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Text;
 using TGC.Group.Sprites;
+using TGC.Group.Objetos;
 
 namespace TGC.Group.Model
 {

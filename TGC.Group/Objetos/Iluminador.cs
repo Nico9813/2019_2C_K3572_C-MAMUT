@@ -12,7 +12,7 @@ using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Group.Model;
 
-namespace TGC.Group.Iluminacion
+namespace TGC.Group.Objetos
 {
 	abstract class Iluminador : Item
 	{

@@ -102,17 +102,19 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Iluminacion\Bateria.cs" />
-    <Compile Include="Iluminacion\Fogata.cs" />
-    <Compile Include="Iluminacion\SinLuz.cs" />
-    <Compile Include="Iluminacion\Vela.cs" />
-    <Compile Include="Iluminacion\Iluminador.cs" />
-    <Compile Include="Iluminacion\Linterna.cs" />
-    <Compile Include="Model\Recolectable.cs" />
-    <Compile Include="Model\Mapa.cs" />
+    <Compile Include="Objetos\Bateria.cs" />
+    <Compile Include="Objetos\Fogata.cs" />
+    <Compile Include="Objetos\Iluminador.cs" />
+    <Compile Include="Objetos\SinLuz.cs" />
+    <Compile Include="Objetos\Vela.cs" />
+    <Compile Include="Objetos\Linterna.cs" />
+    <Compile Include="Model\MapaJuego.cs" />
+    <Compile Include="Model\Isla.cs" />
+    <Compile Include="Objetos\Recolectable.cs" />
+    <Compile Include="Objetos\Mapa.cs" />
     <Compile Include="Model\HUD.cs" />
-    <Compile Include="Model\Item.cs" />
-    <Compile Include="Model\Pieza.cs" />
+    <Compile Include="Objetos\Item.cs" />
+    <Compile Include="Objetos\Pieza.cs" />
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Physics\Fisicas.cs" />
     <Compile Include="Model\GameModel.cs" />

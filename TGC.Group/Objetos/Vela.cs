@@ -9,9 +9,8 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model;
 
-namespace TGC.Group.Iluminacion
+namespace TGC.Group.Objetos
 {
-
 	class Vela : Iluminador
 	{
 		public float duracionVela;

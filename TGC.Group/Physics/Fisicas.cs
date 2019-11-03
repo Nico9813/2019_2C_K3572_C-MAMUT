@@ -86,7 +86,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
             #endregion Configuracion Basica de World
 
-            strength = 20f;
+            strength = 30f;
             angle = 0.5f;
 
             foreach (var mesh in meshes)

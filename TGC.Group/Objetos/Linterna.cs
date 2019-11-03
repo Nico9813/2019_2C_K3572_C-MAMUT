@@ -14,7 +14,7 @@ using TGC.Core.Terrain;
 using TGC.Examples.Camara;
 using TGC.Group.Model;
 
-namespace TGC.Group.Iluminacion
+namespace TGC.Group.Objetos
 {
 	class Linterna : Iluminador
 	{

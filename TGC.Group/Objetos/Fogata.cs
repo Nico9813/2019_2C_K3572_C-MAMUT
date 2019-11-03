@@ -10,7 +10,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Terrain;
 using TGC.Group.Model;
 
-namespace TGC.Group.Iluminacion
+namespace TGC.Group.Objetos
 {
 	class Fogata : Iluminador
 	{
