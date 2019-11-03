@@ -196,5 +196,10 @@ namespace TGC.Examples.Optimization.Quadtree
 		{
 			this.modelos = meshARenderizar;
 		}
+
+		public void agregarModelo(TgcMesh meshARenderizar)
+		{
+			this.modelos.Add(meshARenderizar);
+		}
 	}
 }

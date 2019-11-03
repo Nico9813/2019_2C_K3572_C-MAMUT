@@ -31,7 +31,7 @@ namespace TGC.Group.Model
 		private Boolean objetoEquipado;
         private Boolean perdio = false;
 		private Boolean itemSelecionadoActivo;
-		private TgcMesh meshEnMano = null;
+		public TgcMesh meshEnMano = null;
 
 		public void Init(TgcMesh meshPersonaje, String MediaDir) {
 			mesh = meshPersonaje;
@@ -117,10 +117,12 @@ namespace TGC.Group.Model
 		public void Render(float ElapsedTime, TgcD3dInput input)
 		{
 			HUD.Instance.Render();
+			this.mesh.Render();
 			if (meshEnMano != null) {
 				
-				meshEnMano.Move(new TGCVector3(-3500, 50, 555));
-				meshEnMano.Transform = TGCMatrix.Translation(new TGCVector3(-3500, 50, 555));
+				meshEnMano.Move(new TGCVector3(-3500, 100, 555));
+				meshEnMano.Transform = TGCMatrix.Translation(new TGCVector3(-3500, 100, 555));
+				Console.WriteLine(meshEnMano.ToString());
 				meshEnMano.Render();
 			}
 		}

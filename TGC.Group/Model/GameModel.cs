@@ -200,7 +200,7 @@ namespace TGC.Group.Model
             MeshARenderizar.Add(BateriaMesh);
 
 			//Instancio piezas
-			for (var j = 0; j < 8; j++)
+			for (var j = 0; j < 9; j++)
 			{
 				rutaImagen = MediaDir + "\\2D\\windows\\windows_" + (j+1) + ".png";
 				var pieza = new Pieza(j, "Pieza" + j, rutaImagen, MediaDir + "Bateria-TgcScene.xml");
@@ -414,7 +414,7 @@ namespace TGC.Group.Model
 			}
 			else {
 				HUD.Instance.Mensaje = false;
-			} 
+			}
 
 
 			skyBox.Render();
@@ -456,19 +456,15 @@ namespace TGC.Group.Model
                 mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularExp", 9f);
-
-                
             }
-            quadtree.render(Frustum, true);
+            //quadtree.render(Frustum, true);
 
-			physicsExample.Render();
+			//physicsExample.Render();
 
 			foreach (TgcMesh meshFog in meshFogatas)
 			{
-				meshFog.Render();
+				//meshFog.Render();
 			}
-
-			Personaje.Render(ElapsedTime, Input);
 
 			var desplazamiento = physicsExample.getDirector() * (180f);
 			monstruo.Position = new TGCVector3(camaraInterna.Position.X + desplazamiento.X, camaraInterna.Position.Y - 60 + desplazamiento.Y, camaraInterna.Position.Z + desplazamiento.Z);
@@ -477,7 +473,7 @@ namespace TGC.Group.Model
 
 			if (giroMuerte >= 180)
 			{
-				monstruo.Render();
+				//monstruo.Render();
 			}
 
 			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
@@ -485,7 +481,7 @@ namespace TGC.Group.Model
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
-            Personaje.mesh.Render();
+			//Personaje.Render(ElapsedTime, Input);
 
 			PostRender();
 		}

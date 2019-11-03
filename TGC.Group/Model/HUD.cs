@@ -126,6 +126,7 @@ namespace TGC.Group.Model
 					{
 						Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioObjeto.png", D3DDevice.Instance.Device),
 						Position = new TGCVector2(x0, y0),
+						Scaling = new TGCVector2(1.2f, 1.2f),
 					};
 					espaciosPiezas.Add(new EspacioObjeto(spriteActual));
 				}
