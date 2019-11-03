@@ -124,8 +124,34 @@ namespace TGC.Group.Model
 			List<TGCVector3> posicionesArboles = new List<TGCVector3>();
 
 			posicionesArboles.Add(new TGCVector3(1,1,1));
+            posicionesArboles.Add(new TGCVector3(-3442, 1, -2736));
+            posicionesArboles.Add(new TGCVector3(-3689, 1, -3039));
+            posicionesArboles.Add(new TGCVector3(-3799, 1, -2719));
+            posicionesArboles.Add(new TGCVector3(-3417, 1, -2480));
+            posicionesArboles.Add(new TGCVector3(-2917, 1, -2433));
+            posicionesArboles.Add(new TGCVector3(-3668, 1, -2025));
+            posicionesArboles.Add(new TGCVector3(-3362, 1, -2009));
+            posicionesArboles.Add(new TGCVector3(-3451, 1, -3786));
+            posicionesArboles.Add(new TGCVector3(-4037, 1, -2329));
+            posicionesArboles.Add(new TGCVector3(-2885, 1, -1826));
+            posicionesArboles.Add(new TGCVector3(-4123, 1, -1581));
+            posicionesArboles.Add(new TGCVector3(-3289, 1, -909));
+            posicionesArboles.Add(new TGCVector3(-4261, 1, -435));
+            posicionesArboles.Add(new TGCVector3(-2883, 1, -655));
+            posicionesArboles.Add(new TGCVector3(-3352, 1, -1761));
+            posicionesArboles.Add(new TGCVector3(-3244, 1, -2394));
+            posicionesArboles.Add(new TGCVector3(-3978, 1, -2572));
+            posicionesArboles.Add(new TGCVector3(-3517, 1, -1982));
+            posicionesArboles.Add(new TGCVector3(-3118, 1, -1524));
+            posicionesArboles.Add(new TGCVector3(-3349, 1, -980));
+            posicionesArboles.Add(new TGCVector3(-4110, 1, -407));
+            posicionesArboles.Add(new TGCVector3(-3304, 1, -1774));
+            posicionesArboles.Add(new TGCVector3(-3139, 1, -1269));
+            posicionesArboles.Add(new TGCVector3(-2140, 1, -562));
+            posicionesArboles.Add(new TGCVector3(-4094, 1, -145));
 
-			for(var i = 0; i< scene.Meshes.Count && i<posicionesArboles.Count; i++)
+
+            for (var i = 0; i< scene.Meshes.Count && i<posicionesArboles.Count; i++)
             {
                 scene.Meshes[i].Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
 				scene.Meshes[i].Move(posicionesArboles[i]);
@@ -133,6 +159,46 @@ namespace TGC.Group.Model
 				Objetos.Add(scene.Meshes[i]);
                 MeshARenderizar.Add(scene.Meshes[i]);
 				i++;
+            }
+
+            //Instancio la Cabania
+            var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
+            foreach (var Mesh in sceneCabania.Meshes)
+            {
+                Mesh.Move(-500, 8, 500);
+                Mesh.Scale = new TGCVector3(4.5f, 4.5f, 4.5f);
+
+                Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
+
+                Objetos.Add(Mesh);
+                MeshARenderizar.Add(Mesh);
+            }
+            cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 8, 500), new TGCVector3(0, 1001, 1080));
+
+
+            var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
+            foreach (var Mesh in sceneBridge.Meshes)
+            {
+                Mesh.Move(-2561, 12, 159);
+                Mesh.Scale = new TGCVector3(4.5f, .75f, 1.35f);
+
+                Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
+
+                Objetos.Add(Mesh);
+                MeshARenderizar.Add(Mesh);
+            }
+
+
+            var sceneCanoa = loader.loadSceneFromFile(MediaDir + @"Canoa-TgcScene.xml");
+            foreach (var Mesh in sceneCanoa.Meshes)
+            {
+                Mesh.Move(-482, 20, -3110);
+                Mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+
+                Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
+
+                Objetos.Add(Mesh);
+                MeshARenderizar.Add(Mesh);
             }
 
             //Instancia del personaje
@@ -331,12 +397,12 @@ namespace TGC.Group.Model
 
 
             //Cabania es lugar seguro
-			/*
+			
             if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
             {
                 Personaje.tiempoDesprotegido = 0;
             }
-			*/
+			
 
             camaraInterna.Target = physicsExample.getPersonaje().Position;
             if (Personaje.estaEnPeligro())
@@ -411,8 +477,8 @@ namespace TGC.Group.Model
                 
                 mesh.Effect.SetValue("lightIntensityFog", 50f);
                 mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-                //mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
-				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
+				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
 
                 //Cargo variables Shader Linterna/Vela "SpotLight"
