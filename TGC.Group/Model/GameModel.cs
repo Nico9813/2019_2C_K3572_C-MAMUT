@@ -364,7 +364,7 @@ namespace TGC.Group.Model
 
 
             camaraInterna.Target = physicsExample.getPersonaje().Position;
-            if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
+            if (Personaje.estaEnPeligro())
             {
 
                 foreach (var mesh in MeshARenderizar)
@@ -373,6 +373,9 @@ namespace TGC.Group.Model
                     mesh.Technique = "Sepia";
 
                 }
+
+				monstruo.Effect = effect;
+				monstruo.Technique = "Sepia";
 
                 terreno.Effect = effect;
                 terreno.Technique = "Sepia";
@@ -434,8 +437,8 @@ namespace TGC.Group.Model
                 
                 mesh.Effect.SetValue("lightIntensityFog", 50f);
                 mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
-				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                //mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
 
                 //Cargo variables Shader Linterna/Vela "SpotLight"

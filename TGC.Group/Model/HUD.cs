@@ -155,15 +155,15 @@ namespace TGC.Group.Model
 
 		public void removerItem(Item item) {
 			EspacioObjeto espacioInventarioActual;
-			espacioInventarioActual = espaciosInventario.ElementAt(indiceSelccionado);
+			espacioInventarioActual = espaciosInventario.Find(espacio => espacio.itemGuardado.Equals(item));
 			espacioInventarioActual.desasociarObjeto();
 		}
 
-		public void seleccionarItem(int indiceItem)
+		public void seleccionarItem(Item item)
 		{
 			espaciosInventario.ForEach(espacio => espacio.deseleccionar());
-			indiceSelccionado = indiceItem;
-			espaciosInventario.FindAll(espacioInventario => !espacioInventario.libre).ElementAt(indiceItem).seleccionar();
+			//espaciosInventario.FindAll(espacioInventario => !espacioInventario.libre).ElementAt(indiceItem).seleccionar();
+			espaciosInventario.Find(espacio => espacio.itemGuardado.Equals(item)).seleccionar();
 		}
 
 		public void Update()

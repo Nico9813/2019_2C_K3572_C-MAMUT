@@ -38,19 +38,26 @@ namespace TGC.Group.Model
 			iluminadorPrincipal = new SinLuz();
 			mediaDir = MediaDir;
 
+			var loader = new TgcSceneLoader();
+			var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
+			var VelasMesh = scene5.Meshes[0];
+			VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
+
 			//linterna.vaciarBateria();
 			items = new List<Item>();
 			piezas = new List<Pieza>();
-			linterna = new Linterna(null, mediaDir + "\\2D\\imgLinterna.png");
+			linterna = new Linterna(VelasMesh, mediaDir + "\\2D\\imgLinterna.png");
 
 			HUD.Instance.Init(mediaDir, this);
 			HUD.Instance.HUDpersonaje = true;
 			HUD.Instance.HUDpersonaje_piezas = true;
 
+			
+
 			agregarItem(linterna);
-			agregarItem(new Vela(null, mediaDir + "\\2D\\imgVela.png"));
-			agregarItem(new Mapa(null, mediaDir + "\\2D\\MapaHud.png"));
-			HUD.Instance.seleccionarItem(0);
+			agregarItem(new Vela(VelasMesh, mediaDir + "\\2D\\imgVela.png"));
+			agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
+			HUD.Instance.seleccionarItem(linterna);
 
 			objetoEquipado = false;
 			ilumnacionActiva = false;
@@ -73,11 +80,13 @@ namespace TGC.Group.Model
 				objetoEquipado = false;
 				var index = items.IndexOf(itemSelecionado);
 				var indiceObjeto = (index + 1) % items.Count;
-				itemSelecionado.desactivar(this);
+				Item itemViejo = itemSelecionado;
 				itemSelecionado = items.ElementAtOrDefault(indiceObjeto);
-				HUD.Instance.seleccionarItem(indiceObjeto);
+				meshEnMano = itemSelecionado.mesh;
+				HUD.Instance.seleccionarItem(itemSelecionado);
 				if (itemSelecionadoActivo)
 				{
+					itemViejo.desactivar(this);
 					objetoEquipado = true;
 					itemSelecionadoActivo = false;
 				}
@@ -109,6 +118,9 @@ namespace TGC.Group.Model
 		{
 			HUD.Instance.Render();
 			if (meshEnMano != null) {
+				
+				meshEnMano.Move(new TGCVector3(-3500, 50, 555));
+				meshEnMano.Transform = TGCMatrix.Translation(new TGCVector3(-3500, 50, 555));
 				meshEnMano.Render();
 			}
 		}
@@ -193,7 +205,7 @@ namespace TGC.Group.Model
 		}
         public Boolean estaEnPeligro()
         {
-            return tiempoDesprotegido >= (0.8 * tiempoLimiteDesprotegido);
+            return tiempoDesprotegido >= (0.8f * tiempoLimiteDesprotegido);
         }
 	}
 }
