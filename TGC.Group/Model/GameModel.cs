@@ -121,18 +121,17 @@ namespace TGC.Group.Model
 
 			//Instancio la vegetacion
 			var scene = loader.loadSceneFromFile(MediaDir + @"Vegetacion-TgcScene.xml");
-			int i = 0;
 			List<TGCVector3> posicionesArboles = new List<TGCVector3>();
 
 			posicionesArboles.Add(new TGCVector3(1,1,1));
 
-            foreach (var Mesh in scene.Meshes)
+			for(var i = 0; i< scene.Meshes.Count && i<posicionesArboles.Count; i++)
             {
-                Mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
-				Mesh.Move(posicionesArboles[i]);
-				Mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
-				Objetos.Add(Mesh);
-                MeshARenderizar.Add(Mesh);
+                scene.Meshes[i].Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+				scene.Meshes[i].Move(posicionesArboles[i]);
+				scene.Meshes[i].Transform = TGCMatrix.Translation(posicionesArboles[i]);
+				Objetos.Add(scene.Meshes[i]);
+                MeshARenderizar.Add(scene.Meshes[i]);
 				i++;
             }
 
