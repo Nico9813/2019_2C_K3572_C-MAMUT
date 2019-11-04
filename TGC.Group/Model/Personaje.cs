@@ -21,16 +21,21 @@ namespace TGC.Group.Model
 		public TgcMesh mesh;
 		private List<Item> items;
 		private List<Pieza> piezas;
+		private List<Pista> pistas;
 		private Iluminador iluminadorPrincipal;
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 90000000000;
+		public float tiempoLimiteDesprotegido = 90;
 		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
-        private Boolean perdio = false;
+        private Boolean perdio;
 		private Boolean itemSelecionadoActivo;
+		private Boolean agendaActiva;
+
+		public int pistaActual;
+
 		public TgcMesh meshEnMano = null;
 
 		public void Init(TgcMesh meshPersonaje, String MediaDir) {
@@ -46,22 +51,29 @@ namespace TGC.Group.Model
 			//linterna.vaciarBateria();
 			items = new List<Item>();
 			piezas = new List<Pieza>();
+			pistas = new List<Pista>();
+
 			linterna = new Linterna(VelasMesh, mediaDir + "\\2D\\imgLinterna.png");
 
 			HUD.Instance.Init(mediaDir, this);
 			HUD.Instance.HUDpersonaje = true;
 			HUD.Instance.HUDpersonaje_piezas = true;
-
-			
+			HUD.Instance.Agenda = false;
 
 			agregarItem(linterna);
 			agregarItem(new Vela(VelasMesh, mediaDir + "\\2D\\imgVela.png"));
 			agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
+
+			pistas.Add(new Pista(mediaDir + "\\2D\\imgVela.png"));
+			pistas.Add(new Pista(mediaDir + "\\2D\\texto_inicial.png"));
+
 			HUD.Instance.seleccionarItem(linterna);
 
 			objetoEquipado = false;
 			ilumnacionActiva = false;
 			itemSelecionadoActivo = false;
+			agendaActiva = false;
+			perdio = false;
 
 			itemSelecionado = items.ElementAt(0);
 		}
@@ -106,6 +118,18 @@ namespace TGC.Group.Model
 					objetoEquipado = true;
 					itemSelecionadoActivo = true;
 				}
+			}
+
+			if (Input.keyPressed(Key.G) && pistas.Count != 0) {
+				agendaActiva = !agendaActiva;
+				HUD.Instance.Agenda = !HUD.Instance.Agenda;
+				HUD.Instance.paginaActual = pistas[0];
+				pistaActual = 0;
+			}
+
+			if (agendaActiva && Input.keyPressed(Key.Space)){
+				pistaActual = (pistaActual + 1) % pistas.Count;
+				HUD.Instance.paginaActual = pistas[pistaActual];
 			}
 
 			if (objetoEquipado && itemSelecionadoActivo)

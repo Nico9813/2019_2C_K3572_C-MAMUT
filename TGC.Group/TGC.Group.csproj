@@ -103,6 +103,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Objetos\Bateria.cs" />
+    <Compile Include="Objetos\Pista.cs" />
     <Compile Include="Objetos\Fogata.cs" />
     <Compile Include="Objetos\Iluminador.cs" />
     <Compile Include="Objetos\SinLuz.cs" />

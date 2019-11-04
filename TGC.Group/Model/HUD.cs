@@ -28,13 +28,19 @@ namespace TGC.Group.Model
 		private CustomSprite MenuControlesSprite;
 		private CustomSprite MapaPersonajeSprite;
 		private CustomSprite MensajeRecolectableSprite;
+		private CustomSprite AgendaSprite;
+		private CustomSprite paginaActualSprite;
+
+		public Pista paginaActual;
 
 		public bool MenuControles = false;
 		public bool MenuPausa = false;
 		public bool HUDpersonaje = false;
 		public bool HUDpersonaje_piezas = false;
 		public bool MapaPersonaje = false;
+		public bool Agenda = false;
 		public bool Mensaje = false;
+
 		public Recolectable MensajeRecolectable;
 
 		private readonly static HUD instance = new HUD();
@@ -85,7 +91,7 @@ namespace TGC.Group.Model
 			MapaPersonajeSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\mapa.png", D3DDevice.Instance.Device),
-				Position = new TGCVector2(width * 0.32f, height * 0.20f),
+				Position = new TGCVector2(width * 0.3f, height * 0.20f),
 				Scaling = new TGCVector2(0.6f, 0.6f),
 			};
 
@@ -93,6 +99,13 @@ namespace TGC.Group.Model
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioMensaje.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.35f, height * 0.70f),
+			};
+
+			AgendaSprite = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioPista.png", D3DDevice.Instance.Device),
+				Position = new TGCVector2(width * 0.3f, height * 0.2f),
+				Scaling = new TGCVector2(1.5f, 1.5f),
 			};
 
 			espaciosInventario = new List<EspacioObjeto>();
@@ -221,6 +234,17 @@ namespace TGC.Group.Model
 
 			if (MenuPausa) {
 
+			}
+
+			if (Agenda) {
+				drawer.DrawSprite(AgendaSprite);
+				paginaActualSprite = new CustomSprite
+				{
+					Bitmap = new CustomBitmap(paginaActual.rutaImagen, D3DDevice.Instance.Device),
+					Position = AgendaSprite.Position,
+					Scaling = new TGCVector2(1.5f, 1.5f),
+				};
+				drawer.DrawSprite(paginaActualSprite);
 			}
 
 			if (Mensaje) {

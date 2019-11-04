@@ -103,8 +103,7 @@ namespace TGC.Group.Model
 
             //Instancio el terreno (Heigthmap)
             terreno = new TgcSimpleTerrain();
-            var position = TGCVector3.Empty;
-            var pathTextura = MediaDir + "Textures\\2.png";
+            var pathTextura = MediaDir + "Textures\\mapa1.jpg";
             var pathHeighmap = MediaDir + "mapa1.jpg";
             currentScaleXZ = 100f;
             currentScaleY = 3f;
@@ -165,7 +164,7 @@ namespace TGC.Group.Model
             var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
             foreach (var Mesh in sceneCabania.Meshes)
             {
-                Mesh.Move(-500, 8, 500);
+                Mesh.Move(-500, 20, 500);
                 Mesh.Scale = new TGCVector3(4.5f, 4.5f, 4.5f);
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
@@ -173,8 +172,7 @@ namespace TGC.Group.Model
                 Objetos.Add(Mesh);
                 MeshARenderizar.Add(Mesh);
             }
-            cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 8, 500), new TGCVector3(0, 1001, 1080));
-
+            cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
 
             var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
             foreach (var Mesh in sceneBridge.Meshes)
@@ -262,8 +260,8 @@ namespace TGC.Group.Model
             //Instancia de fogatas
             var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
             var fogataMesh = scene6.Meshes[0];
-            Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(100, 0, -1000));
-            Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(0, 0, -350));
+            Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(-3500, 25, -3200));
+            Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(-4100, 20, 2900));
             //Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
             //Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
             IluminacionEscenario.Add(fogata1);
@@ -280,7 +278,7 @@ namespace TGC.Group.Model
             foreach (var fog in IluminacionEscenario) {
 				fog.mesh.Move(fog.getPosicion());
 				fog.mesh.Transform = TGCMatrix.Translation(fog.getPosicion());
-                FogatasPos[auxF] = new Vector4 (fog.getPosicion().X+50, fog.getPosicion().Y-55, fog.getPosicion().Z+50,1) ; //+50 en xz porque no esta centrada la hoguera -55 en y porque no se ilumina el piso sino
+                FogatasPos[auxF] = new Vector4 (fog.getPosicion().X+50, fog.getPosicion().Y + 55, fog.getPosicion().Z+50,1) ; //+50 en xz porque no esta centrada la hoguera -55 en y porque no se ilumina el piso sino
                 auxF++;
 			}
 
@@ -395,16 +393,14 @@ namespace TGC.Group.Model
 
             this.effect.SetValue("time", time);
 
-
             //Cabania es lugar seguro
 			
             if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
             {
                 Personaje.tiempoDesprotegido = 0;
             }
-			
 
-            camaraInterna.Target = physicsExample.getPersonaje().Position;
+			camaraInterna.Target = physicsExample.getPersonaje().Position;
             if (Personaje.estaEnPeligro())
             {
 
@@ -475,9 +471,9 @@ namespace TGC.Group.Model
                 mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
                 mesh.Effect.SetValue("lightPositionFog", FogatasPos);
                 
-                mesh.Effect.SetValue("lightIntensityFog", 50f);
+                mesh.Effect.SetValue("lightIntensityFog", 500f);
                 mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
 
@@ -487,17 +483,44 @@ namespace TGC.Group.Model
                 mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
                 mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                 mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
-                mesh.Effect.SetValue("lightIntensityPj", 50f);
+                mesh.Effect.SetValue("lightIntensityPj", 150f);
                 mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
-                mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(5));
-                mesh.Effect.SetValue("spotLightExponent", 17f);
+                mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
+                mesh.Effect.SetValue("spotLightExponent", 35f);
 
                 //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
                 mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
                 mesh.Effect.SetValue("materialSpecularExp", 9f);
             }
-            quadtree.render(Frustum, true);
+
+			//Cargar variables shader de la luz FOGATA
+			terreno.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
+			terreno.Effect.SetValue("lightPositionFog", FogatasPos);
+
+			terreno.Effect.SetValue("lightIntensityFog", 500f);
+			terreno.Effect.SetValue("lightAttenuationFog", 0.65f);
+			terreno.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1, 2, 3)));
+			//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+			terreno.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
+
+			//Cargo variables Shader Linterna/Vela "SpotLight"
+			terreno.Effect.SetValue("lightColorPj", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+			//Cargar variables shader de la luz
+			terreno.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
+			terreno.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+			terreno.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
+			terreno.Effect.SetValue("lightIntensityPj", 150f);
+			terreno.Effect.SetValue("lightAttenuationPj", 0.3f);
+			terreno.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
+			terreno.Effect.SetValue("spotLightExponent", 35f);
+
+			//Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+			terreno.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+			terreno.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+			terreno.Effect.SetValue("materialSpecularExp", 9f);
+
+			quadtree.render(Frustum, true);
 
 			physicsExample.Render();
 
