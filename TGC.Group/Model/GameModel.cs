@@ -236,14 +236,6 @@ namespace TGC.Group.Model
             Items.Add(bateria);
             MeshARenderizar.Add(BateriaMesh);
 
-			//Instancio piezas
-			for (var j = 0; j < 9; j++)
-			{
-				rutaImagen = MediaDir + "\\2D\\windows\\windows_" + (j+1) + ".png";
-				var pieza = new Pieza(j, "Pieza" + j, rutaImagen, MediaDir + "Bateria-TgcScene.xml");
-				Items.Add(pieza);
-			}
-
 			//Instancia de velas
 			var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
             var VelasMesh = scene5.Meshes[0];
@@ -276,7 +268,7 @@ namespace TGC.Group.Model
 			var ServidorMesh = loader.loadSceneFromFile(MediaDir + "servidor-TgcScene.xml").Meshes[0];
 			ServidorMesh.Move(500, 25, 500);
 			ServidorMesh.Transform = TGCMatrix.Translation(500, 25, 500);
-			Objetos.Add(new Servidor(ServidorMesh));
+			Objetos.Add(new Servidor(ServidorMesh, MediaDir));
 			MeshARenderizar.Add(ServidorMesh);
 
 			//Instancia de Pala
@@ -407,16 +399,22 @@ namespace TGC.Group.Model
 
 			foreach (var objeto in Objetos)
 			{
-				var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 50;
+				var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 300;
 				if (result)
 				{
+					HUD.Instance.MensajeColisionable = true;
+					HUD.Instance.Colisionado = objeto;
 					if (Input.keyPressed(Key.E))
 					{
 						objeto.serColisionado(Personaje);
 					}
 					break;
 				}
-			}
+				else
+				{
+					HUD.Instance.MensajeColisionable = false;
+				}
+				}
 
 			var fogatasLejos = 0;
             foreach (var iluminador in IluminacionEscenario)

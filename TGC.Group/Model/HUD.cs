@@ -11,11 +11,14 @@ using TGC.Core.Mathematica;
 using TGC.Core.Text;
 using TGC.Group.Sprites;
 using TGC.Group.Objetos;
+using TGC.Examples.Engine2D;
 
 namespace TGC.Group.Model
 {
 	class HUD
 	{
+		TgcText2D drawerText = new TgcText2D();
+
 		private CustomSprite BarraBateria;
 		private CustomSprite RellenoBateria;
 		private List<EspacioObjeto> espaciosInventario;
@@ -27,11 +30,13 @@ namespace TGC.Group.Model
 		private Personaje personaje;
 		private CustomSprite MenuControlesSprite;
 		private CustomSprite MapaPersonajeSprite;
-		private CustomSprite MensajeRecolectableSprite;
+		private CustomSprite EspacioMensajeSprite;
 		private CustomSprite AgendaSprite;
 		private CustomSprite paginaActualSprite;
 
 		public Pista paginaActual;
+
+		public List<MensajeTemporal> mensajesTemporales = new List<MensajeTemporal>();
 
 		public bool MenuControles = false;
 		public bool MenuPausa = false;
@@ -40,8 +45,10 @@ namespace TGC.Group.Model
 		public bool MapaPersonaje = false;
 		public bool Agenda = false;
 		public bool Mensaje = false;
+		public bool MensajeColisionable = false;
 
 		public Recolectable MensajeRecolectable;
+		public Colisionable Colisionado;
 
 		private readonly static HUD instance = new HUD();
 
@@ -92,7 +99,7 @@ namespace TGC.Group.Model
 				Scaling = new TGCVector2(0.6f, 0.6f),
 			};
 
-			MensajeRecolectableSprite = new CustomSprite
+			EspacioMensajeSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioMensaje.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.35f, height * 0.70f),
@@ -245,13 +252,22 @@ namespace TGC.Group.Model
 			}
 
 			if (Mensaje) {
-				drawer.DrawSprite(MensajeRecolectableSprite);
+
+				drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 100, Color.White);
+				drawer.DrawSprite(EspacioMensajeSprite);
 				CustomSprite imagenRecolectableColisionado = new CustomSprite
 				{
 					Bitmap = new CustomBitmap(MensajeRecolectable.getRutaImagen(), D3DDevice.Instance.Device),
-					Position = MensajeRecolectableSprite.Position ,
+					Position = EspacioMensajeSprite.Position ,
 				};
 				drawer.DrawSprite(imagenRecolectableColisionado);
+			}
+
+			if (MensajeColisionable) {
+				if (Colisionado.interactuable) {
+					drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 100, Color.White);
+					drawer.DrawSprite(EspacioMensajeSprite);
+				}
 			}
 
 			drawer.EndDrawSprite();

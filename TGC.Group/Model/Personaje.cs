@@ -65,7 +65,6 @@ namespace TGC.Group.Model
 			agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
 
 			pistas.Add(new Pista(null,mediaDir + "\\2D\\pista_pala.png", null));
-			pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_hacha.png", null));
 			pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_sudo.png", null));
 
 			HUD.Instance.seleccionarItem(linterna);
@@ -147,7 +146,6 @@ namespace TGC.Group.Model
 				
 				meshEnMano.Move(new TGCVector3(-3500, 100, 555));
 				meshEnMano.Transform = TGCMatrix.Translation(new TGCVector3(-3500, 100, 555));
-				Console.WriteLine(meshEnMano.ToString());
 				meshEnMano.Render();
 			}
 		}

@@ -13,6 +13,12 @@ namespace TGC.Group.Model
 		public SinEfecto(TgcMesh meshPlano)
 		{
 			this.mesh = meshPlano;
+			interactuable = false;
+		}
+
+		public override string getMensajeColision()
+		{
+			return "";
 		}
 
 		public override void serColisionado(Personaje personaje) {

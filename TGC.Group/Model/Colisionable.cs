@@ -10,6 +10,8 @@ namespace TGC.Group.Model
 	abstract class Colisionable
 	{
 		public TgcMesh mesh;
+		public bool interactuable;
 		abstract public void serColisionado(Personaje personaje);
+		abstract public String getMensajeColision();
 	}
 }
