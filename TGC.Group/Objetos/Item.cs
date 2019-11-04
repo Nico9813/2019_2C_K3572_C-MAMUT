@@ -24,6 +24,11 @@ namespace TGC.Group.Objetos
 			personaje.agregarItem(this);
 		}
 
+		public override String getRutaImagen()
+		{
+			return this.rutaImagen;
+		}
+
 		internal abstract void desactivar(Personaje personaje);
 	}
 }

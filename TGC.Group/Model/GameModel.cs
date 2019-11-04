@@ -224,14 +224,12 @@ namespace TGC.Group.Model
 
             String rutaImagen;
 
-
-
             //Instancia de baterias
             var scene4 = loader.loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
             var BateriaMesh = scene4.Meshes[0];
             BateriaMesh.Move(-3400, 10, 530);
             BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
-            BateriaMesh.Transform = TGCMatrix.Translation(-3400, 10, 530);
+            BateriaMesh.Transform = TGCMatrix.Translation(-3400, 30, 530);
             rutaImagen = MediaDir + "\\2D\\imgBateria.png";
             bateria = new Bateria(BateriaMesh, rutaImagen);
             Items.Add(bateria);
@@ -243,7 +241,6 @@ namespace TGC.Group.Model
 				rutaImagen = MediaDir + "\\2D\\windows\\windows_" + (j+1) + ".png";
 				var pieza = new Pieza(j, "Pieza" + j, rutaImagen, MediaDir + "Bateria-TgcScene.xml");
 				Items.Add(pieza);
-				Personaje.agregarPieza(pieza);
 			}
 
 			//Instancia de velas
@@ -251,14 +248,31 @@ namespace TGC.Group.Model
             var VelasMesh = scene5.Meshes[0];
             VelasMesh.Move(-3400, 10, 400);
             VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
-            VelasMesh.Transform = TGCMatrix.Translation(-3400, 10, 400);
+            VelasMesh.Transform = TGCMatrix.Translation(-3400, 30, 400);
             rutaImagen = MediaDir + "\\2D\\imgVela.png";
             vela = new Vela(VelasMesh, rutaImagen);
             Items.Add(vela);
             MeshARenderizar.Add(VelasMesh);
 
-            //Instancia de fogatas
-            var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
+			//Instancia de pista
+			var PistaMesh = loader.loadSceneFromFile(MediaDir + "pista-TgcScene.xml").Meshes[0];
+			PistaMesh.Move(-250, 55, 741);
+			PistaMesh.Transform = TGCMatrix.Translation(-300, 55, 741);
+			PistaMesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+			rutaImagen = MediaDir + "\\2D\\texto_inicial.png";
+			var rutaMostrable = MediaDir + "\\2D\\EspacioPistaHUD.png";
+			var pista = new Pista(PistaMesh, rutaImagen, rutaMostrable);
+			Items.Add(pista);
+			MeshARenderizar.Add(pista.mesh);
+
+			//Instancia de Mesa
+			var MesaMesh = loader.loadSceneFromFile(MediaDir + "MesaRedonda-TgcScene.xml").Meshes[0];
+			MesaMesh.Move(-250, 20, 741);
+			MesaMesh.Transform = TGCMatrix.Translation(-300, 30, 741);
+			MeshARenderizar.Add(MesaMesh);
+
+			//Instancia de fogatas
+			var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
             var fogataMesh = scene6.Meshes[0];
             Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(-3500, 25, -3200));
             Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(-4100, 20, 2900));

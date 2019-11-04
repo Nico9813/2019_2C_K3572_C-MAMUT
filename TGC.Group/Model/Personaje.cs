@@ -64,8 +64,9 @@ namespace TGC.Group.Model
 			agregarItem(new Vela(VelasMesh, mediaDir + "\\2D\\imgVela.png"));
 			agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
 
-			pistas.Add(new Pista(mediaDir + "\\2D\\imgVela.png"));
-			pistas.Add(new Pista(mediaDir + "\\2D\\texto_inicial.png"));
+			pistas.Add(new Pista(null,mediaDir + "\\2D\\pista_pala.png", null));
+			pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_hacha.png", null));
+			pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_sudo.png", null));
 
 			HUD.Instance.seleccionarItem(linterna);
 
@@ -181,6 +182,11 @@ namespace TGC.Group.Model
 		public void agregarItem(Item item) {
 			this.items.Add(item);
 			HUD.Instance.guardarItem(item);
+		}
+
+		public void agregarPista(Pista item)
+		{
+			this.pistas.Add(item);
 		}
 
 		public void agregarPieza(Pieza pieza){

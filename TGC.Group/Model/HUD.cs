@@ -55,8 +55,6 @@ namespace TGC.Group.Model
 			}
 		}
 
-		
-
 		public void Init(String MediaDir, Personaje _personaje)
 		{
 			personaje = _personaje;
@@ -70,7 +68,6 @@ namespace TGC.Group.Model
 				Position = new TGCVector2(width * 0.02f, height * 0.85f),
 				Scaling = new TGCVector2(0.5f, 0.5f),
 				Color = Color.DarkMagenta,
-
 			};
 
 			RellenoBateria = new CustomSprite
