@@ -25,7 +25,7 @@ using TGC.Core.Example;
 using TGC.Group.Sprites;
 using Microsoft.DirectX;
 using Effect = Microsoft.DirectX.Direct3D.Effect;
-
+using TGC.Core.Fog;
 
 namespace TGC.Group.Model
 {
@@ -82,7 +82,7 @@ namespace TGC.Group.Model
 
         private Effect effect;
         float time = 0;
-
+        private TgcFog fog;
         public override void Init()
         {
             var loader = new TgcSceneLoader();
@@ -326,6 +326,10 @@ namespace TGC.Group.Model
 
 			giroMuerte = 0;
             monstruo = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
+
+            fog = new TgcFog();
+            fog.StartDistance = 1000f;
+            fog.EndDistance = 1200f;
         }
 
 		public override void Update()
@@ -469,6 +473,11 @@ namespace TGC.Group.Model
                     mesh.Technique = "Sepia";
 
                 }
+                foreach (var mesh in skyBox.Faces)
+                {
+                    mesh.Effect = effect;
+                    mesh.Technique = "Sepia";
+                }
             }
             else 
             {
@@ -488,6 +497,12 @@ namespace TGC.Group.Model
 					mesh.Technique = "Spotlight";
 
 				}
+                foreach(var mesh in skyBox.Faces)
+                {
+                    mesh.Effect = effect;
+                    mesh.Technique = "Spotlight";
+                }
+
 			}
 
             PostUpdate();
@@ -507,7 +522,12 @@ namespace TGC.Group.Model
             lightPos.Add(desplazamientoLuz);
            
             var lightDir = -direccionLuz;
-
+            
+            effect.SetValue("ColorFog", fog.Color.ToArgb());
+       
+            effect.SetValue("StartFogDistance", fog.StartDistance);
+            effect.SetValue("EndFogDistance", fog.EndDistance);
+            //effect.SetValue("Density", fog.Density);
             foreach (var mesh in MeshARenderizar)
             {
 				//Cargar variables shader de la luz FOGATA
