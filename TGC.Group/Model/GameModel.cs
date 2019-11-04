@@ -49,7 +49,7 @@ namespace TGC.Group.Model
 
 		private List<Recolectable> Items;
 		private List<Pieza> Piezas;
-		private List<TgcMesh> Objetos;
+		private List<Colisionable> Objetos;
 		private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
 
@@ -96,14 +96,14 @@ namespace TGC.Group.Model
 
             Items = new List<Recolectable>();
             Piezas = new List<Pieza>();
-            Objetos = new List<TgcMesh>();
+            Objetos = new List<Colisionable>();
             MeshARenderizar = new List<TgcMesh>();
             meshFogatas = new List<TgcMesh>();
             IluminacionEscenario = new List<Fogata>();
 
             //Instancio el terreno (Heigthmap)
             terreno = new TgcSimpleTerrain();
-            var pathTextura = MediaDir + "Textures\\mapa1.jpg";
+            var pathTextura = MediaDir + "Textures\\4.png";
             var pathHeighmap = MediaDir + "mapa1.jpg";
             currentScaleXZ = 100f;
             currentScaleY = 3f;
@@ -115,48 +115,50 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\water2.jpg");
             Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
             MeshPlano = Plano.toMesh("MeshPlano");
-            Objetos.Add(MeshPlano);
+            Objetos.Add(new SinEfecto(MeshPlano));
 			MeshARenderizar.Add(MeshPlano);
 
 			//Instancio la vegetacion
-			var scene = loader.loadSceneFromFile(MediaDir + @"Vegetacion-TgcScene.xml");
+			var scene = loader.loadSceneFromFile(MediaDir + @"Pino-TgcScene.xml");
+			var PinoOriginal = scene.Meshes[0];
 			List<TGCVector3> posicionesArboles = new List<TGCVector3>();
 
 			posicionesArboles.Add(new TGCVector3(1,1,1));
-            posicionesArboles.Add(new TGCVector3(-3442, 1, -2736));
-            posicionesArboles.Add(new TGCVector3(-3689, 1, -3039));
-            posicionesArboles.Add(new TGCVector3(-3799, 1, -2719));
-            posicionesArboles.Add(new TGCVector3(-3417, 1, -2480));
-            posicionesArboles.Add(new TGCVector3(-2917, 1, -2433));
-            posicionesArboles.Add(new TGCVector3(-3668, 1, -2025));
-            posicionesArboles.Add(new TGCVector3(-3362, 1, -2009));
-            posicionesArboles.Add(new TGCVector3(-3451, 1, -3786));
-            posicionesArboles.Add(new TGCVector3(-4037, 1, -2329));
-            posicionesArboles.Add(new TGCVector3(-2885, 1, -1826));
-            posicionesArboles.Add(new TGCVector3(-4123, 1, -1581));
-            posicionesArboles.Add(new TGCVector3(-3289, 1, -909));
-            posicionesArboles.Add(new TGCVector3(-4261, 1, -435));
-            posicionesArboles.Add(new TGCVector3(-2883, 1, -655));
-            posicionesArboles.Add(new TGCVector3(-3352, 1, -1761));
-            posicionesArboles.Add(new TGCVector3(-3244, 1, -2394));
-            posicionesArboles.Add(new TGCVector3(-3978, 1, -2572));
-            posicionesArboles.Add(new TGCVector3(-3517, 1, -1982));
-            posicionesArboles.Add(new TGCVector3(-3118, 1, -1524));
-            posicionesArboles.Add(new TGCVector3(-3349, 1, -980));
-            posicionesArboles.Add(new TGCVector3(-4110, 1, -407));
-            posicionesArboles.Add(new TGCVector3(-3304, 1, -1774));
-            posicionesArboles.Add(new TGCVector3(-3139, 1, -1269));
-            posicionesArboles.Add(new TGCVector3(-2140, 1, -562));
-            posicionesArboles.Add(new TGCVector3(-4094, 1, -145));
+            posicionesArboles.Add(new TGCVector3(-3442, 10, -2736));
+            posicionesArboles.Add(new TGCVector3(-3689, 10, -3039));
+            posicionesArboles.Add(new TGCVector3(-3799, 10, -2719));
+            posicionesArboles.Add(new TGCVector3(-3417, 10, -2480));
+            posicionesArboles.Add(new TGCVector3(-2917, 10, -2433));
+            posicionesArboles.Add(new TGCVector3(-3668, 10, -2025));
+            posicionesArboles.Add(new TGCVector3(-3362, 10, -2009));
+            posicionesArboles.Add(new TGCVector3(-3451, 10, -3786));
+            posicionesArboles.Add(new TGCVector3(-4037, 10, -2329));
+            posicionesArboles.Add(new TGCVector3(-2885, 10, -1826));
+            posicionesArboles.Add(new TGCVector3(-4123, 10, -1581));
+            posicionesArboles.Add(new TGCVector3(-3289, 10, -909));
+            posicionesArboles.Add(new TGCVector3(-4261, 10, -435));
+            posicionesArboles.Add(new TGCVector3(-2883, 10, -655));
+            posicionesArboles.Add(new TGCVector3(-3352, 10, -1761));
+            posicionesArboles.Add(new TGCVector3(-3244, 10, -2394));
+            posicionesArboles.Add(new TGCVector3(-3978, 10, -2572));
+            posicionesArboles.Add(new TGCVector3(-3517, 10, -1982));
+            posicionesArboles.Add(new TGCVector3(-3118, 10, -1524));
+            posicionesArboles.Add(new TGCVector3(-3349, 10, -980));
+            posicionesArboles.Add(new TGCVector3(-4110, 10, -407));
+            posicionesArboles.Add(new TGCVector3(-3304, 10, -1774));
+            posicionesArboles.Add(new TGCVector3(-3139, 10, -1269));
+            posicionesArboles.Add(new TGCVector3(-2140, 10, -562));
+            posicionesArboles.Add(new TGCVector3(-4094, 10, -145));
 
 
-            for (var i = 0; i< scene.Meshes.Count && i<posicionesArboles.Count; i++)
+            for (var i = 0; i<posicionesArboles.Count; i++)
             {
-                scene.Meshes[i].Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
-				scene.Meshes[i].Move(posicionesArboles[i]);
-				scene.Meshes[i].Transform = TGCMatrix.Translation(posicionesArboles[i]);
-				Objetos.Add(scene.Meshes[i]);
-                MeshARenderizar.Add(scene.Meshes[i]);
+				var instance = PinoOriginal.createMeshInstance("Pino" + i );
+				instance.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+				instance.Move(posicionesArboles[i]);
+				instance.Transform = TGCMatrix.Translation(posicionesArboles[i]);
+				Objetos.Add(new SinEfecto(instance));
+                MeshARenderizar.Add(instance);
 				i++;
             }
 
@@ -169,7 +171,7 @@ namespace TGC.Group.Model
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 
-                Objetos.Add(Mesh);
+                Objetos.Add(new SinEfecto(Mesh));
                 MeshARenderizar.Add(Mesh);
             }
             cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
@@ -182,10 +184,9 @@ namespace TGC.Group.Model
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 
-                Objetos.Add(Mesh);
+                Objetos.Add(new SinEfecto(Mesh));
                 MeshARenderizar.Add(Mesh);
             }
-
 
             var sceneCanoa = loader.loadSceneFromFile(MediaDir + @"Canoa-TgcScene.xml");
             foreach (var Mesh in sceneCanoa.Meshes)
@@ -195,7 +196,7 @@ namespace TGC.Group.Model
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 
-                Objetos.Add(Mesh);
+                Objetos.Add(new SinEfecto(Mesh));
                 MeshARenderizar.Add(Mesh);
             }
 
@@ -271,6 +272,25 @@ namespace TGC.Group.Model
 			MesaMesh.Transform = TGCMatrix.Translation(-300, 30, 741);
 			MeshARenderizar.Add(MesaMesh);
 
+			//Instancia del Servidor
+			var ServidorMesh = loader.loadSceneFromFile(MediaDir + "servidor-TgcScene.xml").Meshes[0];
+			ServidorMesh.Move(500, 25, 500);
+			ServidorMesh.Transform = TGCMatrix.Translation(500, 25, 500);
+			Objetos.Add(new Servidor(ServidorMesh));
+			MeshARenderizar.Add(ServidorMesh);
+
+			//Instancia de Pala
+			var PalaMesh = loader.loadSceneFromFile(MediaDir + "Pala-TgcScene.xml").Meshes[0];
+			PalaMesh.Move(-220, 100, 680);
+			PalaMesh.RotateX(FastMath.PI);
+			PalaMesh.RotateZ(FastMath.PI_HALF);
+			PalaMesh.RotateY(FastMath.PI_HALF);
+			PalaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+			PalaMesh.Transform = TGCMatrix.Translation(-250, 100, 700);
+			rutaImagen = MediaDir + "\\2D\\pala.png";
+			Items.Add(new Herramienta("Pala", PalaMesh, rutaImagen));
+			MeshARenderizar.Add(PalaMesh);
+
 			//Instancia de fogatas
 			var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
             var fogataMesh = scene6.Meshes[0];
@@ -300,7 +320,7 @@ namespace TGC.Group.Model
 			physicsExample = new Fisicas();
 			physicsExample.setTerrain(terreno);
 			physicsExample.setPersonaje(Personaje.mesh);
-			physicsExample.setBuildings(Objetos);
+			physicsExample.setBuildings(Objetos.ConvertAll(objeto => objeto.mesh));
 			physicsExample.Init(MediaDir);
 
 			//Instancia del quadTree (optimizacion)
@@ -347,6 +367,7 @@ namespace TGC.Group.Model
 				HUD.Instance.MenuControles = !HUD.Instance.MenuControles;
 				HUD.Instance.HUDpersonaje = !HUD.Instance.HUDpersonaje;
 				HUD.Instance.HUDpersonaje_piezas = !HUD.Instance.HUDpersonaje_piezas;
+				HUD.Instance.Mensaje = false;
 			}
 
             if (Personaje.perdioJuego()) 
@@ -368,22 +389,36 @@ namespace TGC.Group.Model
 				var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
 				if (result)
 				{
-					itemCerca = true;
-					objetoColisionado = item;
+					HUD.Instance.Mensaje = true;
+					HUD.Instance.MensajeRecolectable = item;
+					if (Input.keyPressed(Key.E))
+					{
+						MeshARenderizar.Remove(item.mesh);
+						Items.Remove(item);
+						Personaje.agregarRecolectable(item);
+						quadtree.actualizarModelos(MeshARenderizar);
+					}
+					break;
+				}
+				else {
+					HUD.Instance.Mensaje = false;
+				}
+			}
+
+			foreach (var objeto in Objetos)
+			{
+				var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 50;
+				if (result)
+				{
+					if (Input.keyPressed(Key.E))
+					{
+						objeto.serColisionado(Personaje);
+					}
 					break;
 				}
 			}
 
-			if (itemCerca)
-			{
-				if (Input.keyPressed(Key.E)){
-					MeshARenderizar.Remove(objetoColisionado.mesh);
-                    Items.Remove(objetoColisionado);
-					Personaje.agregarRecolectable(objetoColisionado);
-					quadtree.actualizarModelos(MeshARenderizar);
-				}
-			}
-            var fogatasLejos = 0;
+			var fogatasLejos = 0;
             foreach (var iluminador in IluminacionEscenario)
             {
                 var distancia = FastMath.Sqrt(TGCVector3.LengthSq(new TGCVector3(50,0,50) + iluminador.mesh.Position - Personaje.mesh.Position));//50 en xz es porque no esta centrada la hoguera
@@ -422,7 +457,6 @@ namespace TGC.Group.Model
                 {
                     mesh.Effect = effect;
                     mesh.Technique = "Sepia";
-
                 }
 
 				monstruo.Effect = effect;
@@ -449,7 +483,14 @@ namespace TGC.Group.Model
 
                 terreno.Effect = effect;
                 terreno.Technique = "Spotlight";
-            }
+
+				foreach (var mesh in meshFogatas)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Spotlight";
+
+				}
+			}
 
             PostUpdate();
         }
@@ -457,16 +498,6 @@ namespace TGC.Group.Model
         public override void Render()
         {
 			PreRender();
-
-			if (itemCerca)
-			{
-				HUD.Instance.Mensaje = true;
-				HUD.Instance.MensajeRecolectable = objetoColisionado;
-			}
-			else {
-				HUD.Instance.Mensaje = false;
-			}
-
 
 			skyBox.Render();
 
@@ -481,58 +512,32 @@ namespace TGC.Group.Model
 
             foreach (var mesh in MeshARenderizar)
             {
-                //Cargar variables shader de la luz FOGATA
-                mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
-                mesh.Effect.SetValue("lightPositionFog", FogatasPos);
-                
-                mesh.Effect.SetValue("lightIntensityFog", 500f);
-                mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1,2,3)));
+				//Cargar variables shader de la luz FOGATA
+				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
+				mesh.Effect.SetValue("lightPositionFog", FogatasPos);
+
+				mesh.Effect.SetValue("lightIntensityFog", 50f);
+				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1, 2, 3)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
-				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
+				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 
-                //Cargo variables Shader Linterna/Vela "SpotLight"
-                mesh.Effect.SetValue("lightColorPj", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
-                //Cargar variables shader de la luz
-                mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
-                mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
-                mesh.Effect.SetValue("lightIntensityPj", 150f);
-                mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
-                mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
-                mesh.Effect.SetValue("spotLightExponent", 35f);
+				//Cargo variables Shader Linterna/Vela "SpotLight"
+				mesh.Effect.SetValue("lightColorPj", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+				//Cargar variables shader de la luz
+				mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
+				mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+				mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
+				mesh.Effect.SetValue("lightIntensityPj", 150f);
+				mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
+				mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
+				mesh.Effect.SetValue("spotLightExponent", 35f);
 
-                //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
-                mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
-                mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
-                mesh.Effect.SetValue("materialSpecularExp", 9f);
-            }
-
-			//Cargar variables shader de la luz FOGATA
-			terreno.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
-			terreno.Effect.SetValue("lightPositionFog", FogatasPos);
-
-			terreno.Effect.SetValue("lightIntensityFog", 500f);
-			terreno.Effect.SetValue("lightAttenuationFog", 0.65f);
-			terreno.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1, 2, 3)));
-			//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
-			terreno.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Yellow));
-
-			//Cargo variables Shader Linterna/Vela "SpotLight"
-			terreno.Effect.SetValue("lightColorPj", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
-			//Cargar variables shader de la luz
-			terreno.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
-			terreno.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-			terreno.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
-			terreno.Effect.SetValue("lightIntensityPj", 150f);
-			terreno.Effect.SetValue("lightAttenuationPj", 0.3f);
-			terreno.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
-			terreno.Effect.SetValue("spotLightExponent", 35f);
-
-			//Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
-			terreno.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
-			terreno.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
-			terreno.Effect.SetValue("materialSpecularExp", 9f);
+				//Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+				mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+				mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
+				mesh.Effect.SetValue("materialSpecularExp", 9f);
+			}
 
 			quadtree.render(Frustum, true);
 

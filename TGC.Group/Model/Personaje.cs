@@ -194,6 +194,10 @@ namespace TGC.Group.Model
 			HUD.Instance.guardarPieza(pieza);
 		}
 
+		public bool tieneItem(String descripcionItem) {
+			return items.Exists(item => item.getDescripcion().Equals(descripcionItem));
+		}
+
 		internal void removerItem(Item item)
 		{
 			this.items.Remove(item);

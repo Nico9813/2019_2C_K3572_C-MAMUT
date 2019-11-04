@@ -127,7 +127,7 @@ float3 computeDiffuseComponent(float3 surfacePosition, float3 N, int i)
     float intensity = lightIntensityFog / distAtten; //Dividimos intensidad sobre distancia
 
 	//Calcular Diffuse (N dot L)
-    return intensity * lightColorFog.rgb * materialDiffuseColor * max(0.0, dot(N, Ln));
+	return abs(intensity * lightColorFog.rgb * materialDiffuseColor);
 }
 
 //Pixel Shader para Point Light

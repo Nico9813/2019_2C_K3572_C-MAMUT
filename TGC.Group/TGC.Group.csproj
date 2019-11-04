@@ -102,7 +102,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Servidor.cs" />
+    <Compile Include="Model\SinEfecto.cs" />
+    <Compile Include="Model\Colisionable.cs" />
     <Compile Include="Objetos\Bateria.cs" />
+    <Compile Include="Objetos\Herramienta.cs" />
     <Compile Include="Objetos\Pista.cs" />
     <Compile Include="Objetos\Fogata.cs" />
     <Compile Include="Objetos\Iluminador.cs" />
