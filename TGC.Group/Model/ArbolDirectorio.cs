@@ -8,26 +8,27 @@ using TGC.Group.Objetos;
 
 namespace TGC.Group.Model
 {
-	class Servidor : Colisionable
+	class ArbolDirectorio : Colisionable
 	{
 		Pieza piezaAsociada;
 		Pista pistaAsociada;
 		bool usado;
-		public Servidor(String MediaDir) {
-			piezaAsociada = new Pieza(0, "Pieza 0", MediaDir + "\\2D\\windows\\windows_0.png", null);
-			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
-			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"servidor-TgcScene.xml").Meshes[0];
+		public ArbolDirectorio(String MediaDir) {
+			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_1.png", null);
+			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_sudo.png", null);
+			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml").Meshes[0];
 			usado = false;
 			interactuable = true;
 		}
 
 		public override string getMensajeColision()
 		{
-			return "Servidor DNS";
+			return "Este arbol no parece igual a los demas";
 		}
 
 		public override void serColisionado(Personaje personaje)
 		{
+			
 			if (!usado)
 			{
 				if (personaje.tieneItem("Pala"))

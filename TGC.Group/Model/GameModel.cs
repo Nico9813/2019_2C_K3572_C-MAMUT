@@ -56,7 +56,6 @@ namespace TGC.Group.Model
 		private List<Fogata> IluminacionEscenario;
 
 		private List<TgcMesh> MeshTotales;
-		private Boolean itemCerca = false;
         private Boolean fogataCerca = false;
         Recolectable objetoColisionado = null;
 
@@ -150,16 +149,24 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-2140, 10, -562));
             posicionesArboles.Add(new TGCVector3(-4094, 10, -145));
 
+			var indiceArbolDirectorio = 2; //(new Random()).Next(0, posicionesArboles.Count);
 
-            for (var i = 0; i<posicionesArboles.Count; i++)
+			Colisionable Arbol;
+
+			Console.WriteLine("Cant: " + posicionesArboles.Count);
+			for (var i = 0; i<posicionesArboles.Count; i++)
             {
-				var instance = PinoOriginal.createMeshInstance("Pino" + i );
-				instance.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
-				instance.Move(posicionesArboles[i]);
-				instance.Transform = TGCMatrix.Translation(posicionesArboles[i]);
-				Objetos.Add(new SinEfecto(instance));
-                MeshARenderizar.Add(instance);
-				i++;
+				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+				if (i == indiceArbolDirectorio)
+					Arbol = new ArbolDirectorio(MediaDir);
+				else
+					Arbol = new SinEfecto(Instance);
+				Arbol.mesh.Move(0, 0, 0);
+				Arbol.mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+				Arbol.mesh.Move(posicionesArboles[i]);
+				Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
+				Objetos.Add(Arbol);
+                MeshARenderizar.Add(Arbol.mesh);
             }
 
             //Instancio la Cabania
@@ -210,7 +217,7 @@ namespace TGC.Group.Model
             //Instancia de skybox
             skyBox = new TgcSkyBox();
             skyBox.Center = TGCVector3.Empty;
-            skyBox.Size = new TGCVector3(10000, 10000, 10000);
+            skyBox.Size = new TGCVector3(9000, 9000, 9000);
 
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, MediaDir + "cielo.jpg");
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, MediaDir + "cielo.jpg");
@@ -265,11 +272,11 @@ namespace TGC.Group.Model
 			MeshARenderizar.Add(MesaMesh);
 
 			//Instancia del Servidor
-			var ServidorMesh = loader.loadSceneFromFile(MediaDir + "servidor-TgcScene.xml").Meshes[0];
-			ServidorMesh.Move(500, 25, 500);
-			ServidorMesh.Transform = TGCMatrix.Translation(500, 25, 500);
-			Objetos.Add(new Servidor(ServidorMesh, MediaDir));
-			MeshARenderizar.Add(ServidorMesh);
+			var Servidor = new Servidor(MediaDir);
+			Servidor.mesh.Move(500, 25, 500);
+			Servidor.mesh.Transform = TGCMatrix.Translation(500, 25, 500);
+			Objetos.Add(Servidor);
+			MeshARenderizar.Add(Servidor.mesh);
 
 			//Instancia de Pala
 			var PalaMesh = loader.loadSceneFromFile(MediaDir + "Pala-TgcScene.xml").Meshes[0];
@@ -354,7 +361,6 @@ namespace TGC.Group.Model
 				}
 			}
 
-			itemCerca = false;
 			objetoColisionado = null;
 
 			if (Input.keyPressed(Key.Escape))
@@ -380,12 +386,14 @@ namespace TGC.Group.Model
                 physicsExample.personajeBody.ActivationState = ActivationState.IslandSleeping;
             }
 
+			var itemCerca = false;
+
 			foreach (var item in Items)
 			{
 				var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
 				if (result)
 				{
-					HUD.Instance.Mensaje = true;
+					itemCerca = true;
 					HUD.Instance.MensajeRecolectable = item;
 					if (Input.keyPressed(Key.E))
 					{
@@ -396,17 +404,18 @@ namespace TGC.Group.Model
 					}
 					break;
 				}
-				else {
-					HUD.Instance.Mensaje = false;
-				}
 			}
+
+			HUD.Instance.Mensaje = itemCerca;
+
+			var objetoCerca = false;
 
 			foreach (var objeto in Objetos)
 			{
 				var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 300;
 				if (result)
 				{
-					HUD.Instance.MensajeColisionable = true;
+					objetoCerca = true;
 					HUD.Instance.Colisionado = objeto;
 					if (Input.keyPressed(Key.E))
 					{
@@ -414,11 +423,9 @@ namespace TGC.Group.Model
 					}
 					break;
 				}
-				else
-				{
-					HUD.Instance.MensajeColisionable = false;
-				}
-				}
+			}
+
+			HUD.Instance.MensajeColisionable = objetoCerca;
 
 			var fogatasLejos = 0;
             foreach (var iluminador in IluminacionEscenario)

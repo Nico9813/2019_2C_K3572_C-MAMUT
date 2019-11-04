@@ -135,7 +135,7 @@ namespace TGC.Group.Model
 			if (objetoEquipado && itemSelecionadoActivo)
 				itemSelecionado.update(this, elapsedTime);
 
-			HUD.Instance.Update();
+			HUD.Instance.Update(elapsedTime);
 		}
 
 		public void Render(float ElapsedTime, TgcD3dInput input)
@@ -179,16 +179,19 @@ namespace TGC.Group.Model
 
 		public void agregarItem(Item item) {
 			this.items.Add(item);
+			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Se agrego al inventario el item " + item.getDescripcion()));
 			HUD.Instance.guardarItem(item);
 		}
 
 		public void agregarPista(Pista item)
 		{
+			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pista, pulsa G para visualizarla"));
 			this.pistas.Add(item);
 		}
 
 		public void agregarPieza(Pieza pieza){
 			this.piezas.Add(pieza);
+			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pieza de la imagen"));
 			HUD.Instance.guardarPieza(pieza);
 		}
 

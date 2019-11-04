@@ -19,6 +19,9 @@ namespace TGC.Group.Model
 	{
 		TgcText2D drawerText = new TgcText2D();
 
+		float width = D3DDevice.Instance.Width;
+		float height = D3DDevice.Instance.Height;
+
 		private CustomSprite BarraBateria;
 		private CustomSprite RellenoBateria;
 		private List<EspacioObjeto> espaciosInventario;
@@ -65,8 +68,6 @@ namespace TGC.Group.Model
 		public void Init(String MediaDir, Personaje _personaje)
 		{
 			personaje = _personaje;
-			var width = D3DDevice.Instance.Width;
-			var height = D3DDevice.Instance.Height;
 			drawer = new Drawer2D();
 
 			BarraBateria = new CustomSprite
@@ -185,10 +186,12 @@ namespace TGC.Group.Model
 			espaciosInventario.Find(espacio => espacio.itemGuardado.Equals(item)).seleccionar();
 		}
 
-		public void Update()
+		public void Update(float elapsedtime)
 		{
 			float bateriaRestante = personaje.getIluminadorPrincipal().getDuracionRestante();
 			RellenoBateria.Scaling = new TGCVector2(bateriaRestante * 0.5f / personaje.getIluminadorPrincipal().getDuracionTotal(), 1* 0.5f);
+			mensajesTemporales.ForEach(mensaje => mensaje.Update(elapsedtime));
+			mensajesTemporales = mensajesTemporales.FindAll(mensaje => !mensaje.tiempoCumplido());
 		}
 
 		public void Render()
@@ -253,7 +256,7 @@ namespace TGC.Group.Model
 
 			if (Mensaje) {
 
-				drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 100, Color.White);
+				drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 				drawer.DrawSprite(EspacioMensajeSprite);
 				CustomSprite imagenRecolectableColisionado = new CustomSprite
 				{
@@ -265,9 +268,16 @@ namespace TGC.Group.Model
 
 			if (MensajeColisionable) {
 				if (Colisionado.interactuable) {
-					drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 100, Color.White);
+					drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 					drawer.DrawSprite(EspacioMensajeSprite);
 				}
+			}
+
+			for (int i=0; i<mensajesTemporales.Count; i++) {
+				var mensaje = mensajesTemporales[i];
+				drawerText.drawText(mensaje.getContenido(),
+				(int)(width * 0.75f), (int)(height * 0.8) + 20 * i,
+				Color.White);
 			}
 
 			drawer.EndDrawSprite();

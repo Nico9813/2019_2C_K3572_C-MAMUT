@@ -102,6 +102,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\ArbolDirectorio.cs" />
+    <Compile Include="Model\MensajeTemporal.cs" />
     <Compile Include="Model\Servidor.cs" />
     <Compile Include="Model\SinEfecto.cs" />
     <Compile Include="Model\Colisionable.cs" />

@@ -244,27 +244,18 @@ struct PS_DIFFUSE_MAP
     float1 Fog : FOG;
 };
 
-//METODO PARA LA NIEBLA
-float4 calcularNiebla(float4 fvBaseColor, float PosViewZ,float PosViewX)
+float4 calcularNiebla(float4 fvBaseColor, float PosViewZ, float PosViewX)
 {
-    float zn = StartFogDistance;
-    float zf = EndFogDistance;
-    
-    if (sqrt(pow(abs(eyePositionPj.z - PosViewZ), 2) + pow(abs(eyePositionPj.x - PosViewX), 2)) < zn)
-        return fvBaseColor;
-    else if (sqrt(pow(abs(eyePositionPj.z - PosViewZ), 2) + pow(abs(eyePositionPj.x - PosViewX), 2)) > zn)
-    {
-        fvBaseColor = ColorFog * 0.3 + fvBaseColor * 0.7;
-        return fvBaseColor;
-    }
-    else
-    {
-		// combino fog y textura
-        fvBaseColor = ColorFog * 0.2 + fvBaseColor * 0.8;
-        return fvBaseColor;
-    }
-}
+	float zn = StartFogDistance;
+	float zf = EndFogDistance;
+	float distancia = sqrt(pow(abs(eyePositionPj.z - PosViewZ), 2) + pow(abs(eyePositionPj.x - PosViewX), 2));
 
+	float coef = distancia / 10000;
+	fvBaseColor = ColorFog * coef + fvBaseColor * (1 - coef);
+	return fvBaseColor;
+
+
+}
 
 //Pixel Shader
 float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
