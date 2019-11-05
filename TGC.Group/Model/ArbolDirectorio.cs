@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Group.Objetos;
 
@@ -12,11 +13,15 @@ namespace TGC.Group.Model
 	{
 		Pieza piezaAsociada;
 		Pista pistaAsociada;
+		Item itemAsociado;
 		bool usado;
 		public ArbolDirectorio(String MediaDir) {
 			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_1.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_sudo.png", null);
-			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml").Meshes[0];
+			itemAsociado = new Herramienta("SUDO", null, MediaDir + "\\2D\\SUDO.png");
+			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"Palmera2-TgcScene.xml").Meshes[0];
+			mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
+			mesh.setColor(System.Drawing.Color.Yellow);
 			usado = false;
 			interactuable = true;
 		}
@@ -31,10 +36,11 @@ namespace TGC.Group.Model
 			
 			if (!usado)
 			{
-				if (personaje.tieneItem("Pala"))
+				if (personaje.tieneItem("Hacha"))
 				{
 					personaje.agregarPieza(piezaAsociada);
 					personaje.agregarPista(pistaAsociada);
+					personaje.agregarItem(itemAsociado);
 					usado = true;
 				}
 				else

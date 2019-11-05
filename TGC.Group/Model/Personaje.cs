@@ -111,8 +111,9 @@ namespace TGC.Group.Model
 			}
 
 			if (agendaActiva && Input.keyPressed(Key.Space)){
+				pistas[pistaActual].esNueva = false;
 				pistaActual = (pistaActual + 1) % pistas.Count;
-				HUD.Instance.paginaActual = pistas[pistaActual];
+				HUD.Instance.seleccionarPaginaActual(pistas[pistaActual]);
 			}
 
 			if (objetoEquipado && itemSelecionadoActivo)
@@ -134,7 +135,7 @@ namespace TGC.Group.Model
 		public void AbrirAgenda() {
 			agendaActiva = !agendaActiva;
 			HUD.Instance.Agenda = !HUD.Instance.Agenda;
-			HUD.Instance.paginaActual = pistas[0];
+			HUD.Instance.seleccionarPaginaActual(pistas[0]);
 			pistaActual = 0;
 		}
 

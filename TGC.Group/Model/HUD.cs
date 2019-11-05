@@ -33,6 +33,7 @@ namespace TGC.Group.Model
 		private CustomSprite AgendaSprite;
 		private CustomSprite paginaActualSprite;
 		private CustomSprite mainMenuSprite;
+		private CustomSprite nuevaPistaSprite;
 
 		public Pista paginaActual;
 
@@ -118,6 +119,13 @@ namespace TGC.Group.Model
 				Scaling = new TGCVector2(0.8f, 0.5f),
 			};
 
+			nuevaPistaSprite = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\NuevaPista.png", D3DDevice.Instance.Device),
+				Position = AgendaSprite.Position + new TGCVector2(100, -30),
+				Scaling = new TGCVector2(0.5f,0.5f),
+			};
+
 			espaciosInventario = new List<EspacioObjeto>();
 			espaciosPiezas = new List<EspacioObjeto>();
 			CustomSprite spriteActual;
@@ -199,6 +207,10 @@ namespace TGC.Group.Model
 			mensajesTemporales = mensajesTemporales.FindAll(mensaje => !mensaje.tiempoCumplido());
 		}
 
+		public void seleccionarPaginaActual(Pista pista) {
+			paginaActual = pista;
+		}
+
 		public void Render()
 		{
 			drawer.BeginDrawSprite();
@@ -266,6 +278,10 @@ namespace TGC.Group.Model
 					drawerText.drawText("Presionar [Espacio] para pasar entre notas ", (int)AgendaSprite.Position.X + 50, (int)AgendaSprite.Position.Y + 400, Color.White);
 					drawerText.drawText("Presionar [G] para cerrar la agenda ", (int)AgendaSprite.Position.X + 50, (int)AgendaSprite.Position.Y + 420, Color.White);
 					drawer.DrawSprite(paginaActualSprite);
+					if (paginaActual.esNueva)
+					{
+						drawer.DrawSprite(nuevaPistaSprite);
+					}
 				}
 
 				if (Mensaje)

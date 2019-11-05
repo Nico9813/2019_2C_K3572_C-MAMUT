@@ -65,6 +65,7 @@ namespace TGC.Group.Model
 		private Pieza piezaAsociadaLago;
 		private Pista pistaAsociadaLago;
 		MensajeTemporal mensajeAgua = null;
+		bool piezaLagoEntregada = false;
 		private TgcBoundingElipsoid lago;
 		private TgcSimpleTerrain terreno;
 		private float currentScaleXZ;
@@ -125,7 +126,7 @@ namespace TGC.Group.Model
             MeshPlano = Plano.toMesh("MeshPlano");
             Objetos.Add(new SinEfecto(MeshPlano));
 			MeshARenderizar.Add(MeshPlano);
-			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_0.png", null);
+			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_2.png", null);
 			pistaAsociadaLago = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
 
 			//Instancio la vegetacion
@@ -182,19 +183,16 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-2793, 1, -476));
 
 
-            var indiceArbolDirectorio = (new Random()).Next(0, posicionesArboles.Count);
+			var indiceArbolDirectorio = (new Random()).Next(posicionesArboles.Count, posicionesArboles.Count+100);
 
 			Colisionable Arbol;
 
 			for (var i = 0; i<posicionesArboles.Count; i++)
             {
 				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
-				if (i == indiceArbolDirectorio)
-					Arbol = new ArbolDirectorio(MediaDir);
-				else
-					Arbol = new SinEfecto(Instance);
+				Arbol = new SinEfecto(Instance);
 				Arbol.mesh.Move(0, 0, 0);
-				Arbol.mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+				Arbol.mesh.Scale = new TGCVector3(0.05f * i , 0.05f * i , 0.05f * i);
 				Arbol.mesh.Move(posicionesArboles[i]);
 				Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
 				Objetos.Add(Arbol);
@@ -204,12 +202,16 @@ namespace TGC.Group.Model
             for (var i = posicionesArboles.Count; i < posicionesArboles.Count + 100; i++)
             {
                 var Instance = PinoOriginal.createMeshInstance("Pino" + i);
-                if (i == indiceArbolDirectorio)
-                    Arbol = new ArbolDirectorio(MediaDir);
-                else
-                    Arbol = new SinEfecto(Instance);
+				if (i == indiceArbolDirectorio)
+				{
+					Arbol = new ArbolDirectorio(MediaDir);
+				}
+				else {
+					Arbol = new SinEfecto(Instance);
+				}
+                    
                 Arbol.mesh.Move(0, 0, 0);
-                Arbol.mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+                Arbol.mesh.Scale = new TGCVector3(0.01f * i , 0.01f * i, 0.01f* i);
                 Arbol.mesh.Move(new TGCVector3(((float) Math.Pow(i, Math.PI) % 2066) + 98, 1,((float) Math.Pow(i, Math.E) % 3136) - 1339));
                 Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
                 Objetos.Add(Arbol);
@@ -320,7 +322,7 @@ namespace TGC.Group.Model
 			PistaMesh.Move(-250, 55, 741);
 			PistaMesh.Transform = TGCMatrix.Translation(-300, 55, 741);
 			PistaMesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-			rutaImagen = MediaDir + "\\2D\\texto_inicial.png";
+			rutaImagen = MediaDir + "\\2D\\pista_pala.png";
 			var rutaMostrable = MediaDir + "\\2D\\EspacioPistaHUD.png";
 			var pista = new Pista(PistaMesh, rutaImagen, rutaMostrable);
 			Items.Add(pista);
@@ -495,7 +497,7 @@ namespace TGC.Group.Model
 
 				foreach (var objeto in Objetos)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 300;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.Position - Personaje.mesh.Position)) < 100;
 					if (result)
 					{
 						objetoCerca = true;
@@ -545,21 +547,25 @@ namespace TGC.Group.Model
 				{
 					if (Personaje.tieneItem("SUDO"))
 					{
-						Personaje.agregarPieza(piezaAsociadaLago);
-						Personaje.agregarPista(pistaAsociadaLago);
+						if (!piezaLagoEntregada) {
+							Personaje.agregarPieza(piezaAsociadaLago);
+							Personaje.agregarPista(pistaAsociadaLago);
+							piezaLagoEntregada = true;
+						}
 					}
 					else {
 						if (mensajeAgua == null || mensajeAgua.tiempoCumplido()) {
 							mensajeAgua = new MensajeTemporal("No tienes permiso para nadar");
 							HUD.Instance.mensajesTemporales.Add(mensajeAgua);
 						}
+						physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
+						physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
+						var direccionATierra = (Personaje.mesh.Position - new TGCVector3(-3800, 80, 160));
+						direccionATierra.Normalize();
+						physicsExample.personajeBody.ApplyCentralImpulse(-25 * direccionATierra.ToBulletVector3());
 					}
 
-                    physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
-                    physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
-                    var direccionATierra = (Personaje.mesh.Position - new TGCVector3(-3800,80,160));
-                    direccionATierra.Normalize();
-                    physicsExample.personajeBody.ApplyCentralImpulse(-25 * direccionATierra.ToBulletVector3());
+                    
                     
                 }
                 

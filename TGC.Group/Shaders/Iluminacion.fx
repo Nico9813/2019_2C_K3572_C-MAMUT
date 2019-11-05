@@ -304,7 +304,7 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
     float4 finalColor = float4(saturate(materialEmissiveColor + ambientLight + diffuseLight) * texelColor + specularLight, 1);
     finalColor = calcularNiebla(finalColor, input.WorldPosition.z, input.WorldPosition.x);
 
-    return finalColor;
+    return finalColor * 0.5;
 }
 
 /*

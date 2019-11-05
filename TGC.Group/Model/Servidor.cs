@@ -12,10 +12,12 @@ namespace TGC.Group.Model
 	{
 		Pieza piezaAsociada;
 		Pista pistaAsociada;
+		Item itemAsociado;
 		bool usado;
 		public Servidor(String MediaDir) {
 			piezaAsociada = new Pieza(0, "Pieza 0", MediaDir + "\\2D\\windows\\windows_0.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
+			itemAsociado = new Herramienta("Hacha" , null, MediaDir + "\\2D\\hacha.png");
 			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"servidor-TgcScene.xml").Meshes[0];
 			usado = false;
 			interactuable = true;
@@ -34,6 +36,7 @@ namespace TGC.Group.Model
 				{
 					personaje.agregarPieza(piezaAsociada);
 					personaje.agregarPista(pistaAsociada);
+					personaje.agregarItem(itemAsociado);
 					usado = true;
 				}
 				else
