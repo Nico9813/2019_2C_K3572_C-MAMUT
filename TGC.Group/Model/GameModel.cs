@@ -156,12 +156,25 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(951, 1, 637));
             posicionesArboles.Add(new TGCVector3(1361, 1, 404));
             posicionesArboles.Add(new TGCVector3(1361, 1, 440));
+            posicionesArboles.Add(new TGCVector3(-3877, 1, -678));
+            posicionesArboles.Add(new TGCVector3(-3997, 1, -1079));
+            posicionesArboles.Add(new TGCVector3(-3996, 1, -1617));
+            posicionesArboles.Add(new TGCVector3(-3701, 1, -1505));
+            posicionesArboles.Add(new TGCVector3(-3761, 1, -1069));
+            posicionesArboles.Add(new TGCVector3(-3968, 1, -1952));
+            posicionesArboles.Add(new TGCVector3(-3550, 1, -1562));
+            posicionesArboles.Add(new TGCVector3(-3557, 1, -1192));
+            posicionesArboles.Add(new TGCVector3(-3938, 1, -1048));
+            posicionesArboles.Add(new TGCVector3(-3148, 1, -268));
+            posicionesArboles.Add(new TGCVector3(-4120, 1, 433));
+            posicionesArboles.Add(new TGCVector3(-3136, 1, -135));
+            posicionesArboles.Add(new TGCVector3(-2793, 1, -476));
+
 
             var indiceArbolDirectorio = 2; //(new Random()).Next(0, posicionesArboles.Count);
 
 			Colisionable Arbol;
 
-			Console.WriteLine("Cant: " + posicionesArboles.Count);
 			for (var i = 0; i<posicionesArboles.Count; i++)
             {
 				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
@@ -174,6 +187,21 @@ namespace TGC.Group.Model
 				Arbol.mesh.Move(posicionesArboles[i]);
 				Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
 				Objetos.Add(Arbol);
+                MeshARenderizar.Add(Arbol.mesh);
+            }
+
+            for (var i = posicionesArboles.Count; i < posicionesArboles.Count + 100; i++)
+            {
+                var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+                if (i == indiceArbolDirectorio)
+                    Arbol = new ArbolDirectorio(MediaDir);
+                else
+                    Arbol = new SinEfecto(Instance);
+                Arbol.mesh.Move(0, 0, 0);
+                Arbol.mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+                Arbol.mesh.Move(new TGCVector3(((float) Math.Pow(i, Math.PI) % 2066) + 98, 1,((float) Math.Pow(i, Math.E) % 3136) - 1339));
+                Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
+                Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
             }
 
