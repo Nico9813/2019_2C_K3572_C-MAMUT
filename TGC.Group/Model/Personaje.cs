@@ -9,6 +9,7 @@ using TGC.Core.Interpolation;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
+using TGC.Core.Sound;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Objetos;
@@ -121,16 +122,18 @@ namespace TGC.Group.Model
 			}
 
 			if (Input.keyPressed(Key.G) && pistas.Count != 0) {
-				agendaActiva = !agendaActiva;
+                agendaActiva = !agendaActiva;
 				HUD.Instance.Agenda = !HUD.Instance.Agenda;
 				HUD.Instance.paginaActual = pistas[0];
 				pistaActual = 0;
+                GameModel.sonidoNota.play(false);
 			}
 
 			if (agendaActiva && Input.keyPressed(Key.Space)){
-				pistaActual = (pistaActual + 1) % pistas.Count;
+                pistaActual = (pistaActual + 1) % pistas.Count;
 				HUD.Instance.paginaActual = pistas[pistaActual];
-			}
+                GameModel.sonidoNota.play(false);
+            }
 
 			if (objetoEquipado && itemSelecionadoActivo)
 				itemSelecionado.update(this, elapsedTime);

@@ -40,45 +40,44 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-		private Boolean Pausa = false;
-		private Boolean JuegoIniciado = false;
+        private Boolean Pausa = false;
+        private Boolean JuegoIniciado = false;
 
-		private TgcPlane Plano;
-		private Personaje Personaje;
-		private TgcMesh MeshPersonaje;
+        private TgcPlane Plano;
+        private Personaje Personaje;
+        private TgcMesh MeshPersonaje;
 
-		private TgcSkyBox skyBox;
+        private TgcSkyBox skyBox;
 
-		private List<Recolectable> Items;
-		private List<Pieza> Piezas;
-		private List<Colisionable> Objetos;
-		private List<TgcMesh> MeshARenderizar;
+        private List<Recolectable> Items;
+        private List<Pieza> Piezas;
+        private List<Colisionable> Objetos;
+        private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
 
-		private List<Fogata> IluminacionEscenario;
+        private List<Fogata> IluminacionEscenario;
 
-		private List<TgcMesh> MeshTotales;
+        private List<TgcMesh> MeshTotales;
         private Boolean fogataCerca = false;
         Recolectable objetoColisionado = null;
 
-		private TgcMesh MeshPlano;
-		private TgcMesh MeshLago;
-		private Pieza piezaAsociadaLago;
-		private Pista pistaAsociadaLago;
-		private TgcBoundingElipsoid lago;
-		private TgcSimpleTerrain terreno;
-		private float currentScaleXZ;
-		private float currentScaleY;
-		private float tamanioMapa = 10000;
+        private TgcMesh MeshPlano;
+        private TgcMesh MeshLago;
+        private Pieza piezaAsociadaLago;
+        private Pista pistaAsociadaLago;
+        private TgcBoundingElipsoid lago;
+        private TgcSimpleTerrain terreno;
+        private float currentScaleXZ;
+        private float currentScaleY;
+        private float tamanioMapa = 10000;
 
-		private Quadtree quadtree;
-		private MamutCamara camaraInterna;
-		private Bateria bateria;
-		private Vela vela;
+        private Quadtree quadtree;
+        private MamutCamara camaraInterna;
+        private Bateria bateria;
+        private Vela vela;
 
-		Bug bug;
-        Tgc3dSound sonidoBug;//sonido que actualiza la posicion
-
+        Bug bug;
+        
         private Fisicas physicsExample;
 
         private float giroMuerte;
@@ -89,14 +88,18 @@ namespace TGC.Group.Model
         private Effect effect;
         float time = 0;
         private TgcFog fog;
-    
-        private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
-        private List<Tgc3dSound> sonidos = new List<Tgc3dSound>();
 
+        private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
+
+
+        public List<Tgc3dSound> sonidos = new List<Tgc3dSound>();
         //para sonidos
-        private TgcStaticSound sonidoPisadas;
-        private TgcStaticSound sonidoAgua;
-        private TgcStaticSound sonidoNota;
+        public static TgcStaticSound sonidoPisadas;
+        public static TgcStaticSound sonidoAgua;
+        public static TgcStaticSound sonidoNota;
+        public static TgcStaticSound sonidoPickup;
+        public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
+        
 
         public override void Init()
         {
@@ -399,13 +402,10 @@ namespace TGC.Group.Model
             fog = new TgcFog();
             fog.StartDistance = 1000f;
             fog.EndDistance = 1200f;
-            //Hacer que el Listener del sonido 3D siga al personaje
-            DirectSound.ListenerTracking = Personaje.mesh;
-            sonidosInit();
-            foreach (var s in sonidos)
-            {
-                s.play(true);
-            }
+            
+            SonidosInit();
+
+
         }
 
 		public override void Update()
@@ -484,6 +484,7 @@ namespace TGC.Group.Model
 							Items.Remove(item);
 							Personaje.agregarRecolectable(item);
 							quadtree.actualizarModelos(MeshARenderizar);
+                            sonidoPickup.play(false);
 						}
 						break;
 					}
@@ -573,7 +574,7 @@ namespace TGC.Group.Model
                 camaraInterna.Target = Personaje.mesh.Position;
 			}
 
-            sonidosUpdate();
+            SonidosUpdate();
 
             PostUpdate();
         }
@@ -717,21 +718,24 @@ namespace TGC.Group.Model
             physicsExample.Dispose();
             monstruo.Dispose();
         }
-
-        public void sonidosInit()
+        public void SonidosInit()
         {
-            foreach(var mesh in meshFogatas)
-            { 
-            Tgc3dSound sonidoFogata;
-            sonidoFogata = new Tgc3dSound(MediaDir + "Sound\\fogata.wav", mesh.Position, DirectSound.DsDevice);
-                
-            sonidoFogata.MinDistance = 40f;
-            sonidos.Add(sonidoFogata);
-            }
+            DirectSound.InitializeD3DDevice(new System.Windows.Forms.Control());
+            //Hacer que el Listener del sonido 3D siga al personaje
+            DirectSound.ListenerTracking = Personaje.mesh;
             
-            sonidoBug = new Tgc3dSound(MediaDir + "Sound\\bug.wav", bug.meshMounstroMiniatura.Position, DirectSound.DsDevice);
+            foreach (var mesh in meshFogatas)
+            {
+                Tgc3dSound sonidoFogata;
+                sonidoFogata = new Tgc3dSound(MediaDir + "Sound\\fogata.wav", mesh.Position, DirectSound.DsDevice);
 
-            sonidoBug.MinDistance = 50f;
+                sonidoFogata.MinDistance = 60f;
+                sonidos.Add(sonidoFogata);
+            }
+
+            sonidoBug = new Tgc3dSound(MediaDir + "Sound\\bug.wav", bug.mesh.Position, DirectSound.DsDevice);
+
+            sonidoBug.MinDistance = 75f;
             sonidos.Add(sonidoBug);
 
             sonidoPisadas = new TgcStaticSound();
@@ -742,12 +746,22 @@ namespace TGC.Group.Model
 
             sonidoNota = new TgcStaticSound();
             sonidoNota.loadSound(MediaDir + "Sound\\notas.wav", DirectSound.DsDevice);
-        }
-        public void sonidosUpdate()
-        {
-            sonidoBug.Position = bug.meshMounstroMiniatura.Position;
 
-            if (physicsExample.personajeBody.ActivationState == ActivationState.ActiveTag)
+            sonidoPickup = new TgcStaticSound();
+            sonidoPickup.loadSound(MediaDir + "Sound\\pickup.wav", DirectSound.DsDevice);
+
+            foreach (var s in sonidos)
+            {
+                s.play(true);
+            }
+        }
+
+
+        public void SonidosUpdate()
+        {
+            sonidoBug.Position = bug.mesh.Position;
+
+            if(physicsExample.personajeBody.ActivationState == ActivationState.ActiveTag)
             {
                 sonidoPisadas.play(true);
             }
@@ -756,5 +770,7 @@ namespace TGC.Group.Model
                 sonidoPisadas.stop();
             }
         }
-	}
+
+
+    }
 }
