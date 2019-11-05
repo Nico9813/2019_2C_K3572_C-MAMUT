@@ -127,7 +127,7 @@ namespace TGC.Examples.Physics.CubePhysic
             personajeBody.SetDamping(0.3f, 0f);
             personajeBody.Restitution = 0.1f;
             personajeBody.Friction = 1;
-
+            personajeBody.ActivationState = ActivationState.IslandSleeping;
 
             dynamicsWorld.AddRigidBody(personajeBody);
 

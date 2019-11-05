@@ -20,12 +20,13 @@ using BulletSharp;
 using TGC.Examples.Physics.CubePhysic;
 using TGC.Group.Objetos;
 using TGC.Core.Interpolation;
-using Device = Microsoft.DirectX.Direct3D.Device;
+
 using TGC.Core.Example;
 using TGC.Group.Sprites;
 using Microsoft.DirectX;
 using Effect = Microsoft.DirectX.Direct3D.Effect;
 using TGC.Core.Fog;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -76,8 +77,9 @@ namespace TGC.Group.Model
 		private Vela vela;
 
 		Bug bug;
+        Tgc3dSound sonidoBug;//sonido que actualiza la posicion
 
-		private Fisicas physicsExample;
+        private Fisicas physicsExample;
 
         private float giroMuerte;
         private TgcMesh monstruo;
@@ -87,9 +89,14 @@ namespace TGC.Group.Model
         private Effect effect;
         float time = 0;
         private TgcFog fog;
-        float enfriamento = 0;
+    
         private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
+        private List<Tgc3dSound> sonidos = new List<Tgc3dSound>();
 
+        //para sonidos
+        private TgcStaticSound sonidoPisadas;
+        private TgcStaticSound sonidoAgua;
+        private TgcStaticSound sonidoNota;
 
         public override void Init()
         {
@@ -392,6 +399,13 @@ namespace TGC.Group.Model
             fog = new TgcFog();
             fog.StartDistance = 1000f;
             fog.EndDistance = 1200f;
+            //Hacer que el Listener del sonido 3D siga al personaje
+            DirectSound.ListenerTracking = Personaje.mesh;
+            sonidosInit();
+            foreach (var s in sonidos)
+            {
+                s.play(true);
+            }
         }
 
 		public override void Update()
@@ -542,6 +556,7 @@ namespace TGC.Group.Model
 
                     // Personaje.mesh.Position = cabaniaBoundingBox.PMin;
                     // Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
+                    sonidoAgua.play(false);
                     physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
                     physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
                     var direccionATierra = (Personaje.mesh.Position - ultimaPosTierra);
@@ -557,6 +572,8 @@ namespace TGC.Group.Model
 
                 camaraInterna.Target = Personaje.mesh.Position;
 			}
+
+            sonidosUpdate();
 
             PostUpdate();
         }
@@ -643,7 +660,7 @@ namespace TGC.Group.Model
 
 				mesh.Effect.SetValue("lightIntensityFog", 50f);
 				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1, 2, 3)));
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 
@@ -699,6 +716,45 @@ namespace TGC.Group.Model
             skyBox.Dispose();
             physicsExample.Dispose();
             monstruo.Dispose();
+        }
+
+        public void sonidosInit()
+        {
+            foreach(var mesh in meshFogatas)
+            { 
+            Tgc3dSound sonidoFogata;
+            sonidoFogata = new Tgc3dSound(MediaDir + "Sound\\fogata.wav", mesh.Position, DirectSound.DsDevice);
+                
+            sonidoFogata.MinDistance = 40f;
+            sonidos.Add(sonidoFogata);
+            }
+            
+            sonidoBug = new Tgc3dSound(MediaDir + "Sound\\bug.wav", bug.meshMounstroMiniatura.Position, DirectSound.DsDevice);
+
+            sonidoBug.MinDistance = 50f;
+            sonidos.Add(sonidoBug);
+
+            sonidoPisadas = new TgcStaticSound();
+            sonidoPisadas.loadSound(MediaDir + "Sound\\pisadas.wav", DirectSound.DsDevice);
+
+            sonidoAgua = new TgcStaticSound();
+            sonidoAgua.loadSound(MediaDir + "Sound\\agua.wav", DirectSound.DsDevice);
+
+            sonidoNota = new TgcStaticSound();
+            sonidoNota.loadSound(MediaDir + "Sound\\notas.wav", DirectSound.DsDevice);
+        }
+        public void sonidosUpdate()
+        {
+            sonidoBug.Position = bug.meshMounstroMiniatura.Position;
+
+            if (physicsExample.personajeBody.ActivationState == ActivationState.ActiveTag)
+            {
+                sonidoPisadas.play(true);
+            }
+            else
+            {
+                sonidoPisadas.stop();
+            }
         }
 	}
 }
