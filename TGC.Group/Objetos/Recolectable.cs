@@ -14,10 +14,7 @@ namespace TGC.Group.Objetos
 		public String rutaImagen;
 
 		abstract public String getDescripcion();
-		public String getRutaImagen()
-		{
-			return rutaImagen;
-		}
+		abstract public String getRutaImagen();
 		abstract public void Agregarse(Personaje personaje);
 	}
 }

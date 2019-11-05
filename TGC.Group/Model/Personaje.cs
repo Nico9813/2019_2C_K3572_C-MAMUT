@@ -21,16 +21,21 @@ namespace TGC.Group.Model
 		public TgcMesh mesh;
 		private List<Item> items;
 		private List<Pieza> piezas;
+		private List<Pista> pistas;
 		private Iluminador iluminadorPrincipal;
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 90000000000;
+		public float tiempoLimiteDesprotegido = 90;
 		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
-        private Boolean perdio = false;
+        private Boolean perdio;
 		private Boolean itemSelecionadoActivo;
+		private Boolean agendaActiva;
+
+		public int pistaActual;
+
 		public TgcMesh meshEnMano = null;
 
 		public void Init(TgcMesh meshPersonaje, String MediaDir) {
@@ -46,22 +51,29 @@ namespace TGC.Group.Model
 			//linterna.vaciarBateria();
 			items = new List<Item>();
 			piezas = new List<Pieza>();
+			pistas = new List<Pista>();
+
 			linterna = new Linterna(VelasMesh, mediaDir + "\\2D\\imgLinterna.png");
 
 			HUD.Instance.Init(mediaDir, this);
 			HUD.Instance.HUDpersonaje = true;
 			HUD.Instance.HUDpersonaje_piezas = true;
-
-			
+			HUD.Instance.Agenda = false;
 
 			agregarItem(linterna);
 			agregarItem(new Vela(VelasMesh, mediaDir + "\\2D\\imgVela.png"));
 			agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
+
+			pistas.Add(new Pista(null,mediaDir + "\\2D\\pista_pala.png", null));
+			pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_sudo.png", null));
+
 			HUD.Instance.seleccionarItem(linterna);
 
 			objetoEquipado = false;
 			ilumnacionActiva = false;
 			itemSelecionadoActivo = false;
+			agendaActiva = false;
+			perdio = false;
 
 			itemSelecionado = items.ElementAt(0);
 		}
@@ -108,10 +120,22 @@ namespace TGC.Group.Model
 				}
 			}
 
+			if (Input.keyPressed(Key.G) && pistas.Count != 0) {
+				agendaActiva = !agendaActiva;
+				HUD.Instance.Agenda = !HUD.Instance.Agenda;
+				HUD.Instance.paginaActual = pistas[0];
+				pistaActual = 0;
+			}
+
+			if (agendaActiva && Input.keyPressed(Key.Space)){
+				pistaActual = (pistaActual + 1) % pistas.Count;
+				HUD.Instance.paginaActual = pistas[pistaActual];
+			}
+
 			if (objetoEquipado && itemSelecionadoActivo)
 				itemSelecionado.update(this, elapsedTime);
 
-			HUD.Instance.Update();
+			HUD.Instance.Update(elapsedTime);
 		}
 
 		public void Render(float ElapsedTime, TgcD3dInput input)
@@ -122,7 +146,6 @@ namespace TGC.Group.Model
 				
 				meshEnMano.Move(new TGCVector3(-3500, 100, 555));
 				meshEnMano.Transform = TGCMatrix.Translation(new TGCVector3(-3500, 100, 555));
-				Console.WriteLine(meshEnMano.ToString());
 				meshEnMano.Render();
 			}
 		}
@@ -156,12 +179,24 @@ namespace TGC.Group.Model
 
 		public void agregarItem(Item item) {
 			this.items.Add(item);
+			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Se agrego al inventario el item " + item.getDescripcion()));
 			HUD.Instance.guardarItem(item);
+		}
+
+		public void agregarPista(Pista item)
+		{
+			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pista, pulsa G para visualizarla"));
+			this.pistas.Add(item);
 		}
 
 		public void agregarPieza(Pieza pieza){
 			this.piezas.Add(pieza);
+			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pieza de la imagen"));
 			HUD.Instance.guardarPieza(pieza);
+		}
+
+		public bool tieneItem(String descripcionItem) {
+			return items.Exists(item => item.getDescripcion().Equals(descripcionItem));
 		}
 
 		internal void removerItem(Item item)

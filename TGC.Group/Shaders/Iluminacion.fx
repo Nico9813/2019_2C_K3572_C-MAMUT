@@ -65,6 +65,11 @@ float spotLightExponent; //Exponente de atenuacion dentro del cono de luz
 
 float time = 0;
 
+//Para niebla
+float4 ColorFog;
+float StartFogDistance;
+float EndFogDistance;
+
 /**************************************************************************************/
 /* MultiDiffuseLightsTechnique  PARA LAS FOGATAS*/
 /**************************************************************************************/
@@ -127,7 +132,7 @@ float3 computeDiffuseComponent(float3 surfacePosition, float3 N, int i)
     float intensity = lightIntensityFog / distAtten; //Dividimos intensidad sobre distancia
 
 	//Calcular Diffuse (N dot L)
-    return intensity * lightColorFog.rgb * materialDiffuseColor * max(0.0, dot(N, Ln));
+	return abs(intensity * lightColorFog.rgb * materialDiffuseColor);
 }
 
 //Pixel Shader para Point Light
@@ -236,7 +241,21 @@ struct PS_DIFFUSE_MAP
     float3 WorldNormal : TEXCOORD2;
     float3 LightVec : TEXCOORD3;
     float3 HalfAngleVec : TEXCOORD4;
+    float1 Fog : FOG;
 };
+
+float4 calcularNiebla(float4 fvBaseColor, float PosViewZ, float PosViewX)
+{
+	float zn = StartFogDistance;
+	float zf = EndFogDistance;
+	float distancia = sqrt(pow(abs(eyePositionPj.z - PosViewZ), 2) + pow(abs(eyePositionPj.x - PosViewX), 2));
+
+	float coef = distancia / 10000;
+	fvBaseColor = ColorFog * coef + fvBaseColor * (1 - coef);
+	return fvBaseColor;
+
+
+}
 
 //Pixel Shader
 float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
@@ -283,6 +302,7 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
 	/* Color final: modular (Emissive + Ambient + Diffuse) por el color de la textura, y luego sumar Specular.
 	   El color Alpha sale del diffuse material */
     float4 finalColor = float4(saturate(materialEmissiveColor + ambientLight + diffuseLight) * texelColor + specularLight, 1);
+    finalColor = calcularNiebla(finalColor, input.WorldPosition.z, input.WorldPosition.x);
 
     return finalColor;
 }
@@ -351,6 +371,7 @@ float4 ps_Sepia(PS_DIFFUSE_MAP input) : COLOR0
     outputColor.g *= 0.1;
     outputColor.b *= 0.1;
     outputColor.rgb *= diffuseLighting;
+    outputColor = calcularNiebla(outputColor, input.WorldPosition.z, input.WorldPosition.x);
     return outputColor;
 }
 
@@ -362,3 +383,4 @@ technique Sepia
         PixelShader = compile ps_3_0 ps_Sepia();
     }
 }
+

@@ -11,11 +11,17 @@ using TGC.Core.Mathematica;
 using TGC.Core.Text;
 using TGC.Group.Sprites;
 using TGC.Group.Objetos;
+using TGC.Examples.Engine2D;
 
 namespace TGC.Group.Model
 {
 	class HUD
 	{
+		TgcText2D drawerText = new TgcText2D();
+
+		float width = D3DDevice.Instance.Width;
+		float height = D3DDevice.Instance.Height;
+
 		private CustomSprite BarraBateria;
 		private CustomSprite RellenoBateria;
 		private List<EspacioObjeto> espaciosInventario;
@@ -27,15 +33,25 @@ namespace TGC.Group.Model
 		private Personaje personaje;
 		private CustomSprite MenuControlesSprite;
 		private CustomSprite MapaPersonajeSprite;
-		private CustomSprite MensajeRecolectableSprite;
+		private CustomSprite EspacioMensajeSprite;
+		private CustomSprite AgendaSprite;
+		private CustomSprite paginaActualSprite;
+
+		public Pista paginaActual;
+
+		public List<MensajeTemporal> mensajesTemporales = new List<MensajeTemporal>();
 
 		public bool MenuControles = false;
 		public bool MenuPausa = false;
 		public bool HUDpersonaje = false;
 		public bool HUDpersonaje_piezas = false;
 		public bool MapaPersonaje = false;
+		public bool Agenda = false;
 		public bool Mensaje = false;
+		public bool MensajeColisionable = false;
+
 		public Recolectable MensajeRecolectable;
+		public Colisionable Colisionado;
 
 		private readonly static HUD instance = new HUD();
 
@@ -49,13 +65,9 @@ namespace TGC.Group.Model
 			}
 		}
 
-		
-
 		public void Init(String MediaDir, Personaje _personaje)
 		{
 			personaje = _personaje;
-			var width = D3DDevice.Instance.Width;
-			var height = D3DDevice.Instance.Height;
 			drawer = new Drawer2D();
 
 			BarraBateria = new CustomSprite
@@ -64,7 +76,6 @@ namespace TGC.Group.Model
 				Position = new TGCVector2(width * 0.02f, height * 0.85f),
 				Scaling = new TGCVector2(0.5f, 0.5f),
 				Color = Color.DarkMagenta,
-
 			};
 
 			RellenoBateria = new CustomSprite
@@ -85,14 +96,21 @@ namespace TGC.Group.Model
 			MapaPersonajeSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\mapa.png", D3DDevice.Instance.Device),
-				Position = new TGCVector2(width * 0.32f, height * 0.20f),
+				Position = new TGCVector2(width * 0.3f, height * 0.20f),
 				Scaling = new TGCVector2(0.6f, 0.6f),
 			};
 
-			MensajeRecolectableSprite = new CustomSprite
+			EspacioMensajeSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioMensaje.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.35f, height * 0.70f),
+			};
+
+			AgendaSprite = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioPista.png", D3DDevice.Instance.Device),
+				Position = new TGCVector2(width * 0.3f, height * 0.2f),
+				Scaling = new TGCVector2(1.5f, 1.5f),
 			};
 
 			espaciosInventario = new List<EspacioObjeto>();
@@ -168,10 +186,12 @@ namespace TGC.Group.Model
 			espaciosInventario.Find(espacio => espacio.itemGuardado.Equals(item)).seleccionar();
 		}
 
-		public void Update()
+		public void Update(float elapsedtime)
 		{
 			float bateriaRestante = personaje.getIluminadorPrincipal().getDuracionRestante();
 			RellenoBateria.Scaling = new TGCVector2(bateriaRestante * 0.5f / personaje.getIluminadorPrincipal().getDuracionTotal(), 1* 0.5f);
+			mensajesTemporales.ForEach(mensaje => mensaje.Update(elapsedtime));
+			mensajesTemporales = mensajesTemporales.FindAll(mensaje => !mensaje.tiempoCumplido());
 		}
 
 		public void Render()
@@ -223,14 +243,41 @@ namespace TGC.Group.Model
 
 			}
 
+			if (Agenda) {
+				drawer.DrawSprite(AgendaSprite);
+				paginaActualSprite = new CustomSprite
+				{
+					Bitmap = new CustomBitmap(paginaActual.rutaImagen, D3DDevice.Instance.Device),
+					Position = AgendaSprite.Position,
+					Scaling = new TGCVector2(1.5f, 1.5f),
+				};
+				drawer.DrawSprite(paginaActualSprite);
+			}
+
 			if (Mensaje) {
-				drawer.DrawSprite(MensajeRecolectableSprite);
+
+				drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+				drawer.DrawSprite(EspacioMensajeSprite);
 				CustomSprite imagenRecolectableColisionado = new CustomSprite
 				{
 					Bitmap = new CustomBitmap(MensajeRecolectable.getRutaImagen(), D3DDevice.Instance.Device),
-					Position = MensajeRecolectableSprite.Position ,
+					Position = EspacioMensajeSprite.Position ,
 				};
 				drawer.DrawSprite(imagenRecolectableColisionado);
+			}
+
+			if (MensajeColisionable) {
+				if (Colisionado.interactuable) {
+					drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+					drawer.DrawSprite(EspacioMensajeSprite);
+				}
+			}
+
+			for (int i=0; i<mensajesTemporales.Count; i++) {
+				var mensaje = mensajesTemporales[i];
+				drawerText.drawText(mensaje.getContenido(),
+				(int)(width * 0.75f), (int)(height * 0.8) + 20 * i,
+				Color.White);
 			}
 
 			drawer.EndDrawSprite();

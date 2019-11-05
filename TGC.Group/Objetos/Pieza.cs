@@ -17,9 +17,15 @@ namespace TGC.Group.Objetos
 			numeroPieza = np;
 			descripcion = descrip;
 			rutaImagen = imagen;
-			mesh = (new TgcSceneLoader()).loadSceneFromFile(rutaMesh).Meshes[0];
+			if (rutaMesh != null) {
+				mesh = (new TgcSceneLoader()).loadSceneFromFile(rutaMesh).Meshes[0];
+			}
+			
 		}
-
+		public override String getRutaImagen()
+		{
+			return this.rutaImagen;
+		}
 		public override String getDescripcion() { return descripcion; }
 		public override void Agregarse(Personaje personaje) {
 			personaje.agregarPieza(this);
