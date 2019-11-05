@@ -88,7 +88,8 @@ namespace TGC.Group.Model
         float time = 0;
         private TgcFog fog;
         float enfriamento = 0;
-        private TGCVector3 ultimaPosTierra;
+        private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
+
 
         public override void Init()
         {
@@ -543,12 +544,16 @@ namespace TGC.Group.Model
                     // Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
                     physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
                     physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
-                    var direccionATierra = (Personaje.mesh.Position - new TGCVector3(-3800,80,160));
+                    var direccionATierra = (Personaje.mesh.Position - ultimaPosTierra);
                     direccionATierra.Normalize();
-                    physicsExample.personajeBody.ApplyCentralImpulse(-25 * direccionATierra.ToBulletVector3());
+                    physicsExample.personajeBody.ApplyCentralImpulse(-20 * direccionATierra.ToBulletVector3());
                     
                 }
-                
+
+                if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-2520, 0,179), new TGCVector3(-2435, 100,276))))//Dependiendo si pasa el puente o no se guarda ultima posicion en tierra
+                    ultimaPosTierra = new TGCVector3(-3800, 80, 160);
+                if(TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-1125, 0, 179), new TGCVector3(-900, 100, 276))))
+                    ultimaPosTierra = new TGCVector3(1000, 80, 1200);
 
                 camaraInterna.Target = Personaje.mesh.Position;
 			}
