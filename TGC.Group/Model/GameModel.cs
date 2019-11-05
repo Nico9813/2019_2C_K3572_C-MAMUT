@@ -149,6 +149,14 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-3139, 1, -1269));
             posicionesArboles.Add(new TGCVector3(-2140, 1, -562));
             posicionesArboles.Add(new TGCVector3(-4094, 1, -145));
+            posicionesArboles.Add(new TGCVector3(-3103, 1, -1337));
+            posicionesArboles.Add(new TGCVector3(-2896, 1, -1087));
+            posicionesArboles.Add(new TGCVector3(-2529, 1, 10));
+            posicionesArboles.Add(new TGCVector3(-3917, 1, 772));
+            posicionesArboles.Add(new TGCVector3(746, 1, 157));
+            posicionesArboles.Add(new TGCVector3(951, 1, 637));
+            posicionesArboles.Add(new TGCVector3(1361, 1, 404));
+            posicionesArboles.Add(new TGCVector3(1361, 1, 440));
 
 
             for (var i = 0; i< scene.Meshes.Count && i<posicionesArboles.Count; i++)
