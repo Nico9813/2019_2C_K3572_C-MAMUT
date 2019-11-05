@@ -40,6 +40,7 @@ namespace TGC.Group.Model
         }
 
 		private Boolean Pausa = false;
+		private Boolean JuegoIniciado = false;
 
 		private TgcPlane Plano;
 		private Personaje Personaje;
@@ -61,6 +62,8 @@ namespace TGC.Group.Model
 
 		private TgcMesh MeshPlano;
 		private TgcMesh MeshLago;
+		private Pieza piezaAsociadaLago;
+		private Pista pistaAsociadaLago;
 		private TgcBoundingElipsoid lago;
 		private TgcSimpleTerrain terreno;
 		private float currentScaleXZ;
@@ -116,6 +119,8 @@ namespace TGC.Group.Model
             MeshPlano = Plano.toMesh("MeshPlano");
             Objetos.Add(new SinEfecto(MeshPlano));
 			MeshARenderizar.Add(MeshPlano);
+			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_0.png", null);
+			pistaAsociadaLago = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
 
 			//Instancio la vegetacion
 			var scene = loader.loadSceneFromFile(MediaDir + @"Pino-TgcScene.xml");
@@ -149,7 +154,7 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-2140, 10, -562));
             posicionesArboles.Add(new TGCVector3(-4094, 10, -145));
 
-			var indiceArbolDirectorio = 2; //(new Random()).Next(0, posicionesArboles.Count);
+			var indiceArbolDirectorio = (new Random()).Next(0, posicionesArboles.Count);
 
 			Colisionable Arbol;
 
@@ -342,174 +347,152 @@ namespace TGC.Group.Model
 		public override void Update()
         {
 			PreUpdate();
-            time += ElapsedTime;
 
-			if (Pausa) ElapsedTime = 0;
-
-			if (!Pausa) {
-				physicsExample.Update(Input, monstruo);
-				Personaje.Update(Input, ElapsedTime);
-
-				if (Input.keyDown(Key.A))
-				{
-					camaraInterna.rotateY(-0.005f);
-				}
-
-				if (Input.keyDown(Key.D))
-				{
-					camaraInterna.rotateY(0.5f * 0.01f);
+			if (!JuegoIniciado)
+			{
+				HUD.Instance.MainMenu = true;
+				Personaje.mesh.Position = new TGCVector3(-3300, 22, 650);
+				camaraInterna.Target = Personaje.mesh.Position;
+				Camara = camaraInterna;
+				if (Input.keyPressed(Key.F)){
+					JuegoIniciado = true;
+					HUD.Instance.MainMenu = false;
 				}
 			}
+			else {
+				time += ElapsedTime;
 
-			objetoColisionado = null;
+				if (Pausa) ElapsedTime = 0;
 
-			if (Input.keyPressed(Key.Escape))
-			{
-				Pausa = !Pausa;
-				HUD.Instance.MenuControles = !HUD.Instance.MenuControles;
-				HUD.Instance.HUDpersonaje = !HUD.Instance.HUDpersonaje;
-				HUD.Instance.HUDpersonaje_piezas = !HUD.Instance.HUDpersonaje_piezas;
-				HUD.Instance.Mensaje = false;
-			}
-
-            if (Personaje.perdioJuego()) 
-            {
-
-                camaraInterna.rotateY(FastMath.PI/180);
-                this.giroMuerte += 1f;
-                if (giroMuerte >= 180f)
-                {
-                    camaraInterna.RotationSpeed = 0;
-                    physicsExample.strength = 0;
-                    physicsExample.angle = 0;
-                }
-                physicsExample.personajeBody.ActivationState = ActivationState.IslandSleeping;
-            }
-
-			var itemCerca = false;
-
-			foreach (var item in Items)
-			{
-				var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
-				if (result)
+				if (!Pausa)
 				{
-					itemCerca = true;
-					HUD.Instance.MensajeRecolectable = item;
-					if (Input.keyPressed(Key.E))
+					physicsExample.Update(Input, monstruo);
+					Personaje.Update(Input, ElapsedTime);
+
+					if (Input.keyDown(Key.A))
 					{
-						MeshARenderizar.Remove(item.mesh);
-						Items.Remove(item);
-						Personaje.agregarRecolectable(item);
-						quadtree.actualizarModelos(MeshARenderizar);
+						camaraInterna.rotateY(-0.005f);
 					}
-					break;
-				}
-			}
 
-			HUD.Instance.Mensaje = itemCerca;
-
-			var objetoCerca = false;
-
-			foreach (var objeto in Objetos)
-			{
-				var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 300;
-				if (result)
-				{
-					objetoCerca = true;
-					HUD.Instance.Colisionado = objeto;
-					if (Input.keyPressed(Key.E))
+					if (Input.keyDown(Key.D))
 					{
-						objeto.serColisionado(Personaje);
+						camaraInterna.rotateY(0.5f * 0.01f);
 					}
-					break;
 				}
-			}
 
-			HUD.Instance.MensajeColisionable = objetoCerca;
+				objetoColisionado = null;
 
-			var fogatasLejos = 0;
-            foreach (var iluminador in IluminacionEscenario)
-            {
-                var distancia = FastMath.Sqrt(TGCVector3.LengthSq(new TGCVector3(50,0,50) + iluminador.mesh.Position - Personaje.mesh.Position));//50 en xz es porque no esta centrada la hoguera
-                var dentroFogata = distancia < 300;
-             
-                if (dentroFogata)
-                {
-                    fogataCerca = true;
-                    
+				if (Input.keyPressed(Key.Escape))
+				{
+					Pausa = !Pausa;
+					HUD.Instance.MenuControles = !HUD.Instance.MenuControles;
+					HUD.Instance.HUDpersonaje = !HUD.Instance.HUDpersonaje;
+					HUD.Instance.HUDpersonaje_piezas = !HUD.Instance.HUDpersonaje_piezas;
+					HUD.Instance.Mensaje = false;
+				}
+
+				if (Personaje.perdioJuego())
+				{
+
+					camaraInterna.rotateY(FastMath.PI / 180);
+					this.giroMuerte += 1f;
+					if (giroMuerte >= 180f)
+					{
+						camaraInterna.RotationSpeed = 0;
+						physicsExample.strength = 0;
+						physicsExample.angle = 0;
+					}
+					physicsExample.personajeBody.ActivationState = ActivationState.IslandSleeping;
+				}
+
+				var itemCerca = false;
+
+				foreach (var item in Items)
+				{
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
+					if (result)
+					{
+						itemCerca = true;
+						HUD.Instance.MensajeRecolectable = item;
+						if (Input.keyPressed(Key.E))
+						{
+							MeshARenderizar.Remove(item.mesh);
+							Items.Remove(item);
+							Personaje.agregarRecolectable(item);
+							quadtree.actualizarModelos(MeshARenderizar);
+						}
+						break;
+					}
+				}
+
+				HUD.Instance.Mensaje = itemCerca;
+
+				var objetoCerca = false;
+
+				foreach (var objeto in Objetos)
+				{
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.PMax - Personaje.mesh.Position)) < 300;
+					if (result)
+					{
+						objetoCerca = true;
+						HUD.Instance.Colisionado = objeto;
+						if (Input.keyPressed(Key.E))
+						{
+							objeto.serColisionado(Personaje);
+						}
+						break;
+					}
+				}
+
+				HUD.Instance.MensajeColisionable = objetoCerca;
+
+				var fogatasLejos = 0;
+				foreach (var iluminador in IluminacionEscenario)
+				{
+					var distancia = FastMath.Sqrt(TGCVector3.LengthSq(new TGCVector3(50, 0, 50) + iluminador.mesh.Position - Personaje.mesh.Position));//50 en xz es porque no esta centrada la hoguera
+					var dentroFogata = distancia < 300;
+
+					if (dentroFogata)
+					{
+						fogataCerca = true;
+
+						Personaje.tiempoDesprotegido = 0;
+
+						break;
+					}
+
+					else
+					{
+						fogatasLejos++;
+					}
+
+				}
+
+				this.effect.SetValue("time", time);
+
+				//Cabania es lugar seguro
+
+				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
+				{
 					Personaje.tiempoDesprotegido = 0;
-                    
-                    break;
-                }
-
-                else
-                {
-					fogatasLejos++;
-                }
-               
-            }
-
-            this.effect.SetValue("time", time);
-
-            //Cabania es lugar seguro
-			
-            if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
-            {
-                Personaje.tiempoDesprotegido = 0;
-            }
-
-			camaraInterna.Target = physicsExample.getPersonaje().Position;
-            if (Personaje.estaEnPeligro())
-            {
-
-                foreach (var mesh in MeshARenderizar)
-                {
-                    mesh.Effect = effect;
-                    mesh.Technique = "Sepia";
-                }
-
-				monstruo.Effect = effect;
-				monstruo.Technique = "Sepia";
-
-                terreno.Effect = effect;
-                terreno.Technique = "Sepia";
-
-                foreach (var mesh in meshFogatas)
-                {
-                    mesh.Effect = effect;
-                    mesh.Technique = "Sepia";
-
-                }
-                foreach (var mesh in skyBox.Faces)
-                {
-                    mesh.Effect = effect;
-                    mesh.Technique = "Sepia";
-                }
-            }
-            else 
-            {
-                foreach (var mesh in MeshARenderizar)
-                {
-                    mesh.Effect = effect;
-                    mesh.Technique = "Spotlight";
-
-                }
-
-                terreno.Effect = effect;
-                terreno.Technique = "Spotlight";
-
-				foreach (var mesh in meshFogatas)
-				{
-					mesh.Effect = effect;
-					mesh.Technique = "Spotlight";
-
 				}
-                foreach(var mesh in skyBox.Faces)
-                {
-                    mesh.Effect = effect;
-                    mesh.Technique = "Spotlight";
-                }
 
+				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
+				{
+					Console.WriteLine("choca rio");
+					if (Personaje.tieneItem("SUDO"))
+					{
+						Personaje.agregarPieza(piezaAsociadaLago);
+						Personaje.agregarPista(pistaAsociadaLago);
+					}
+					else {
+						//D.Instance.mensajesTemporales.Add(new MensajeTemporal("No tienes permiso para nadar"));
+						Personaje.mesh.Position = cabaniaBoundingBox.PMin;
+						Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
+					}
+				}
+
+				camaraInterna.Target = physicsExample.getPersonaje().Position;
 			}
 
             PostUpdate();
@@ -534,8 +517,62 @@ namespace TGC.Group.Model
        
             effect.SetValue("StartFogDistance", fog.StartDistance);
             effect.SetValue("EndFogDistance", fog.EndDistance);
-            //effect.SetValue("Density", fog.Density);
-            foreach (var mesh in MeshARenderizar)
+			//effect.SetValue("Density", fog.Density);
+
+			if (Personaje.estaEnPeligro())
+			{
+
+				foreach (var mesh in MeshARenderizar)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Sepia";
+				}
+
+				monstruo.Effect = effect;
+				monstruo.Technique = "Sepia";
+
+				terreno.Effect = effect;
+				terreno.Technique = "Sepia";
+
+				foreach (var mesh in meshFogatas)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Sepia";
+
+				}
+				foreach (var mesh in skyBox.Faces)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Sepia";
+				}
+			}
+			else
+			{
+				foreach (var mesh in MeshARenderizar)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Spotlight";
+
+				}
+
+				terreno.Effect = effect;
+				terreno.Technique = "Spotlight";
+
+				foreach (var mesh in meshFogatas)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Spotlight";
+
+				}
+				foreach (var mesh in skyBox.Faces)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "Spotlight";
+				}
+
+			}
+
+			foreach (var mesh in MeshARenderizar)
             {
 				//Cargar variables shader de la luz FOGATA
 				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));

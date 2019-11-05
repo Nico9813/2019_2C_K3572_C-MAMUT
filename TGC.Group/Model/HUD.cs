@@ -36,11 +36,13 @@ namespace TGC.Group.Model
 		private CustomSprite EspacioMensajeSprite;
 		private CustomSprite AgendaSprite;
 		private CustomSprite paginaActualSprite;
+		private CustomSprite mainMenuSprite;
 
 		public Pista paginaActual;
 
 		public List<MensajeTemporal> mensajesTemporales = new List<MensajeTemporal>();
 
+		public bool MainMenu = true;
 		public bool MenuControles = false;
 		public bool MenuPausa = false;
 		public bool HUDpersonaje = false;
@@ -111,6 +113,13 @@ namespace TGC.Group.Model
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioPista.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.3f, height * 0.2f),
 				Scaling = new TGCVector2(1.5f, 1.5f),
+			};
+
+			mainMenuSprite = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\logo.png", D3DDevice.Instance.Device),
+				Position = new TGCVector2(width * 0.28f, height * 0.02f),
+				Scaling = new TGCVector2(0.8f, 0.5f),
 			};
 
 			espaciosInventario = new List<EspacioObjeto>();
@@ -198,86 +207,102 @@ namespace TGC.Group.Model
 		{
 			drawer.BeginDrawSprite();
 
-			if (HUDpersonaje) {
-				if (personaje.ilumnacionActiva)
-				{
-					drawer.DrawSprite(RellenoBateria);
-					drawer.DrawSprite(BarraBateria);
-				}
-				foreach (EspacioObjeto espacio in espaciosInventario)
-				{
-					drawer.DrawSprite(espacio.spriteEspacioInventario);
-					if (!espacio.libre)
-					{
-						drawer.DrawSprite(espacio.spriteItem);
-					}
-				}
-			}
-
-			if (HUDpersonaje_piezas)
+			if (!MainMenu)
 			{
-				if (personaje.ilumnacionActiva)
+				if (HUDpersonaje)
 				{
-					drawer.DrawSprite(RellenoBateria);
-					drawer.DrawSprite(BarraBateria);
-				}
-				foreach (EspacioObjeto espacio in espaciosPiezas)
-				{
-					drawer.DrawSprite(espacio.spriteEspacioInventario);
-					if (!espacio.libre)
+					if (personaje.ilumnacionActiva)
 					{
-						drawer.DrawSprite(espacio.spriteItem);
+						drawer.DrawSprite(RellenoBateria);
+						drawer.DrawSprite(BarraBateria);
+					}
+					foreach (EspacioObjeto espacio in espaciosInventario)
+					{
+						drawer.DrawSprite(espacio.spriteEspacioInventario);
+						if (!espacio.libre)
+						{
+							drawer.DrawSprite(espacio.spriteItem);
+						}
 					}
 				}
-			}
 
-			if (MapaPersonaje) {
-				drawer.DrawSprite(MapaPersonajeSprite);
-			}
-
-			if (MenuControles) {
-				drawer.DrawSprite(MenuControlesSprite);
-			}
-
-			if (MenuPausa) {
-
-			}
-
-			if (Agenda) {
-				drawer.DrawSprite(AgendaSprite);
-				paginaActualSprite = new CustomSprite
+				if (HUDpersonaje_piezas)
 				{
-					Bitmap = new CustomBitmap(paginaActual.rutaImagen, D3DDevice.Instance.Device),
-					Position = AgendaSprite.Position,
-					Scaling = new TGCVector2(1.5f, 1.5f),
-				};
-				drawer.DrawSprite(paginaActualSprite);
-			}
+					if (personaje.ilumnacionActiva)
+					{
+						drawer.DrawSprite(RellenoBateria);
+						drawer.DrawSprite(BarraBateria);
+					}
+					foreach (EspacioObjeto espacio in espaciosPiezas)
+					{
+						drawer.DrawSprite(espacio.spriteEspacioInventario);
+						if (!espacio.libre)
+						{
+							drawer.DrawSprite(espacio.spriteItem);
+						}
+					}
+				}
 
-			if (Mensaje) {
-
-				drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
-				drawer.DrawSprite(EspacioMensajeSprite);
-				CustomSprite imagenRecolectableColisionado = new CustomSprite
+				if (MapaPersonaje)
 				{
-					Bitmap = new CustomBitmap(MensajeRecolectable.getRutaImagen(), D3DDevice.Instance.Device),
-					Position = EspacioMensajeSprite.Position ,
-				};
-				drawer.DrawSprite(imagenRecolectableColisionado);
-			}
+					drawer.DrawSprite(MapaPersonajeSprite);
+				}
 
-			if (MensajeColisionable) {
-				if (Colisionado.interactuable) {
-					drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+				if (MenuControles)
+				{
+					drawer.DrawSprite(MenuControlesSprite);
+				}
+
+				if (MenuPausa)
+				{
+
+				}
+
+				if (Agenda)
+				{
+					drawer.DrawSprite(AgendaSprite);
+					paginaActualSprite = new CustomSprite
+					{
+						Bitmap = new CustomBitmap(paginaActual.rutaImagen, D3DDevice.Instance.Device),
+						Position = AgendaSprite.Position,
+						Scaling = new TGCVector2(1.5f, 1.5f),
+					};
+					drawer.DrawSprite(paginaActualSprite);
+				}
+
+				if (Mensaje)
+				{
+
+					drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 					drawer.DrawSprite(EspacioMensajeSprite);
+					CustomSprite imagenRecolectableColisionado = new CustomSprite
+					{
+						Bitmap = new CustomBitmap(MensajeRecolectable.getRutaImagen(), D3DDevice.Instance.Device),
+						Position = EspacioMensajeSprite.Position,
+					};
+					drawer.DrawSprite(imagenRecolectableColisionado);
+				}
+
+				if (MensajeColisionable)
+				{
+					if (Colisionado.interactuable)
+					{
+						drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+						drawer.DrawSprite(EspacioMensajeSprite);
+					}
+				}
+
+				for (int i = 0; i < mensajesTemporales.Count; i++)
+				{
+					var mensaje = mensajesTemporales[i];
+					drawerText.drawText(mensaje.getContenido(),
+					(int)(width * 0.75f), (int)(height * 0.8) + 20 * i,
+					Color.White);
 				}
 			}
-
-			for (int i=0; i<mensajesTemporales.Count; i++) {
-				var mensaje = mensajesTemporales[i];
-				drawerText.drawText(mensaje.getContenido(),
-				(int)(width * 0.75f), (int)(height * 0.8) + 20 * i,
-				Color.White);
+			else {
+				drawer.DrawSprite(mainMenuSprite);
+				drawerText.drawText("Presionar F para empezar", (int) (width * 0.43f), (int) (height * 0.7f), Color.White);
 			}
 
 			drawer.EndDrawSprite();
