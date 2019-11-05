@@ -38,36 +38,32 @@ namespace TGC.Group.Model
 
 		public TgcMesh meshEnMano = null;
 
-		public void Init(TgcMesh meshPersonaje, String MediaDir) {
+		public void Init(TgcMesh meshPersonaje, String MediaDir, Linterna linternaInicial) {
 			mesh = meshPersonaje;
 			iluminadorPrincipal = new SinLuz();
 			mediaDir = MediaDir;
 
-			var loader = new TgcSceneLoader();
-			var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
-			var VelasMesh = scene5.Meshes[0];
-			VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
-
+			//var VelasMesh = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml").Meshes[0];
+			//VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
 			//linterna.vaciarBateria();
+
 			items = new List<Item>();
 			piezas = new List<Pieza>();
 			pistas = new List<Pista>();
-
-			linterna = new Linterna(VelasMesh, mediaDir + "\\2D\\imgLinterna.png");
 
 			HUD.Instance.Init(mediaDir, this);
 			HUD.Instance.HUDpersonaje = true;
 			HUD.Instance.HUDpersonaje_piezas = true;
 			HUD.Instance.Agenda = false;
 
+			linterna = linternaInicial;
+
 			agregarItem(linterna);
-			agregarItem(new Vela(VelasMesh, mediaDir + "\\2D\\imgVela.png"));
-			agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
+			//agregarItem(new Vela(VelasMesh, mediaDir + "\\2D\\imgVela.png"));
+			//agregarItem(new Mapa(VelasMesh, mediaDir + "\\2D\\MapaHud.png"));
 
-			pistas.Add(new Pista(null,mediaDir + "\\2D\\pista_pala.png", null));
-			pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_sudo.png", null));
-
-			HUD.Instance.seleccionarItem(linterna);
+			//pistas.Add(new Pista(null,mediaDir + "\\2D\\pista_pala.png", null));
+			//pistas.Add(new Pista(null, mediaDir + "\\2D\\pista_sudo.png", null));
 
 			objetoEquipado = false;
 			ilumnacionActiva = false;
@@ -75,7 +71,9 @@ namespace TGC.Group.Model
 			agendaActiva = false;
 			perdio = false;
 
+			HUD.Instance.seleccionarItem(linterna);
 			itemSelecionado = items.ElementAt(0);
+			meshEnMano = itemSelecionado.mesh;
 		}
 
 		public void Update(TgcD3dInput Input,float elapsedTime)
@@ -89,19 +87,7 @@ namespace TGC.Group.Model
 
 			if (Input.keyPressed(Key.Tab))
 			{
-				objetoEquipado = false;
-				var index = items.IndexOf(itemSelecionado);
-				var indiceObjeto = (index + 1) % items.Count;
-				Item itemViejo = itemSelecionado;
-				itemSelecionado = items.ElementAtOrDefault(indiceObjeto);
-				meshEnMano = itemSelecionado.mesh;
-				HUD.Instance.seleccionarItem(itemSelecionado);
-				if (itemSelecionadoActivo)
-				{
-					itemViejo.desactivar(this);
-					objetoEquipado = true;
-					itemSelecionadoActivo = false;
-				}
+				EquiparProximoItem();
 			}
 
 			if (Input.keyPressed(Key.R))
@@ -121,10 +107,7 @@ namespace TGC.Group.Model
 			}
 
 			if (Input.keyPressed(Key.G) && pistas.Count != 0) {
-				agendaActiva = !agendaActiva;
-				HUD.Instance.Agenda = !HUD.Instance.Agenda;
-				HUD.Instance.paginaActual = pistas[0];
-				pistaActual = 0;
+				AbrirAgenda();
 			}
 
 			if (agendaActiva && Input.keyPressed(Key.Space)){
@@ -138,16 +121,21 @@ namespace TGC.Group.Model
 			HUD.Instance.Update(elapsedTime);
 		}
 
-		public void Render(float ElapsedTime, TgcD3dInput input)
+		public void Render(float ElapsedTime, TgcD3dInput input, TGCVector3 director)
 		{
 			HUD.Instance.Render();
 			this.mesh.Render();
 			if (meshEnMano != null) {
-				
-				meshEnMano.Move(new TGCVector3(-3500, 100, 555));
-				meshEnMano.Transform = TGCMatrix.Translation(new TGCVector3(-3500, 100, 555));
+				meshEnMano.Position = mesh.Position + new TGCVector3(20 * -director.X, 25, 20 * -director.Z);
 				meshEnMano.Render();
 			}
+		}
+
+		public void AbrirAgenda() {
+			agendaActiva = !agendaActiva;
+			HUD.Instance.Agenda = !HUD.Instance.Agenda;
+			HUD.Instance.paginaActual = pistas[0];
+			pistaActual = 0;
 		}
 
 		public void equiparMeshEnMano(TgcMesh mesh) {
@@ -217,6 +205,23 @@ namespace TGC.Group.Model
         {
             return this.itemSelecionado;
         }
+
+		public void EquiparProximoItem() {
+			objetoEquipado = false;
+			var index = items.IndexOf(itemSelecionado);
+			var indiceObjeto = (index + 1) % items.Count;
+			Item itemViejo = itemSelecionado;
+			itemSelecionado = items.ElementAtOrDefault(indiceObjeto);
+			meshEnMano = itemSelecionado.mesh;
+			HUD.Instance.seleccionarItem(itemSelecionado);
+			if (itemSelecionadoActivo)
+			{
+				itemViejo.desactivar(this);
+				objetoEquipado = true;
+				itemSelecionadoActivo = false;
+			}
+			meshEnMano = itemSelecionado.mesh;
+		}
         public String getDescripcionesItems()
         {
             String descripciones = "";
@@ -242,7 +247,7 @@ namespace TGC.Group.Model
 		}
         public Boolean estaEnPeligro()
         {
-            return tiempoDesprotegido >= (0.8f * tiempoLimiteDesprotegido);
+			return tiempoDesprotegido >= (0.8f * tiempoLimiteDesprotegido);
         }
 	}
 }

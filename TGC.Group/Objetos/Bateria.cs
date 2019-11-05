@@ -19,7 +19,7 @@ namespace TGC.Group.Objetos
 		public override void accion(Personaje personaje)
 		{
 			personaje.agregarBateria();
-			personaje.itemSelecionado = new SinLuz();
+			personaje.EquiparProximoItem();
 			personaje.removerItem(this);
 		}
 

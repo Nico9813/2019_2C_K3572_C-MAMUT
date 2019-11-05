@@ -37,7 +37,6 @@ namespace TGC.Group.Objetos
             if (BateriaConsumida < DuracionBateria)
             { 
                 personaje.setIluminador(this, true);
-				personaje.equiparMeshEnMano(this.mesh);
             }
             else
             Console.WriteLine("La linterna se quedo sin bateria");

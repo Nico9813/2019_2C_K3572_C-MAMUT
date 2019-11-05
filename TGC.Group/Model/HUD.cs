@@ -107,7 +107,7 @@ namespace TGC.Group.Model
 			AgendaSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioPista.png", D3DDevice.Instance.Device),
-				Position = new TGCVector2(width * 0.3f, height * 0.2f),
+				Position = new TGCVector2(width * 0.4f, height * 0.3f),
 				Scaling = new TGCVector2(1.5f, 1.5f),
 			};
 
@@ -263,6 +263,8 @@ namespace TGC.Group.Model
 						Position = AgendaSprite.Position,
 						Scaling = new TGCVector2(1.5f, 1.5f),
 					};
+					drawerText.drawText("Presionar [Espacio] para pasar entre notas ", (int)AgendaSprite.Position.X + 50, (int)AgendaSprite.Position.Y + 400, Color.White);
+					drawerText.drawText("Presionar [G] para cerrar la agenda ", (int)AgendaSprite.Position.X + 50, (int)AgendaSprite.Position.Y + 420, Color.White);
 					drawer.DrawSprite(paginaActualSprite);
 				}
 

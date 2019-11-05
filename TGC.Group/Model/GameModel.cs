@@ -51,7 +51,7 @@ namespace TGC.Group.Model
 		private List<Recolectable> Items;
 		private List<Pieza> Piezas;
 		private List<Colisionable> Objetos;
-		private List<TgcMesh> MeshARenderizar;
+		private static List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
 
 		private List<Fogata> IluminacionEscenario;
@@ -64,6 +64,7 @@ namespace TGC.Group.Model
 		private TgcMesh MeshLago;
 		private Pieza piezaAsociadaLago;
 		private Pista pistaAsociadaLago;
+		MensajeTemporal mensajeAgua = null;
 		private TgcBoundingElipsoid lago;
 		private TgcSimpleTerrain terreno;
 		private float currentScaleXZ;
@@ -110,7 +111,7 @@ namespace TGC.Group.Model
 
             //Instancio el terreno (Heigthmap)
             terreno = new TgcSimpleTerrain();
-            var pathTextura = MediaDir + "Textures\\4.png";
+            var pathTextura = MediaDir + "Textures\\mapa1.jpg";
             var pathHeighmap = MediaDir + "mapa1.jpg";
             currentScaleXZ = 100f;
             currentScaleY = 3f;
@@ -181,7 +182,7 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-2793, 1, -476));
 
 
-            var indiceArbolDirectorio = 2; //(new Random()).Next(0, posicionesArboles.Count);
+            var indiceArbolDirectorio = (new Random()).Next(0, posicionesArboles.Count);
 
 			Colisionable Arbol;
 
@@ -255,9 +256,15 @@ namespace TGC.Group.Model
 
             //Instancia del personaje
             MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
-            Personaje = new Personaje();
 			MeshPersonaje.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-			Personaje.Init(MeshPersonaje, MediaDir);
+
+			var LinternaMesh = loader.loadSceneFromFile(MediaDir + "linterna-TgcScene.xml").Meshes[0];
+			Linterna linterna = new Linterna(LinternaMesh, MediaDir + "\\2D\\imgLinterna.png");
+			linterna.mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
+			linterna.mesh.RotateZ(-FastMath.PI_HALF);
+
+			Personaje = new Personaje();
+			Personaje.Init(MeshPersonaje, MediaDir, linterna);
             Personaje.mesh.RotateY(-FastMath.PI_HALF);
             Personaje.mesh.Transform = TGCMatrix.RotationY(-FastMath.PI_HALF);
 
@@ -323,6 +330,7 @@ namespace TGC.Group.Model
 			var MesaMesh = loader.loadSceneFromFile(MediaDir + "MesaRedonda-TgcScene.xml").Meshes[0];
 			MesaMesh.Move(-250, 20, 741);
 			MesaMesh.Transform = TGCMatrix.Translation(-300, 30, 741);
+			Objetos.Add(new SinEfecto(MesaMesh));
 			MeshARenderizar.Add(MesaMesh);
 
 			//Instancia del Servidor
@@ -334,15 +342,19 @@ namespace TGC.Group.Model
 
 			//Instancia de Pala
 			var PalaMesh = loader.loadSceneFromFile(MediaDir + "Pala-TgcScene.xml").Meshes[0];
-			PalaMesh.Move(-220, 100, 680);
-			PalaMesh.RotateX(FastMath.PI);
-			PalaMesh.RotateZ(FastMath.PI_HALF);
-			PalaMesh.RotateY(FastMath.PI_HALF);
-			PalaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
-			PalaMesh.Transform = TGCMatrix.Translation(-250, 100, 700);
 			rutaImagen = MediaDir + "\\2D\\pala.png";
-			Items.Add(new Herramienta("Pala", PalaMesh, rutaImagen));
-			MeshARenderizar.Add(PalaMesh);
+			var Pala = new Herramienta("Pala", PalaMesh, rutaImagen);
+			
+
+			Pala.mesh.Move(-220, 100, 680);
+			Pala.mesh.RotateX(FastMath.PI);
+			Pala.mesh.RotateZ(FastMath.PI_HALF);
+			Pala.mesh.RotateY(FastMath.PI_HALF);
+			Pala.mesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+			Pala.mesh.Transform = TGCMatrix.Translation(-250, 100, 700);
+			
+			Items.Add(Pala);
+			MeshARenderizar.Add(Pala.mesh);
 
 			//Instancia de fogatas
 			var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
@@ -406,6 +418,9 @@ namespace TGC.Group.Model
 				if (Input.keyPressed(Key.F)){
 					JuegoIniciado = true;
 					HUD.Instance.MainMenu = false;
+					var rutaImagen = MediaDir + "\\2D\\texto_inicial.png";
+					Personaje.agregarPista(new Pista(null,rutaImagen,null));
+					Personaje.AbrirAgenda();
 				}
 			}
 			else {
@@ -528,19 +543,18 @@ namespace TGC.Group.Model
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
 				{
-					
 					if (Personaje.tieneItem("SUDO"))
 					{
 						Personaje.agregarPieza(piezaAsociadaLago);
 						Personaje.agregarPista(pistaAsociadaLago);
 					}
 					else {
-						//HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("No tienes permiso para nadar"));
-						
+						if (mensajeAgua == null || mensajeAgua.tiempoCumplido()) {
+							mensajeAgua = new MensajeTemporal("No tienes permiso para nadar");
+							HUD.Instance.mensajesTemporales.Add(mensajeAgua);
+						}
 					}
 
-                    // Personaje.mesh.Position = cabaniaBoundingBox.PMin;
-                    // Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
                     physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
                     physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
                     var direccionATierra = (Personaje.mesh.Position - new TGCVector3(-3800,80,160));
@@ -551,6 +565,7 @@ namespace TGC.Group.Model
                 
 
                 camaraInterna.Target = Personaje.mesh.Position;
+				quadtree.actualizarModelos(MeshARenderizar);
 			}
 
             PostUpdate();
@@ -565,7 +580,7 @@ namespace TGC.Group.Model
 			var direccionLuz = physicsExample.getDirector();
 
             var desplazamientoLuz = direccionLuz;
-            desplazamientoLuz.Multiply(-1f);
+            desplazamientoLuz.Multiply(-0.2f);
             var lightPos = camaraInterna.LookAt;
             lightPos.Add(desplazamientoLuz);
            
@@ -632,11 +647,13 @@ namespace TGC.Group.Model
 
 			foreach (var mesh in MeshARenderizar)
             {
+				mesh.Effect = effect;
+				mesh.Technique = "Spotlight";
 				//Cargar variables shader de la luz FOGATA
 				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 				mesh.Effect.SetValue("lightPositionFog", FogatasPos);
 
-				mesh.Effect.SetValue("lightIntensityFog", 50f);
+				mesh.Effect.SetValue("lightIntensityFog", 250f);
 				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
 				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1, 2, 3)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
@@ -648,18 +665,16 @@ namespace TGC.Group.Model
 				mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
 				mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
 				mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
-				mesh.Effect.SetValue("lightIntensityPj", 150f);
+				mesh.Effect.SetValue("lightIntensityPj", 250f);
 				mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
 				mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
-				mesh.Effect.SetValue("spotLightExponent", 35f);
+				mesh.Effect.SetValue("spotLightExponent", 80f);
 
 				//Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
 				mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				mesh.Effect.SetValue("materialSpecularExp", 9f);
 			}
-
-			quadtree.render(Frustum, true);
 
 			physicsExample.Render();
 
@@ -683,7 +698,9 @@ namespace TGC.Group.Model
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
-			Personaje.Render(ElapsedTime, Input);
+			Personaje.Render(ElapsedTime, Input, physicsExample.getDirector());
+
+			quadtree.render(Frustum, true);
 
 			bug.Update(time);
 
