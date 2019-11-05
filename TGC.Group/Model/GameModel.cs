@@ -75,6 +75,8 @@ namespace TGC.Group.Model
 		private Bateria bateria;
 		private Vela vela;
 
+		Bug bug;
+
 		private Fisicas physicsExample;
 
         private float giroMuerte;
@@ -127,38 +129,59 @@ namespace TGC.Group.Model
 			var PinoOriginal = scene.Meshes[0];
 			List<TGCVector3> posicionesArboles = new List<TGCVector3>();
 
-			posicionesArboles.Add(new TGCVector3(1,1,1));
-            posicionesArboles.Add(new TGCVector3(-3442, 10, -2736));
-            posicionesArboles.Add(new TGCVector3(-3689, 10, -3039));
-            posicionesArboles.Add(new TGCVector3(-3799, 10, -2719));
-            posicionesArboles.Add(new TGCVector3(-3417, 10, -2480));
-            posicionesArboles.Add(new TGCVector3(-2917, 10, -2433));
-            posicionesArboles.Add(new TGCVector3(-3668, 10, -2025));
-            posicionesArboles.Add(new TGCVector3(-3362, 10, -2009));
-            posicionesArboles.Add(new TGCVector3(-3451, 10, -3786));
-            posicionesArboles.Add(new TGCVector3(-4037, 10, -2329));
-            posicionesArboles.Add(new TGCVector3(-2885, 10, -1826));
-            posicionesArboles.Add(new TGCVector3(-4123, 10, -1581));
-            posicionesArboles.Add(new TGCVector3(-3289, 10, -909));
-            posicionesArboles.Add(new TGCVector3(-4261, 10, -435));
-            posicionesArboles.Add(new TGCVector3(-2883, 10, -655));
-            posicionesArboles.Add(new TGCVector3(-3352, 10, -1761));
-            posicionesArboles.Add(new TGCVector3(-3244, 10, -2394));
-            posicionesArboles.Add(new TGCVector3(-3978, 10, -2572));
-            posicionesArboles.Add(new TGCVector3(-3517, 10, -1982));
-            posicionesArboles.Add(new TGCVector3(-3118, 10, -1524));
-            posicionesArboles.Add(new TGCVector3(-3349, 10, -980));
-            posicionesArboles.Add(new TGCVector3(-4110, 10, -407));
-            posicionesArboles.Add(new TGCVector3(-3304, 10, -1774));
-            posicionesArboles.Add(new TGCVector3(-3139, 10, -1269));
-            posicionesArboles.Add(new TGCVector3(-2140, 10, -562));
-            posicionesArboles.Add(new TGCVector3(-4094, 10, -145));
+            posicionesArboles.Add(new TGCVector3(1, 1, 1));
+            posicionesArboles.Add(new TGCVector3(-3442, 1, -2736));
+            posicionesArboles.Add(new TGCVector3(-3689, 1, -3039));
+            posicionesArboles.Add(new TGCVector3(-3799, 1, -2719));
+            posicionesArboles.Add(new TGCVector3(-3417, 1, -2480));
+            posicionesArboles.Add(new TGCVector3(-2917, 1, -2433));
+            posicionesArboles.Add(new TGCVector3(-3668, 1, -2025));
+            posicionesArboles.Add(new TGCVector3(-3362, 1, -2009));
+            posicionesArboles.Add(new TGCVector3(-3451, 1, -3786));
+            posicionesArboles.Add(new TGCVector3(-4037, 1, -2329));
+            posicionesArboles.Add(new TGCVector3(-2885, 1, -1826));
+            posicionesArboles.Add(new TGCVector3(-4123, 1, -1581));
+            posicionesArboles.Add(new TGCVector3(-3289, 1, -909));
+            posicionesArboles.Add(new TGCVector3(-4261, 1, -435));
+            posicionesArboles.Add(new TGCVector3(-2883, 1, -655));
+            posicionesArboles.Add(new TGCVector3(-3352, 1, -1761));
+            posicionesArboles.Add(new TGCVector3(-3244, 1, -2394));
+            posicionesArboles.Add(new TGCVector3(-3978, 1, -2572));
+            posicionesArboles.Add(new TGCVector3(-3517, 1, -1982));
+            posicionesArboles.Add(new TGCVector3(-3118, 1, -1524));
+            posicionesArboles.Add(new TGCVector3(-3349, 1, -980));
+            posicionesArboles.Add(new TGCVector3(-4110, 1, -407));
+            posicionesArboles.Add(new TGCVector3(-3304, 1, -1774));
+            posicionesArboles.Add(new TGCVector3(-3139, 1, -1269));
+            posicionesArboles.Add(new TGCVector3(-2140, 1, -562));
+            posicionesArboles.Add(new TGCVector3(-4094, 1, -145));
+            posicionesArboles.Add(new TGCVector3(-3103, 1, -1337));
+            posicionesArboles.Add(new TGCVector3(-2896, 1, -1087));
+            posicionesArboles.Add(new TGCVector3(-2529, 1, 10));
+            posicionesArboles.Add(new TGCVector3(-3917, 1, 772));
+            posicionesArboles.Add(new TGCVector3(746, 1, 157));
+            posicionesArboles.Add(new TGCVector3(951, 1, 637));
+            posicionesArboles.Add(new TGCVector3(1361, 1, 404));
+            posicionesArboles.Add(new TGCVector3(1361, 1, 440));
+            posicionesArboles.Add(new TGCVector3(-3877, 1, -678));
+            posicionesArboles.Add(new TGCVector3(-3997, 1, -1079));
+            posicionesArboles.Add(new TGCVector3(-3996, 1, -1617));
+            posicionesArboles.Add(new TGCVector3(-3701, 1, -1505));
+            posicionesArboles.Add(new TGCVector3(-3761, 1, -1069));
+            posicionesArboles.Add(new TGCVector3(-3968, 1, -1952));
+            posicionesArboles.Add(new TGCVector3(-3550, 1, -1562));
+            posicionesArboles.Add(new TGCVector3(-3557, 1, -1192));
+            posicionesArboles.Add(new TGCVector3(-3938, 1, -1048));
+            posicionesArboles.Add(new TGCVector3(-3148, 1, -268));
+            posicionesArboles.Add(new TGCVector3(-4120, 1, 433));
+            posicionesArboles.Add(new TGCVector3(-3136, 1, -135));
+            posicionesArboles.Add(new TGCVector3(-2793, 1, -476));
 
-			var indiceArbolDirectorio = (new Random()).Next(0, posicionesArboles.Count);
+
+            var indiceArbolDirectorio = 2; //(new Random()).Next(0, posicionesArboles.Count);
 
 			Colisionable Arbol;
 
-			Console.WriteLine("Cant: " + posicionesArboles.Count);
 			for (var i = 0; i<posicionesArboles.Count; i++)
             {
 				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
@@ -171,6 +194,21 @@ namespace TGC.Group.Model
 				Arbol.mesh.Move(posicionesArboles[i]);
 				Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
 				Objetos.Add(Arbol);
+                MeshARenderizar.Add(Arbol.mesh);
+            }
+
+            for (var i = posicionesArboles.Count; i < posicionesArboles.Count + 100; i++)
+            {
+                var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+                if (i == indiceArbolDirectorio)
+                    Arbol = new ArbolDirectorio(MediaDir);
+                else
+                    Arbol = new SinEfecto(Instance);
+                Arbol.mesh.Move(0, 0, 0);
+                Arbol.mesh.Scale = new TGCVector3(1.5f, 1.5f, 1.5f);
+                Arbol.mesh.Move(new TGCVector3(((float) Math.Pow(i, Math.PI) % 2066) + 98, 1,((float) Math.Pow(i, Math.E) % 3136) - 1339));
+                Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
+                Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
             }
 
@@ -215,12 +253,20 @@ namespace TGC.Group.Model
             //Instancia del personaje
             MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
             Personaje = new Personaje();
-            Personaje.Init(MeshPersonaje, MediaDir);
+			MeshPersonaje.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+			Personaje.Init(MeshPersonaje, MediaDir);
             Personaje.mesh.RotateY(-FastMath.PI_HALF);
             Personaje.mesh.Transform = TGCMatrix.RotationY(-FastMath.PI_HALF);
 
-            //Instancia de skybox
-            skyBox = new TgcSkyBox();
+			//Instancia de Bug
+			bug = new Bug(MediaDir);
+			Objetos.Add(bug);
+			MeshARenderizar.Add(bug.mesh);
+			MeshARenderizar.Add(bug.meshMounstroMiniatura);
+
+
+			//Instancia de skybox
+			skyBox = new TgcSkyBox();
             skyBox.Center = TGCVector3.Empty;
             skyBox.Size = new TGCVector3(9000, 9000, 9000);
 
@@ -487,8 +533,8 @@ namespace TGC.Group.Model
 					}
 					else {
 						//D.Instance.mensajesTemporales.Add(new MensajeTemporal("No tienes permiso para nadar"));
-						Personaje.mesh.Position = cabaniaBoundingBox.PMin;
-						Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
+						//rsonaje.mesh.Position = cabaniaBoundingBox.PMin;
+						//Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
 					}
 				}
 
@@ -626,6 +672,8 @@ namespace TGC.Group.Model
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
 
 			Personaje.Render(ElapsedTime, Input);
+
+			bug.Update(time);
 
 			PostRender();
 		}

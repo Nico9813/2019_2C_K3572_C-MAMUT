@@ -44,7 +44,7 @@ namespace TGC.Examples.Camara
 		public MamutCamara(TgcD3dInput input)
 		{
 			this.Input = input;
-			this.directionView = new TGCVector3(0, 0, 100);
+			this.directionView = new TGCVector3(0, 0, 75);
 			this.RotationSpeed = 1f;
 			this.leftrightRot = FastMath.PI_HALF;
 			this.updownRot = -FastMath.PI / 10.0f;

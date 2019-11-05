@@ -121,7 +121,7 @@ namespace TGC.Examples.Physics.CubePhysic
             //Se crea el cuerpo rígido de la caja, en la definicio de CreateBox el ultimo parametro representa si se quiere o no
             //calcular el momento de inercia del cuerpo. No calcularlo lo que va a hacer es que la caja que representa el personaje
             //no rote cuando colicione contra el mundo.
-            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(20, 17, 20), 10, new TGCVector3(-4000, 50, 532) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
+            personajeBody = BulletRigidBodyFactory.Instance.CreateBox(new TGCVector3(5, 10, 5), 10, new TGCVector3(-4000, 50, 532) /*personaje.Position*/, 0, 0, 0, 0.55f, false);
 
             personajeBody.Gravity = new TGCVector3(0, -100, 0).ToBulletVector3();
             personajeBody.SetDamping(0.3f, 0f);
