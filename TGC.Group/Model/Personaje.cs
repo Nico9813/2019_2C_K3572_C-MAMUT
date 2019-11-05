@@ -9,6 +9,7 @@ using TGC.Core.Interpolation;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
+using TGC.Core.Sound;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Objetos;
@@ -30,7 +31,7 @@ namespace TGC.Group.Model
 		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
-        private Boolean perdio;
+		private Boolean perdio;
 		private Boolean itemSelecionadoActivo;
 		private Boolean agendaActiva;
 
@@ -76,14 +77,14 @@ namespace TGC.Group.Model
 			meshEnMano = itemSelecionado.mesh;
 		}
 
-		public void Update(TgcD3dInput Input,float elapsedTime)
+		public void Update(TgcD3dInput Input, float elapsedTime)
 		{
-            if (ilumnacionActiva == false)
-                tiempoDesprotegido += elapsedTime;
-            else tiempoDesprotegido = 0;
+			if (ilumnacionActiva == false)
+				tiempoDesprotegido += elapsedTime;
+			else tiempoDesprotegido = 0;
 
-            if (tiempoDesprotegido >= tiempoLimiteDesprotegido)
-                this.perdio = true;
+			if (tiempoDesprotegido >= tiempoLimiteDesprotegido)
+				this.perdio = true;
 
 			if (Input.keyPressed(Key.Tab))
 			{
@@ -110,16 +111,17 @@ namespace TGC.Group.Model
 				AbrirAgenda();
 			}
 
-			if (agendaActiva && Input.keyPressed(Key.Space)){
+			if (agendaActiva && Input.keyPressed(Key.Space)) {
 				pistas[pistaActual].esNueva = false;
 				pistaActual = (pistaActual + 1) % pistas.Count;
 				HUD.Instance.seleccionarPaginaActual(pistas[pistaActual]);
 			}
 
-			if (objetoEquipado && itemSelecionadoActivo)
-				itemSelecionado.update(this, elapsedTime);
-
-			HUD.Instance.Update(elapsedTime);
+			if (agendaActiva && Input.keyPressed(Key.Space)){
+                pistaActual = (pistaActual + 1) % pistas.Count;
+				HUD.Instance.paginaActual = pistas[pistaActual];
+                GameModel.sonidoNota.play(false);
+            }
 		}
 
 		public void Render(float ElapsedTime, TgcD3dInput input, TGCVector3 director)
@@ -137,6 +139,7 @@ namespace TGC.Group.Model
 			HUD.Instance.Agenda = !HUD.Instance.Agenda;
 			HUD.Instance.seleccionarPaginaActual(pistas[0]);
 			pistaActual = 0;
+			GameModel.sonidoNota.play(false);
 		}
 
 		public void equiparMeshEnMano(TgcMesh mesh) {

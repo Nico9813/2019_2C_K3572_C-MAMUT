@@ -20,12 +20,13 @@ using BulletSharp;
 using TGC.Examples.Physics.CubePhysic;
 using TGC.Group.Objetos;
 using TGC.Core.Interpolation;
-using Device = Microsoft.DirectX.Direct3D.Device;
+
 using TGC.Core.Example;
 using TGC.Group.Sprites;
 using Microsoft.DirectX;
 using Effect = Microsoft.DirectX.Direct3D.Effect;
 using TGC.Core.Fog;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -39,24 +40,24 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-		private Boolean Pausa = false;
-		private Boolean JuegoIniciado = false;
+        private Boolean Pausa = false;
+        private Boolean JuegoIniciado = false;
 
-		private TgcPlane Plano;
-		private Personaje Personaje;
-		private TgcMesh MeshPersonaje;
+        private TgcPlane Plano;
+        private Personaje Personaje;
+        private TgcMesh MeshPersonaje;
 
-		private TgcSkyBox skyBox;
+        private TgcSkyBox skyBox;
 
 		private List<Recolectable> Items;
 		private List<Pieza> Piezas;
 		private List<Colisionable> Objetos;
-		private static List<TgcMesh> MeshARenderizar;
+		private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
 
-		private List<Fogata> IluminacionEscenario;
+        private List<Fogata> IluminacionEscenario;
 
-		private List<TgcMesh> MeshTotales;
+        private List<TgcMesh> MeshTotales;
         private Boolean fogataCerca = false;
         Recolectable objetoColisionado = null;
 
@@ -89,8 +90,18 @@ namespace TGC.Group.Model
         private Effect effect;
         float time = 0;
         private TgcFog fog;
-        float enfriamento = 0;
-        private TGCVector3 ultimaPosTierra;
+
+        private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
+
+
+        public List<Tgc3dSound> sonidos = new List<Tgc3dSound>();
+        //para sonidos
+        public static TgcStaticSound sonidoPisadas;
+        public static TgcStaticSound sonidoAgua;
+        public static TgcStaticSound sonidoNota;
+        public static TgcStaticSound sonidoPickup;
+        public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
+        
 
         public override void Init()
         {
@@ -405,6 +416,10 @@ namespace TGC.Group.Model
             fog = new TgcFog();
             fog.StartDistance = 1000f;
             fog.EndDistance = 1200f;
+            
+            SonidosInit();
+
+
         }
 
 		public override void Update()
@@ -486,6 +501,7 @@ namespace TGC.Group.Model
 							Items.Remove(item);
 							Personaje.agregarRecolectable(item);
 							quadtree.actualizarModelos(MeshARenderizar);
+                            sonidoPickup.play(false);
 						}
 						break;
 					}
@@ -497,7 +513,7 @@ namespace TGC.Group.Model
 
 				foreach (var objeto in Objetos)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.Position - Personaje.mesh.Position)) < 100;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.Position - Personaje.mesh.Position)) < 50;
 					if (result)
 					{
 						objetoCerca = true;
@@ -560,19 +576,23 @@ namespace TGC.Group.Model
 						}
 						physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
 						physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
-						var direccionATierra = (Personaje.mesh.Position - new TGCVector3(-3800, 80, 160));
+						var direccionATierra = (Personaje.mesh.Position - ultimaPosTierra);
 						direccionATierra.Normalize();
-						physicsExample.personajeBody.ApplyCentralImpulse(-25 * direccionATierra.ToBulletVector3());
+						physicsExample.personajeBody.ApplyCentralImpulse(-20 * direccionATierra.ToBulletVector3());
 					}
-
-                    
-                    
+                    sonidoAgua.play(false);
                 }
-                
+
+                if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-2520, 0,179), new TGCVector3(-2435, 100,276))))//Dependiendo si pasa el puente o no se guarda ultima posicion en tierra
+                    ultimaPosTierra = new TGCVector3(-3800, 80, 160);
+                if(TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-1125, 0, 179), new TGCVector3(-900, 100, 276))))
+                    ultimaPosTierra = new TGCVector3(1000, 80, 1200);
 
                 camaraInterna.Target = Personaje.mesh.Position;
 				quadtree.actualizarModelos(MeshARenderizar);
 			}
+
+            SonidosUpdate();
 
             PostUpdate();
         }
@@ -661,7 +681,7 @@ namespace TGC.Group.Model
 
 				mesh.Effect.SetValue("lightIntensityFog", 250f);
 				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(1, 2, 3)));
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 
@@ -718,5 +738,59 @@ namespace TGC.Group.Model
             physicsExample.Dispose();
             monstruo.Dispose();
         }
-	}
+        public void SonidosInit()
+        {
+            DirectSound.InitializeD3DDevice(new System.Windows.Forms.Control());
+            //Hacer que el Listener del sonido 3D siga al personaje
+            DirectSound.ListenerTracking = Personaje.mesh;
+            
+            foreach (var mesh in meshFogatas)
+            {
+                Tgc3dSound sonidoFogata;
+                sonidoFogata = new Tgc3dSound(MediaDir + "Sound\\fogata.wav", mesh.Position, DirectSound.DsDevice);
+
+                sonidoFogata.MinDistance = 60f;
+                sonidos.Add(sonidoFogata);
+            }
+
+            sonidoBug = new Tgc3dSound(MediaDir + "Sound\\bug.wav", bug.mesh.Position, DirectSound.DsDevice);
+
+            sonidoBug.MinDistance = 75f;
+            sonidos.Add(sonidoBug);
+
+            sonidoPisadas = new TgcStaticSound();
+            sonidoPisadas.loadSound(MediaDir + "Sound\\pisadas.wav", DirectSound.DsDevice);
+
+            sonidoAgua = new TgcStaticSound();
+            sonidoAgua.loadSound(MediaDir + "Sound\\agua.wav", DirectSound.DsDevice);
+
+            sonidoNota = new TgcStaticSound();
+            sonidoNota.loadSound(MediaDir + "Sound\\notas.wav", DirectSound.DsDevice);
+
+            sonidoPickup = new TgcStaticSound();
+            sonidoPickup.loadSound(MediaDir + "Sound\\pickup.wav", DirectSound.DsDevice);
+
+            foreach (var s in sonidos)
+            {
+                s.play(true);
+            }
+        }
+
+
+        public void SonidosUpdate()
+        {
+            sonidoBug.Position = bug.mesh.Position;
+
+            if(physicsExample.personajeBody.ActivationState == ActivationState.ActiveTag)
+            {
+                sonidoPisadas.play(true);
+            }
+            else
+            {
+                sonidoPisadas.stop();
+            }
+        }
+
+
+    }
 }
