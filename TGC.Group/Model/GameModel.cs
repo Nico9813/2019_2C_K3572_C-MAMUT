@@ -87,6 +87,9 @@ namespace TGC.Group.Model
         private Effect effect;
         float time = 0;
         private TgcFog fog;
+        float enfriamento = 0;
+        private TGCVector3 ultimaPosTierra;
+
         public override void Init()
         {
             var loader = new TgcSceneLoader();
@@ -525,20 +528,29 @@ namespace TGC.Group.Model
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
 				{
-					Console.WriteLine("choca rio");
+					
 					if (Personaje.tieneItem("SUDO"))
 					{
 						Personaje.agregarPieza(piezaAsociadaLago);
 						Personaje.agregarPista(pistaAsociadaLago);
 					}
 					else {
-						//D.Instance.mensajesTemporales.Add(new MensajeTemporal("No tienes permiso para nadar"));
-						//rsonaje.mesh.Position = cabaniaBoundingBox.PMin;
-						//Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
+						//HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("No tienes permiso para nadar"));
+						
 					}
-				}
 
-				camaraInterna.Target = physicsExample.getPersonaje().Position;
+                    // Personaje.mesh.Position = cabaniaBoundingBox.PMin;
+                    // Personaje.mesh.Transform = TGCMatrix.Translation(cabaniaBoundingBox.PMin);
+                    physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
+                    physicsExample.personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
+                    var direccionATierra = (Personaje.mesh.Position - new TGCVector3(-3800,80,160));
+                    direccionATierra.Normalize();
+                    physicsExample.personajeBody.ApplyCentralImpulse(-25 * direccionATierra.ToBulletVector3());
+                    
+                }
+                
+
+                camaraInterna.Target = Personaje.mesh.Position;
 			}
 
             PostUpdate();
