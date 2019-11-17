@@ -27,7 +27,7 @@ namespace TGC.Examples.Physics.CubePhysic
         private BroadphaseInterface overlappingPairCache;
 
         private List<TgcMesh> meshes = new List<TgcMesh>();
-
+        public TgcMesh monstruoMesh;
         private RigidBody floorBody;
 
         private TgcMesh personaje;
@@ -136,7 +136,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
         public void Update(TgcD3dInput input, TgcMesh monstruo)
         {
-
+            monstruoMesh = monstruo;
             dynamicsWorld.StepSimulation(1 / 60f, 100);
 
 
@@ -277,7 +277,14 @@ namespace TGC.Examples.Physics.CubePhysic
 
             return rigidBody;
         }
-
+        public void rotar(float angulo)
+        {
+            director.TransformCoordinate(TGCMatrix.RotationY(-angulo * 0.01f));
+            personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angulo * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
+            personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
+            personaje.RotateY(-angulo * 0.01f);
+            monstruoMesh.RotateY(-angulo * 0.01f);
+        }
     }
 }
 

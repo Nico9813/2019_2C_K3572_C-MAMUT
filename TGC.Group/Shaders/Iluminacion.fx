@@ -70,6 +70,8 @@ float4 ColorFog;
 float StartFogDistance;
 float EndFogDistance;
 
+
+
 /**************************************************************************************/
 /* MultiDiffuseLightsTechnique  PARA LAS FOGATAS*/
 /**************************************************************************************/
@@ -301,24 +303,41 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
 
 	/* Color final: modular (Emissive + Ambient + Diffuse) por el color de la textura, y luego sumar Specular.
 	   El color Alpha sale del diffuse material */
-    float4 finalColor = float4(saturate(materialEmissiveColor + ambientLight + diffuseLight) * texelColor + specularLight, 1);
+    
+    //float4 finalColor = float4(saturate(materialEmissiveColor + ambientLight + diffuseLight) * texelColor.rgb + specularLight, 1);
+    float4 finalColor = texelColor;
+    finalColor.rgb *= saturate(materialEmissiveColor + ambientLight + diffuseLight);
+  
+    finalColor.rgb += specularLight;
     finalColor = calcularNiebla(finalColor, input.WorldPosition.z, input.WorldPosition.x);
-
-    return finalColor * 0.5;
+    finalColor.rgb *= 0.5;
+    return finalColor;
 }
 
 /*
 * Technique linterna o vela + fogatas
 */
-technique Spotlight
+technique SpotlightAB
 {
+   
     pass Pass_0
     {
+        AlphaBlendEnable = true;
         VertexShader = compile vs_3_0 vs_DiffuseMap();
         PixelShader = compile ps_3_0 ps_DiffuseMap();
     }
 }
 
+technique Spotlight
+{
+   
+    pass Pass_0
+    {
+        AlphaBlendEnable = false;
+        VertexShader = compile vs_3_0 vs_DiffuseMap();
+        PixelShader = compile ps_3_0 ps_DiffuseMap();
+    }
+}
 
 VS_OUTPUT_DIFFUSE_MAP vs_Sepia(VS_INPUT_DIFFUSE_MAP input)
 {
@@ -326,7 +345,7 @@ VS_OUTPUT_DIFFUSE_MAP vs_Sepia(VS_INPUT_DIFFUSE_MAP input)
 
 	//Proyectar posicion
     output.Position = mul(input.Position, matWorldViewProj);
-    output.Position.y -=    5 * sin(10 * time) - 5 * cos(5*time);
+    
 	//Enviar Texcoord directamente
     output.Texcoord = input.Texcoord;
 
@@ -366,6 +385,7 @@ float4 ps_Sepia(PS_DIFFUSE_MAP input) : COLOR0
 
 	//Diffuse 1
     diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 1);
+    //input.Texcoord += cos(time);
     float4 outputColor = tex2D(diffuseMap, input.Texcoord);
     outputColor.r = outputColor.r * abs(sin(1.5*time));
     outputColor.g *= 0.1;
@@ -379,8 +399,108 @@ technique Sepia
 {
     pass Pass_0
     {
+        
         VertexShader = compile vs_3_0 vs_Sepia();
         PixelShader = compile ps_3_0 ps_Sepia();
     }
 }
 
+VS_OUTPUT_DIFFUSE_MAP vs_Agua(VS_INPUT_DIFFUSE_MAP input)
+{
+    VS_OUTPUT_DIFFUSE_MAP output;
+
+	//Proyectar posicion
+    float x = input.Position.x;
+    float z = input.Position.z;
+    input.Position.y += 10* cos(time + z ) + 8* sin(x+time);
+    output.Position = mul(input.Position, matWorldViewProj);
+    
+	//Enviar Texcoord directamente
+    output.Texcoord = input.Texcoord;
+
+	//Posicion pasada a World-Space (necesaria para atenuación por distancia)
+    output.WorldPosition = mul(input.Position, matWorld);
+
+	/* Pasar normal a World-Space
+	Solo queremos rotarla, no trasladarla ni escalarla.
+	Por eso usamos matInverseTransposeWorld en vez de matWorld */
+    output.WorldNormal = mul(input.Normal, matInverseTransposeWorld).xyz;
+
+	//LightVec (L): vector que va desde el vertice hacia la luz. Usado en Diffuse y Specular
+    output.LightVec = lightPositionPj.xyz - output.WorldPosition;
+
+	//ViewVec (V): vector que va desde el vertice hacia la camara.
+    float3 viewVector = eyePositionPj.xyz - output.WorldPosition;
+
+	//HalfAngleVec (H): vector de reflexion simplificado de Phong-Blinn (H = |V + L|). Usado en Specular
+    output.HalfAngleVec = viewVector + output.LightVec;
+
+
+	//Propago el color x vertice
+    output.Color = input.Color;
+
+    return output;
+}
+float4 ps_Agua(PS_DIFFUSE_MAP input) : COLOR0
+{
+	//Normalizar vectores
+    float3 Nn = normalize(input.WorldNormal);
+    float3 Ln = normalize(input.LightVec);
+    float3 Hn = normalize(input.HalfAngleVec);
+
+	//Calcular atenuacion por distancia
+    float distAtten = length(lightPositionPj.xyz - input.WorldPosition) * lightAttenuationPj;
+
+	//Calcular atenuacion por Spot Light. Si esta fuera del angulo del cono tiene 0 intensidad.
+    float spotAtten = dot(-spotLightDir, Ln);
+    spotAtten = (spotAtten > spotLightAngleCos)
+					? pow(spotAtten, spotLightExponent)
+					: 0.0;
+
+	//Calcular intensidad de la luz segun la atenuacion por distancia y si esta adentro o fuera del cono de luz
+    float intensity = lightIntensityPj * spotAtten / distAtten;
+
+	//Obtener texel de la textura
+    input.Texcoord += 0.5*cos(time);
+    float4 texelColor = tex2D(diffuseMap, input.Texcoord);
+
+	//Componente Ambient
+    float3 ambientLight = intensity * lightColorPj * materialAmbientColor;
+
+	//Componente Diffuse: N dot L
+    float3 n_dot_l = dot(Nn, Ln);
+    float3 diffuseLight = intensity * lightColorPj * materialDiffuseColor.rgb * max(0.0, n_dot_l); //Controlamos que no de negativo
+    //Diffuse 0
+    diffuseLight += computeDiffuseComponent(input.WorldPosition, Nn, 0);
+
+	//Diffuse 1
+    diffuseLight += computeDiffuseComponent(input.WorldPosition, Nn, 1);
+
+
+	//Componente Specular: (N dot H)^exp
+    float3 n_dot_h = dot(Nn, Hn);
+    float3 specularLight = n_dot_l <= 0.0
+			? float3(0.0, 0.0, 0.0)
+			: (intensity * lightColorPj * materialSpecularColor * pow(max(0.0, n_dot_h), materialSpecularExp));
+
+	/* Color final: modular (Emissive + Ambient + Diffuse) por el color de la textura, y luego sumar Specular.
+	   El color Alpha sale del diffuse material */
+    
+    //float4 finalColor = float4(saturate(materialEmissiveColor + ambientLight + diffuseLight) * texelColor.rgb + specularLight, 1);
+    float4 finalColor = texelColor;
+    finalColor.rgb *= saturate(materialEmissiveColor + ambientLight + diffuseLight);
+  
+    finalColor.rgb += specularLight;
+    finalColor = calcularNiebla(finalColor, input.WorldPosition.z, input.WorldPosition.x);
+    finalColor.rgb *= 0.5;
+    return finalColor;
+}
+technique Agua
+{
+    pass Pass_0
+    {
+        
+        VertexShader = compile vs_3_0 vs_Agua();
+        PixelShader = compile ps_3_0 ps_Agua();
+    }
+}

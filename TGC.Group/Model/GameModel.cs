@@ -27,6 +27,7 @@ using Microsoft.DirectX;
 using Effect = Microsoft.DirectX.Direct3D.Effect;
 using TGC.Core.Fog;
 using TGC.Core.Sound;
+using Device = Microsoft.DirectX.Direct3D.Device;
 
 namespace TGC.Group.Model
 {
@@ -54,6 +55,7 @@ namespace TGC.Group.Model
 		private List<Colisionable> Objetos;
 		private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
+        List<TgcMesh> arbolesMesh;
 
         private List<Fogata> IluminacionEscenario;
 
@@ -101,7 +103,15 @@ namespace TGC.Group.Model
         public static TgcStaticSound sonidoNota;
         public static TgcStaticSound sonidoPickup;
         public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
-        
+
+        //Post Procesado...
+        private Surface depthStencil; // Depth-stencil buffer
+        private Surface pOldRT;
+        private Surface pOldDS;
+        private Texture renderTarget2D;
+        private VertexBuffer screenQuadVB;
+
+
 
         public override void Init()
         {
@@ -120,30 +130,10 @@ namespace TGC.Group.Model
             MeshARenderizar = new List<TgcMesh>();
             meshFogatas = new List<TgcMesh>();
             IluminacionEscenario = new List<Fogata>();
-
-            //Instancio el terreno (Heigthmap)
-            terreno = new TgcSimpleTerrain();
-            var pathTextura = MediaDir + "Textures\\mapa1.jpg";
-            var pathHeighmap = MediaDir + "mapa1.jpg";
-            currentScaleXZ = 100f;
-            currentScaleY = 3f;
-            terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -30, 0));
-            terreno.loadTexture(pathTextura);
-            terreno.AlphaBlendEnable = true;
-
-            //Instancio el piso
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\water2.jpg");
-            Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
-            MeshPlano = Plano.toMesh("MeshPlano");
-            Objetos.Add(new SinEfecto(MeshPlano));
-			MeshARenderizar.Add(MeshPlano);
-			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_2.png", null);
-			pistaAsociadaLago = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
-
-			//Instancio la vegetacion
-			var scene = loader.loadSceneFromFile(MediaDir + @"Pino-TgcScene.xml");
-			var PinoOriginal = scene.Meshes[0];
-			List<TGCVector3> posicionesArboles = new List<TGCVector3>();
+            //Instancio la vegetacion
+            var scene = loader.loadSceneFromFile(MediaDir + @"Pino-TgcScene.xml");
+            var PinoOriginal = scene.Meshes[0];
+            List<TGCVector3> posicionesArboles = new List<TGCVector3>();
 
             posicionesArboles.Add(new TGCVector3(1, 1, 1));
             posicionesArboles.Add(new TGCVector3(-3442, 1, -2736));
@@ -194,41 +184,70 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-2793, 1, -476));
 
 
-			var indiceArbolDirectorio = (new Random()).Next(posicionesArboles.Count, posicionesArboles.Count+100);
+            var indiceArbolDirectorio = (new Random()).Next(posicionesArboles.Count, posicionesArboles.Count + 100);
+            arbolesMesh = new List<TgcMesh>();
+            Colisionable Arbol;
 
-			Colisionable Arbol;
-
-			for (var i = 0; i<posicionesArboles.Count; i++)
+            for (var i = 0; i < posicionesArboles.Count; i++)
             {
-				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
-				Arbol = new SinEfecto(Instance);
-				Arbol.mesh.Move(0, 0, 0);
-				Arbol.mesh.Scale = new TGCVector3(0.05f * i , 0.05f * i , 0.05f * i);
-				Arbol.mesh.Move(posicionesArboles[i]);
-				Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
-				Objetos.Add(Arbol);
+                var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+                Arbol = new SinEfecto(Instance);
+                Arbol.mesh.Move(0, 0, 0);
+                Arbol.mesh.Scale = new TGCVector3(0.05f * i, 0.05f * i, 0.05f * i);
+                Arbol.mesh.Move(posicionesArboles[i]);
+                Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
+                Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
+                arbolesMesh.Add(Arbol.mesh);
+
             }
 
             for (var i = posicionesArboles.Count; i < posicionesArboles.Count + 100; i++)
             {
                 var Instance = PinoOriginal.createMeshInstance("Pino" + i);
-				if (i == indiceArbolDirectorio)
-				{
-					Arbol = new ArbolDirectorio(MediaDir);
-				}
-				else {
-					Arbol = new SinEfecto(Instance);
-				}
-                    
+                if (i == indiceArbolDirectorio)
+                {
+                    Arbol = new ArbolDirectorio(MediaDir);
+                }
+                else
+                {
+                    Arbol = new SinEfecto(Instance);
+                }
+
                 Arbol.mesh.Move(0, 0, 0);
-                Arbol.mesh.Scale = new TGCVector3(0.01f * i , 0.01f * i, 0.01f* i);
-                Arbol.mesh.Move(new TGCVector3(((float) Math.Pow(i, Math.PI) % 2066) + 98, 1,((float) Math.Pow(i, Math.E) % 3136) - 1339));
+                Arbol.mesh.Scale = new TGCVector3(0.01f * i, 0.01f * i, 0.01f * i);
+                Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
                 Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
                 Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
+                arbolesMesh.Add(Arbol.mesh);
+            }
+            foreach (var mesh in arbolesMesh)
+            {
+                mesh.AlphaBlendEnable = true;
             }
 
+            //Instancio el terreno (Heigthmap)
+            terreno = new TgcSimpleTerrain();
+            var pathTextura = MediaDir + "Textures\\mapa1.jpg";
+            var pathHeighmap = MediaDir + "mapa1.jpg";
+            currentScaleXZ = 100f;
+            currentScaleY = 3f;
+            terreno.loadHeightmap(pathHeighmap, currentScaleXZ, currentScaleY, new TGCVector3(0, -30, 0));
+            terreno.loadTexture(pathTextura);
+            
+
+            //Instancio el piso
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\water2.jpg");
+            Plano = new TgcPlane(new TGCVector3(-tamanioMapa / 2, 0, -tamanioMapa / 2), new TGCVector3(tamanioMapa, 0, tamanioMapa), TgcPlane.Orientations.XZplane, pisoTexture, 50f, 50f);
+            MeshPlano = Plano.toMesh("MeshPlano");
+            Objetos.Add(new SinEfecto(MeshPlano));
+			MeshARenderizar.Add(MeshPlano);
+			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_2.png", null);
+			pistaAsociadaLago = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
+
+		
+            
             //Instancio la Cabania
             var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
             foreach (var Mesh in sceneCabania.Meshes)
@@ -393,9 +412,10 @@ namespace TGC.Group.Model
                 FogatasPos[auxF] = new Vector4 (fog.getPosicion().X+50, fog.getPosicion().Y + 55, fog.getPosicion().Z+50,1) ; //+50 en xz porque no esta centrada la hoguera -55 en y porque no se ilumina el piso sino
                 auxF++;
 			}
+           
 
-			//Instancia de motor de fisica para colisiones con mesh y terreno
-			physicsExample = new Fisicas();
+            //Instancia de motor de fisica para colisiones con mesh y terreno
+            physicsExample = new Fisicas();
 			physicsExample.setTerrain(terreno);
 			physicsExample.setPersonaje(Personaje.mesh);
 			physicsExample.setBuildings(Objetos.ConvertAll(objeto => objeto.mesh));
@@ -416,9 +436,10 @@ namespace TGC.Group.Model
             fog = new TgcFog();
             fog.StartDistance = 1000f;
             fog.EndDistance = 1200f;
+
             
             SonidosInit();
-
+           
 
         }
 
@@ -588,8 +609,17 @@ namespace TGC.Group.Model
                 if(TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-1125, 0, 179), new TGCVector3(-900, 100, 276))))
                     ultimaPosTierra = new TGCVector3(1000, 80, 1200);
 
-                camaraInterna.Target = Personaje.mesh.Position;
-				quadtree.actualizarModelos(MeshARenderizar);
+               
+               camaraInterna.Target = Personaje.mesh.Position;
+
+               if (Personaje.estaEnPeligro())
+                {
+                    camaraInterna.rotateY((float)(-0.005 * Math.Cos(7*time)));
+                    physicsExample.rotar((float) (0.5*Math.Cos(7*time)));
+                }
+                
+  
+                quadtree.actualizarModelos(MeshARenderizar);
 			}
 
             SonidosUpdate();
@@ -620,8 +650,8 @@ namespace TGC.Group.Model
 
 			if (Personaje.estaEnPeligro())
 			{
-
-				foreach (var mesh in MeshARenderizar)
+                
+                foreach (var mesh in MeshARenderizar)
 				{
 					mesh.Effect = effect;
 					mesh.Technique = "Sepia";
@@ -668,13 +698,18 @@ namespace TGC.Group.Model
 					mesh.Effect = effect;
 					mesh.Technique = "Spotlight";
 				}
+                foreach(var mesh in arbolesMesh)
+                {
+                    mesh.Technique = "SpotlightAB";
+                }
+                MeshPlano.Technique = "Agua";
 
 			}
 
 			foreach (var mesh in MeshARenderizar)
             {
-				mesh.Effect = effect;
-				mesh.Technique = "Spotlight";
+				//mesh.Effect = effect;
+				//mesh.Technique = "Spotlight";
 				//Cargar variables shader de la luz FOGATA
 				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 				mesh.Effect.SetValue("lightPositionFog", FogatasPos);
@@ -790,7 +825,10 @@ namespace TGC.Group.Model
                 sonidoPisadas.stop();
             }
         }
+      
+
+        }
 
 
     }
-}
+
