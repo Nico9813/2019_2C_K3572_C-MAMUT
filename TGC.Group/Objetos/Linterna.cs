@@ -16,7 +16,7 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Objetos
 {
-	class Linterna : Iluminador
+	public class Linterna : Iluminador
 	{
 		private float DuracionBateria;
 		private float BateriaConsumida;

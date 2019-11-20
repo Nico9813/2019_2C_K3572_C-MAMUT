@@ -91,7 +91,8 @@ namespace TGC.Group.Model
 
         private Effect effect;
         float time = 0;
-        private TgcFog fog;
+		float auxShader = 0;
+		private TgcFog fog;
 
         private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
 
@@ -284,6 +285,7 @@ namespace TGC.Group.Model
             //Instancia del personaje
             MeshPersonaje = loader.loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 			MeshPersonaje.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+			MeshPersonaje.Position = new TGCVector3(-4000, 30, 532);
 
 			var LinternaMesh = loader.loadSceneFromFile(MediaDir + "linterna-TgcScene.xml").Meshes[0];
 			Linterna linterna = new Linterna(LinternaMesh, MediaDir + "\\2D\\imgLinterna.png");
@@ -407,12 +409,11 @@ namespace TGC.Group.Model
                 FogatasPos[auxF] = new Vector4 (fog.getPosicion().X+50, fog.getPosicion().Y + 55, fog.getPosicion().Z+50,1) ; //+50 en xz porque no esta centrada la hoguera -55 en y porque no se ilumina el piso sino
                 auxF++;
 			}
-           
 
             //Instancia de motor de fisica para colisiones con mesh y terreno
             physicsExample = new Fisicas();
 			physicsExample.setTerrain(terreno);
-			physicsExample.setPersonaje(Personaje.mesh);
+			physicsExample.setPersonaje(Personaje);
 			physicsExample.setBuildings(Objetos.ConvertAll(objeto => objeto.mesh));
 			physicsExample.Init(MediaDir);
 
@@ -421,7 +422,7 @@ namespace TGC.Group.Model
             quadtree.create(MeshARenderizar, MeshPlano.BoundingBox);
 
 			//Instancia de la camara (primera persona)
-            camaraInterna = new TgcFpsCamera(new TGCVector3(-4000, 80, 532), Input);
+            camaraInterna = new TgcFpsCamera(Personaje.mesh.Position, Input);
 			//camaraInterna.rotateY(-FastMath.PI_HALF);
 			Camara = camaraInterna;
 
@@ -458,9 +459,25 @@ namespace TGC.Group.Model
 				}
 			}
 			else {
+				if (giroMuerte > 180)
+				{
+					auxShader += ElapsedTime;
+				}
+
 				time += ElapsedTime;
 
 				if (Pausa) ElapsedTime = 0;
+
+				camaraInterna.UpdateCamera(this.ElapsedTime, this.Personaje.mesh.Position, -physicsExample.getDirector());
+				Camara = camaraInterna;
+
+				if (Input.keyPressed(Key.H))
+				{
+					Personaje.mesh.Position = new TGCVector3(0, 30, 0);
+					Personaje.mesh.Move(new TGCVector3(0, 30, 0));
+					physicsExample.setPersonaje(Personaje);
+					physicsExample.Init(MediaDir);
+				}
 
 				if (!Pausa)
 				{
@@ -481,18 +498,16 @@ namespace TGC.Group.Model
 					HUD.Instance.Mensaje = false;
 				}
 
-				if (Personaje.perdioJuego() && giroMuerte<=180 )
+				if (Personaje.perdioJuego() && giroMuerte <= 180)
 				{
 
-                    physicsExample.rotar((float)(FastMath.PI));
-                    giroMuerte += 1.8f;
+					physicsExample.rotar((float)(FastMath.PI));
+					giroMuerte += 1.8f;
 					camaraInterna.RotationSpeed = 0;
 					physicsExample.strength = 0;
 					physicsExample.angle = 0;
-					
+
 					physicsExample.personajeBody.ActivationState = ActivationState.IslandSleeping;
-                    
-                    
 				}
 
 				var itemCerca = false;
@@ -522,7 +537,7 @@ namespace TGC.Group.Model
 
 				foreach (var objeto in Objetos)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.BoundingBox.Position - Personaje.mesh.Position)) < 50;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.Position - Personaje.mesh.Position)) < 50;
 					if (result)
 					{
 						objetoCerca = true;
@@ -560,6 +575,7 @@ namespace TGC.Group.Model
 				}
 
 				this.effect.SetValue("time", time);
+				this.effect.SetValue("aux", auxShader);
 
 				//Cabania es lugar seguro
 
@@ -733,12 +749,18 @@ namespace TGC.Group.Model
 			}
 
 			var desplazamiento = physicsExample.getDirector() * (180f);
-			monstruo.Position = new TGCVector3(camaraInterna.Position.X + desplazamiento.X, camaraInterna.Position.Y - 60 + desplazamiento.Y, camaraInterna.Position.Z + desplazamiento.Z);
-			monstruo.Scale = new TGCVector3(0.8f, 0.8f, 0.8f);
-			monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f, 0.8f, 0.8f));
 
-			if (Personaje.perdioJuego())
+			if (giroMuerte == 0)
 			{
+				monstruo.Position = new TGCVector3(camaraInterna.Position.X + desplazamiento.X, camaraInterna.Position.Y - 60 + desplazamiento.Y, camaraInterna.Position.Z + desplazamiento.Z);
+				monstruo.Scale = new TGCVector3(0.8f, 0.8f, 0.8f);
+				monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f, 0.8f, 0.8f));
+			}
+
+
+			if (giroMuerte > 0)
+			{
+				monstruo.Technique = "NoMeQuieroIr";
 				monstruo.Render();
 			}
 

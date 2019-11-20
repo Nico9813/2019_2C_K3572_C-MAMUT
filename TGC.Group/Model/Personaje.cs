@@ -16,7 +16,7 @@ using TGC.Group.Objetos;
 
 namespace TGC.Group.Model
 {
-	class Personaje
+	public class Personaje
 	{
 		String mediaDir;
 		public TgcMesh mesh;
@@ -28,7 +28,6 @@ namespace TGC.Group.Model
 		private Linterna linterna;
 		public float tiempoDesprotegido;
 		public float tiempoLimiteDesprotegido = 9;
-		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;
 		private Boolean perdio;
@@ -129,9 +128,14 @@ namespace TGC.Group.Model
 			HUD.Instance.Render();
 			this.mesh.Render();
 			if (meshEnMano != null) {
-				meshEnMano.Position = mesh.Position + new TGCVector3(20 * -director.X, 25, 20 * -director.Z);
+				meshEnMano.Position = mesh.Position + new TGCVector3(50 * -director.X, 30, 50 * -director.Z);
+				Console.WriteLine("Mesh en mano: " + meshEnMano.Position);
 				meshEnMano.Render();
 			}
+		}
+
+		public void RotarManos(float angulo) {
+			meshEnMano.RotateY(angulo);
 		}
 
 		public void AbrirAgenda() {

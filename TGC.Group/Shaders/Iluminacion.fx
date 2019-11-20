@@ -17,6 +17,8 @@ float4x4 matWorldView; //Matriz World * View
 float4x4 matWorldViewProj; //Matriz World * View * Projection
 float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 
+float aux = 0;
+
 //Textura para DiffuseMap
 texture texDiffuseMap;
 sampler2D diffuseMap = sampler_state
@@ -504,4 +506,27 @@ technique Agua
         VertexShader = compile vs_3_0 vs_Agua();
         PixelShader = compile ps_3_0 ps_Agua();
     }
+}
+
+float4 ps_NoMeQuieroIr(PS_DIFFUSE_MAP input) : COLOR0
+{
+	float4 finalColor;
+	if (aux + aux < input.Texcoord.y + input.Texcoord.x)
+	{
+
+		finalColor = tex2D(diffuseMap, input.Texcoord);
+		return finalColor;
+	}
+	else
+		discard;
+
+}
+technique NoMeQuieroIr
+{
+	pass Pass_0
+	{
+
+		VertexShader = compile vs_3_0 vs_Sepia();
+		PixelShader = compile ps_3_0 ps_NoMeQuieroIr();
+	}
 }

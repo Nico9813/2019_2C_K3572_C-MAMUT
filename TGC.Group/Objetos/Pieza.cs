@@ -8,7 +8,7 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Objetos
 {
-	class Pieza : Recolectable
+	public class Pieza : Recolectable
 	{
 		public String descripcion;
 		public int numeroPieza;

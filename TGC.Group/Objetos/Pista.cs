@@ -8,7 +8,7 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Objetos
 {
-	class Pista : Recolectable
+	public class Pista : Recolectable
 	{
 		String imagenHUD;
 		public bool esNueva;

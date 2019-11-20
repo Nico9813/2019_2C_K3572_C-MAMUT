@@ -8,7 +8,7 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Objetos
 {
-	abstract class Item : Recolectable
+	public abstract class Item : Recolectable
 	{
 		public String descripcion;
 

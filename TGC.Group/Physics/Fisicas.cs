@@ -13,6 +13,7 @@ using TGC.Core.Textures;
 using TGC.Core.Example;
 using TGC.Core.Terrain;
 using TGC.Core.Shaders;
+using TGC.Group.Model;
 
 namespace TGC.Examples.Physics.CubePhysic
 {
@@ -30,7 +31,7 @@ namespace TGC.Examples.Physics.CubePhysic
         public TgcMesh monstruoMesh;
         private RigidBody floorBody;
 
-        private TgcMesh personaje;
+        public TgcMesh personaje;
         public RigidBody personajeBody;
         private TGCVector3 fowardback;
         private TGCVector3 leftright;
@@ -46,10 +47,15 @@ namespace TGC.Examples.Physics.CubePhysic
         public float strength;
         public float angle;
         public float rotationStrength = 0.01f;
-        public void setPersonaje(TgcMesh personaje)
+
+		Personaje personajeActual;
+
+        public void setPersonaje(Personaje personaje)
         {
-            this.personaje = personaje;
-        }
+            this.personaje = personaje.mesh;
+			this.personajeActual = personaje;
+
+		}
 
         public TgcMesh getPersonaje()
         {
@@ -86,7 +92,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
             #endregion Configuracion Basica de World
 
-            strength = 5f;
+            strength = 5.8f;
             angle = 0.5f;
 
             foreach (var mesh in meshes)
@@ -121,7 +127,7 @@ namespace TGC.Examples.Physics.CubePhysic
             //Se crea el cuerpo rígido de la caja, en la definicio de CreateBox el ultimo parametro representa si se quiere o no
             //calcular el momento de inercia del cuerpo. No calcularlo lo que va a hacer es que la caja que representa el personaje
             //no rote cuando colicione contra el mundo.
-            personajeBody = BulletRigidBodyFactory.Instance.CreateCapsule(10, 10, new TGCVector3(-4000, 50, 532) /*personaje.Position*/,  2.55f, false);
+            personajeBody = BulletRigidBodyFactory.Instance.CreateCapsule(10, 10, personaje.Position,  2.55f, false);
 
             personajeBody.Gravity = new TGCVector3(0, -100, 0).ToBulletVector3();
             personajeBody.SetDamping(0.3f, 0f);
@@ -137,12 +143,11 @@ namespace TGC.Examples.Physics.CubePhysic
         public void Update(TgcD3dInput input, TgcMesh monstruo)
         {
             monstruoMesh = monstruo;
-            dynamicsWorld.StepSimulation(1 / 60f, 100);
+			dynamicsWorld.StepSimulation(1 / 60f, 100);
 
+			#region Comportamiento
 
-            #region Comportamiento
-
-            if (input.keyDown(Key.W))
+			if (input.keyDown(Key.W))
             {
                 //Activa el comportamiento de la simulacion fisica para la capsula
                 personajeBody.ActivationState = ActivationState.ActiveTag;
@@ -172,6 +177,7 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angle * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
                 personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
                 personaje.RotateY(-angle * rotationStrength);
+				personajeActual.RotarManos(-angle * rotationStrength);
                 monstruo.RotateY(-angle * rotationStrength);
             }
 
@@ -181,7 +187,8 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(angle * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
                 personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
                 personaje.RotateY(angle * rotationStrength);
-                monstruo.RotateY(angle * rotationStrength);
+				personajeActual.RotarManos(angle * rotationStrength);
+				monstruo.RotateY(angle * rotationStrength);
             }
 
 
@@ -283,7 +290,6 @@ namespace TGC.Examples.Physics.CubePhysic
             personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angulo * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
             personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
             personaje.RotateY(-angulo * rotationStrength);
-            monstruoMesh.RotateY(-angulo * rotationStrength);
         }
     }
 }

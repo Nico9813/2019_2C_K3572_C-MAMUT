@@ -14,7 +14,7 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Objetos
 {
-	abstract class Iluminador : Item
+	public abstract class Iluminador : Item
 	{
 		protected TGCBox lightMesh;
 		protected Color colorLuz;
