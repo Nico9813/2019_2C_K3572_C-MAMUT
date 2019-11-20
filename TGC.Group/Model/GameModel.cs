@@ -76,7 +76,7 @@ namespace TGC.Group.Model
 		private float tamanioMapa = 10000;
 
 		private Quadtree quadtree;
-		private MamutCamara camaraInterna;
+		private TgcFpsCamera camaraInterna;
 		private Bateria bateria;
 		private Vela vela;
 
@@ -104,12 +104,7 @@ namespace TGC.Group.Model
         public static TgcStaticSound sonidoPickup;
         public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
 
-        //Post Procesado...
-        private Surface depthStencil; // Depth-stencil buffer
-        private Surface pOldRT;
-        private Surface pOldDS;
-        private Texture renderTarget2D;
-        private VertexBuffer screenQuadVB;
+        public bool terminoJuego = false;
 
 
 
@@ -426,8 +421,8 @@ namespace TGC.Group.Model
             quadtree.create(MeshARenderizar, MeshPlano.BoundingBox);
 
 			//Instancia de la camara (primera persona)
-            camaraInterna = new MamutCamara(new TGCVector3(0,0,-1), 50, 50, Input);
-			camaraInterna.rotateY(-FastMath.PI_HALF);
+            camaraInterna = new TgcFpsCamera(new TGCVector3(-4000, 80, 532), Input);
+			//camaraInterna.rotateY(-FastMath.PI_HALF);
 			Camara = camaraInterna;
 
 			giroMuerte = 0;
@@ -450,8 +445,9 @@ namespace TGC.Group.Model
 			if (!JuegoIniciado)
 			{
 				HUD.Instance.MainMenu = true;
-				Personaje.mesh.Position = new TGCVector3(-3300, 22, 650);
-				camaraInterna.Target = Personaje.mesh.Position;
+                Personaje.mesh.Position = new TGCVector3(-4000, 50, 532);
+
+                camaraInterna.UpdateCamera(this.ElapsedTime,this.Personaje.mesh.Position,-physicsExample.getDirector());
 				Camara = camaraInterna;
 				if (Input.keyPressed(Key.F)){
 					JuegoIniciado = true;
@@ -470,16 +466,8 @@ namespace TGC.Group.Model
 				{
 					physicsExample.Update(Input, monstruo);
 					Personaje.Update(Input, ElapsedTime);
-
-					if (Input.keyDown(Key.A))
-					{
-						camaraInterna.rotateY(-0.005f);
-					}
-
-					if (Input.keyDown(Key.D))
-					{
-						camaraInterna.rotateY(0.5f * 0.01f);
-					}
+                    camaraInterna.UpdateCamera(this.ElapsedTime, this.Personaje.mesh.Position,- physicsExample.getDirector());
+                 
 				}
 
 				objetoColisionado = null;
@@ -493,18 +481,18 @@ namespace TGC.Group.Model
 					HUD.Instance.Mensaje = false;
 				}
 
-				if (Personaje.perdioJuego())
+				if (Personaje.perdioJuego() && giroMuerte<=180 )
 				{
 
-					camaraInterna.rotateY(FastMath.PI / 180);
-					this.giroMuerte += 1f;
-					if (giroMuerte >= 180f)
-					{
-						camaraInterna.RotationSpeed = 0;
-						physicsExample.strength = 0;
-						physicsExample.angle = 0;
-					}
+                    physicsExample.rotar((float)(FastMath.PI));
+                    giroMuerte += 1.8f;
+					camaraInterna.RotationSpeed = 0;
+					physicsExample.strength = 0;
+					physicsExample.angle = 0;
+					
 					physicsExample.personajeBody.ActivationState = ActivationState.IslandSleeping;
+                    
+                    
 				}
 
 				var itemCerca = false;
@@ -610,11 +598,11 @@ namespace TGC.Group.Model
                     ultimaPosTierra = new TGCVector3(1000, 80, 1200);
 
                
-               camaraInterna.Target = Personaje.mesh.Position;
+               
 
-               if (Personaje.estaEnPeligro())
+               if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
                 {
-                    camaraInterna.rotateY((float)(-0.005 * Math.Cos(7*time)));
+                    
                     physicsExample.rotar((float) (0.5*Math.Cos(7*time)));
                 }
                 
@@ -648,7 +636,7 @@ namespace TGC.Group.Model
             effect.SetValue("EndFogDistance", fog.EndDistance);
 			//effect.SetValue("Density", fog.Density);
 
-			if (Personaje.estaEnPeligro())
+			if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
 			{
                 
                 foreach (var mesh in MeshARenderizar)
@@ -749,7 +737,7 @@ namespace TGC.Group.Model
 			monstruo.Scale = new TGCVector3(0.8f, 0.8f, 0.8f);
 			monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f, 0.8f, 0.8f));
 
-			if (giroMuerte >= 180)
+			if (Personaje.perdioJuego())
 			{
 				monstruo.Render();
 			}

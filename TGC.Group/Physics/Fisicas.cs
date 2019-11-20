@@ -45,7 +45,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
         public float strength;
         public float angle;
-
+        public float rotationStrength = 0.01f;
         public void setPersonaje(TgcMesh personaje)
         {
             this.personaje = personaje;
@@ -168,20 +168,20 @@ namespace TGC.Examples.Physics.CubePhysic
 
             if (input.keyDown(Key.A))
             {
-                director.TransformCoordinate(TGCMatrix.RotationY(-angle * 0.01f));
-                personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angle * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
+                director.TransformCoordinate(TGCMatrix.RotationY(-angle * rotationStrength));
+                personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angle * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
                 personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
-                personaje.RotateY(-angle * 0.01f);
-                monstruo.RotateY(-angle * 0.01f);
+                personaje.RotateY(-angle * rotationStrength);
+                monstruo.RotateY(-angle * rotationStrength);
             }
 
             if (input.keyDown(Key.D))
             {
-                director.TransformCoordinate(TGCMatrix.RotationY(angle * 0.01f));
-                personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(angle * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
+                director.TransformCoordinate(TGCMatrix.RotationY(angle * rotationStrength));
+                personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(angle * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
                 personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
-                personaje.RotateY(angle * 0.01f);
-                monstruo.RotateY(angle * 0.01f);
+                personaje.RotateY(angle * rotationStrength);
+                monstruo.RotateY(angle * rotationStrength);
             }
 
 
@@ -279,11 +279,11 @@ namespace TGC.Examples.Physics.CubePhysic
         }
         public void rotar(float angulo)
         {
-            director.TransformCoordinate(TGCMatrix.RotationY(-angulo * 0.01f));
-            personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angulo * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
+            director.TransformCoordinate(TGCMatrix.RotationY(-angulo * rotationStrength));
+            personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angulo * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
             personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
-            personaje.RotateY(-angulo * 0.01f);
-            monstruoMesh.RotateY(-angulo * 0.01f);
+            personaje.RotateY(-angulo * rotationStrength);
+            monstruoMesh.RotateY(-angulo * rotationStrength);
         }
     }
 }

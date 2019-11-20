@@ -128,6 +128,7 @@ float4 ps_VertexColor(PS_INPUT_VERTEX_COLOR input) : COLOR0
 	float3 Hn = normalize(input.HalfAngleVec);
 
 	//Calcular atenuacion por distancia
+   
 	float distAtten = length(lightPosition.xyz - input.WorldPosition) * lightAttenuation;
 
 	//Calcular atenuacion por Spot Light. Si esta fuera del angulo del cono tiene 0 intensidad.

@@ -27,7 +27,7 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 90;
+		public float tiempoLimiteDesprotegido = 9;
 		//private HUD HUD;
 		public Boolean ilumnacionActiva;
 		private Boolean objetoEquipado;

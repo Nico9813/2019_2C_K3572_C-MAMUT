@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camara\TgcFpsCamera.cs" />
     <Compile Include="Camara\MamutCamara.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>

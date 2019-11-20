@@ -312,6 +312,7 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
     finalColor = calcularNiebla(finalColor, input.WorldPosition.z, input.WorldPosition.x);
     finalColor.rgb *= 0.5;
     return finalColor;
+    //return texelColor;//Esto para probar sirve para ver todo sin oscuridad
 }
 
 /*
