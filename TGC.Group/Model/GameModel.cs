@@ -86,6 +86,7 @@ namespace TGC.Group.Model
 
         private float giroMuerte;
         private TgcMesh monstruo;
+        private TgcMesh monstruoSilueta;
         private Vector4[] FogatasPos;
         TgcBoundingAxisAlignBox cabaniaBoundingBox;
 
@@ -453,6 +454,10 @@ namespace TGC.Group.Model
 
 			giroMuerte = 0;
             monstruo = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
+            monstruoSilueta = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
+            monstruoSilueta.Effect = effect;
+            monstruoSilueta.Technique = "Silueta";
+            monstruoSilueta.RotateY(FastMath.PI_HALF);
 
             fog = new TgcFog();
             fog.StartDistance = 1000f;
@@ -460,8 +465,7 @@ namespace TGC.Group.Model
 
             
             SonidosInit();
-           
-
+            
         }
 
 		public override void Update()
@@ -506,7 +510,7 @@ namespace TGC.Group.Model
 
 				if (!Pausa)
 				{
-					physicsExample.Update(Input, monstruo);
+					physicsExample.Update(Input, monstruo,monstruoSilueta);
 					Personaje.Update(Input, ElapsedTime);
                     camaraInterna.UpdateCamera(this.ElapsedTime, this.Personaje.mesh.Position,- physicsExample.getDirector());
                  
@@ -659,6 +663,12 @@ namespace TGC.Group.Model
 			}
 
             SonidosUpdate();
+            var desplazamientoSilueta = -2000 * physicsExample.getDirector()*((Personaje.tiempoLimiteDesprotegido-Personaje.tiempoDesprotegido)/ Personaje.tiempoLimiteDesprotegido);
+            monstruoSilueta.Position = camaraInterna.Position;
+            
+            monstruoSilueta.Move(desplazamientoSilueta);
+            monstruoSilueta.Scale = new TGCVector3(0.7f, 0.7f, 0.7f);
+            monstruoSilueta.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.7f, 0.7f, 0.7f));
 
             PostUpdate();
         }
@@ -781,6 +791,12 @@ namespace TGC.Group.Model
 			}
 
 			var desplazamiento = physicsExample.getDirector() * (180f);
+            
+            if (Personaje.estaEnPeligro()&&!Personaje.perdioJuego())
+            {
+                
+                monstruoSilueta.Render();
+            }
 
 			if (giroMuerte == 0)
 			{
@@ -797,11 +813,12 @@ namespace TGC.Group.Model
 			}
 
 			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
-			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.LookAt), 5, 40, Color.Red);
+			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.Position), 5, 40, Color.Red);
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
             DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
-
-			Personaje.Render(ElapsedTime, Input, physicsExample.getDirector());
+            DrawText.drawText("MonstruoSilueta en: " + TGCVector3.PrintVector3(monstruo.Position),5, 100, Color.FloralWhite); 
+            DrawText.drawText("director en: " + TGCVector3.PrintVector3(physicsExample.getDirector()), 5, 120, Color.HotPink);
+            Personaje.Render(ElapsedTime, Input, physicsExample.getDirector());
 
 			quadtree.render(Frustum, true);
 

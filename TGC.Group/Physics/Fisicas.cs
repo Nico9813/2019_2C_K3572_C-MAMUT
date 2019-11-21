@@ -29,6 +29,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
         private List<TgcMesh> meshes = new List<TgcMesh>();
         public TgcMesh monstruoMesh;
+        public TgcMesh monstruoSilueta;
         private RigidBody floorBody;
 
         public TgcMesh personaje;
@@ -140,10 +141,12 @@ namespace TGC.Examples.Physics.CubePhysic
             director = new TGCVector3(-1, 0, 0);
         }
 
-        public void Update(TgcD3dInput input, TgcMesh monstruo)
+        public void Update(TgcD3dInput input, TgcMesh monstruo, TgcMesh monstruoSil)
         {
             monstruoMesh = monstruo;
-			dynamicsWorld.StepSimulation(1 / 60f, 100);
+            monstruoSilueta = monstruoSil;
+
+            dynamicsWorld.StepSimulation(1 / 60f, 100);
 
 			#region Comportamiento
 
@@ -179,6 +182,7 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.RotateY(-angle * rotationStrength);
 				personajeActual.RotarManos(-angle * rotationStrength);
                 monstruo.RotateY(-angle * rotationStrength);
+                monstruoSilueta.RotateY(-angle * rotationStrength);
             }
 
             if (input.keyDown(Key.D))
@@ -189,6 +193,7 @@ namespace TGC.Examples.Physics.CubePhysic
                 personaje.RotateY(angle * rotationStrength);
 				personajeActual.RotarManos(angle * rotationStrength);
 				monstruo.RotateY(angle * rotationStrength);
+                monstruoSilueta.RotateY(angle * rotationStrength);
             }
 
 

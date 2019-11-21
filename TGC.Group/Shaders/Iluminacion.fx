@@ -530,3 +530,19 @@ technique NoMeQuieroIr
 		PixelShader = compile ps_3_0 ps_NoMeQuieroIr();
 	}
 }
+float4 ps_Silueta(PS_DIFFUSE_MAP input) : COLOR0
+{
+  float4 finalColor = tex2D(diffuseMap, input.Texcoord);
+    finalColor.rgb *= 0.01;
+    return finalColor;
+
+}
+technique Silueta
+{
+    pass Pass_0
+    {
+
+        VertexShader = compile vs_3_0 vs_Sepia();
+        PixelShader = compile ps_3_0 ps_Silueta();
+    }
+}
