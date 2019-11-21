@@ -168,8 +168,6 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-3877, 1, -678));
             posicionesArboles.Add(new TGCVector3(-3997, 1, -1079));
             posicionesArboles.Add(new TGCVector3(-3996, 1, -1617));
-            posicionesArboles.Add(new TGCVector3(-3701, 1, -1505));
-            posicionesArboles.Add(new TGCVector3(-3761, 1, -1069));
             posicionesArboles.Add(new TGCVector3(-3968, 1, -1952));
             posicionesArboles.Add(new TGCVector3(-3550, 1, -1562));
             posicionesArboles.Add(new TGCVector3(-3557, 1, -1192));
@@ -256,8 +254,23 @@ namespace TGC.Group.Model
                 Objetos.Add(new SinEfecto(Mesh));
                 MeshARenderizar.Add(Mesh);
             }
-            cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
 
+			//Instancio el altar
+			var sceneCabania2 = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
+			foreach (var Mesh in sceneCabania2.Meshes)
+			{
+				Mesh.Move(-3800, 22, -3169);
+				Mesh.Scale = new TGCVector3(4f, 4f, 4f);
+				Mesh.RotateY(FastMath.QUARTER_PI);
+
+				Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
+
+				Objetos.Add(new SinEfecto(Mesh));
+				MeshARenderizar.Add(Mesh);
+			}
+			cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
+
+			//Instancia puente
             var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
             foreach (var Mesh in sceneBridge.Meshes)
             {
@@ -400,7 +413,7 @@ namespace TGC.Group.Model
 			//Instancia de fogatas
 			var scene6 = loader.loadSceneFromFile(MediaDir + "hoguera-TgcScene.xml");
             var fogataMesh = scene6.Meshes[0];
-            Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(-3500, 25, -3200));
+            Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(-3600, 25, -3450));
             Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(-4100, 20, 2900));
             //Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
             //Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
