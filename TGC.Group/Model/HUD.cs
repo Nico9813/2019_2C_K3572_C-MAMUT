@@ -301,6 +301,7 @@ namespace TGC.Group.Model
 				{
 					if (Colisionado.interactuable)
 					{
+						Console.WriteLine("Colisionado: " + Colisionado.getMensajeColision());
 						drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 						drawer.DrawSprite(EspacioMensajeSprite);
 					}

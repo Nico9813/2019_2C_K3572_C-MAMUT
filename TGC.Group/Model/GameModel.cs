@@ -355,6 +355,18 @@ namespace TGC.Group.Model
 			Items.Add(pista);
 			MeshARenderizar.Add(pista.mesh);
 
+			//Instancia de la canoa
+			var CanoaMesh = loader.loadSceneFromFile(MediaDir + "Canoa-TgcScene.xml").Meshes[0];
+			
+			rutaImagen = MediaDir + "\\2D\\canoa.png";
+			var Canoa = new Canoa(CanoaMesh, rutaImagen);
+
+			Canoa.mesh.Move(-2970, 40, 450);
+			Canoa.mesh.Transform = TGCMatrix.Translation(-2970, 40, 450);
+
+			Items.Add(Canoa);
+			MeshARenderizar.Add(Canoa.mesh);
+
 			//Instancia de Mesa
 			var MesaMesh = loader.loadSceneFromFile(MediaDir + "MesaRedonda-TgcScene.xml").Meshes[0];
 			MesaMesh.Move(-250, 20, 741);
@@ -471,12 +483,12 @@ namespace TGC.Group.Model
 				camaraInterna.UpdateCamera(this.ElapsedTime, this.Personaje.mesh.Position, -physicsExample.getDirector());
 				Camara = camaraInterna;
 
-				if (Input.keyPressed(Key.H))
+				if (Personaje.posicionModificada)
 				{
-					Personaje.mesh.Position = new TGCVector3(0, 30, 0);
-					Personaje.mesh.Move(new TGCVector3(0, 30, 0));
 					physicsExample.setPersonaje(Personaje);
 					physicsExample.Init(MediaDir);
+
+					Personaje.posicionModificada = false;
 				}
 
 				if (!Pausa)
@@ -514,7 +526,7 @@ namespace TGC.Group.Model
 
 				foreach (var item in Items)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 50;
 					if (result)
 					{
 						itemCerca = true;
@@ -537,7 +549,7 @@ namespace TGC.Group.Model
 
 				foreach (var objeto in Objetos)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.Position - Personaje.mesh.Position)) < 50;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.Position - Personaje.mesh.Position)) < 100;
 					if (result)
 					{
 						objetoCerca = true;
@@ -586,17 +598,21 @@ namespace TGC.Group.Model
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
 				{
-					if (Personaje.tieneItem("SUDO"))
+					if (Personaje.tieneItem("Canoa"))
 					{
-						if (!piezaLagoEntregada) {
+						Personaje.EquiparCanoa();
+						if (!piezaLagoEntregada)
+						{
 							Personaje.agregarPieza(piezaAsociadaLago);
 							Personaje.agregarPista(pistaAsociadaLago);
 							piezaLagoEntregada = true;
 						}
 					}
-					else {
-						if (mensajeAgua == null || mensajeAgua.tiempoCumplido()) {
-							mensajeAgua = new MensajeTemporal("No tienes permiso para nadar");
+					else
+					{
+						if (mensajeAgua == null || mensajeAgua.tiempoCumplido())
+						{
+							mensajeAgua = new MensajeTemporal("El agua esta muy fria para nadar");
 							HUD.Instance.mensajesTemporales.Add(mensajeAgua);
 						}
 						physicsExample.personajeBody.ActivationState = ActivationState.ActiveTag;
@@ -605,8 +621,11 @@ namespace TGC.Group.Model
 						direccionATierra.Normalize();
 						physicsExample.personajeBody.ApplyCentralImpulse(-20 * direccionATierra.ToBulletVector3());
 					}
-                    sonidoAgua.play(false);
-                }
+					sonidoAgua.play(false);
+				}
+				else {
+					Personaje.DesequiparCanoa();
+				}
 
                 if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-2520, 0,179), new TGCVector3(-2435, 100,276))))//Dependiendo si pasa el puente o no se guarda ultima posicion en tierra
                     ultimaPosTierra = new TGCVector3(-3800, 80, 160);
@@ -730,7 +749,7 @@ namespace TGC.Group.Model
 				mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
 				mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
 				mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
-				mesh.Effect.SetValue("lightIntensityPj", 250f);
+				mesh.Effect.SetValue("lightIntensityPj", 500f);
 				mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
 				mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
 				mesh.Effect.SetValue("spotLightExponent", 80f);

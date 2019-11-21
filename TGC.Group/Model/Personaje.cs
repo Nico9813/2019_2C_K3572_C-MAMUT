@@ -33,6 +33,8 @@ namespace TGC.Group.Model
 		private Boolean perdio;
 		private Boolean itemSelecionadoActivo;
 		private Boolean agendaActiva;
+		public Boolean posicionModificada = false;
+		public Boolean canoaEquipada = false;
 
 		public int pistaActual;
 
@@ -129,13 +131,33 @@ namespace TGC.Group.Model
 			this.mesh.Render();
 			if (meshEnMano != null) {
 				meshEnMano.Position = mesh.Position + new TGCVector3(50 * -director.X, 30, 50 * -director.Z);
-				Console.WriteLine("Mesh en mano: " + meshEnMano.Position);
 				meshEnMano.Render();
+				if (canoaEquipada) {
+					Item canoa = items.Find(a => a.getDescripcion().Equals("Canoa"));
+					canoa.mesh.Position = mesh.Position + new TGCVector3(50 * -director.X, 30, 50 * -director.Z);
+					canoa.mesh.Render();
+;				}
 			}
+		}
+
+		public void EquiparCanoa() {
+			canoaEquipada = true;
+			Canoa canoa = (Canoa)items.Find(a => a.getDescripcion().Equals("Canoa"));
+			canoa.ReiniciarPosicion(this);
+		}
+
+		public void DesequiparCanoa()
+		{
+			canoaEquipada = false;
 		}
 
 		public void RotarManos(float angulo) {
 			meshEnMano.RotateY(angulo);
+			if (canoaEquipada)
+			{
+				Item canoa = items.Find(a => a.getDescripcion().Equals("Canoa"));
+				canoa.mesh.RotateY(angulo);
+			}
 		}
 
 		public void AbrirAgenda() {
@@ -173,6 +195,12 @@ namespace TGC.Group.Model
 			objetoColisiano.Agregarse(this);
 		}
 
+		public void ModificarPosicion(TGCVector3 newPos) {
+			mesh.Position = newPos;
+			mesh.Move(0,0,0);
+			//mesh.Move(newPos);
+			posicionModificada = true;
+		}
 		public void agregarItem(Item item) {
 			this.items.Add(item);
 			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Se agrego al inventario el item " + item.getDescripcion()));
