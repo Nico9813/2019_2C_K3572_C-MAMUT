@@ -16,7 +16,7 @@ namespace TGC.Group.Objetos
 		public abstract void update(Personaje personaje, float elapsedTime);
         public override String getDescripcion()
         {
-            return this.descripcion;
+            return "Presionar [E] para agarrar " + this.descripcion;
         }
 
 		public override void Agregarse(Personaje personaje)

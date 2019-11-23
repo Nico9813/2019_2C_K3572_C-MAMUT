@@ -123,6 +123,8 @@ namespace TGC.Group.Model
 				HUD.Instance.paginaActual = pistas[pistaActual];
                 GameModel.sonidoNota.play(false);
             }
+
+			HUD.Instance.Update(elapsedTime);
 		}
 
 		public void Render(float ElapsedTime, TgcD3dInput input, TGCVector3 director)

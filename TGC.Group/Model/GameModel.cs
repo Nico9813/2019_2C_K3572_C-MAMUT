@@ -211,8 +211,8 @@ namespace TGC.Group.Model
 
                 Arbol.mesh.Move(0, 0, 0);
                 Arbol.mesh.Scale = new TGCVector3(0.01f * i, 0.01f * i, 0.01f * i);
-                Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
-                Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 2066) + 98, 1, ((float)Math.Pow(i, Math.E) % 3136) - 1339));
+                Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
+                Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
                 Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
                 arbolesMesh.Add(Arbol.mesh);
@@ -543,7 +543,7 @@ namespace TGC.Group.Model
 
 				foreach (var item in Items)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 50;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(item.mesh.Position - Personaje.mesh.Position)) < 100;
 					if (result)
 					{
 						itemCerca = true;
@@ -566,7 +566,7 @@ namespace TGC.Group.Model
 
 				foreach (var objeto in Objetos)
 				{
-					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.Position - Personaje.mesh.Position)) < 100;
+					var result = FastMath.Sqrt(TGCVector3.LengthSq(objeto.mesh.Position - Personaje.mesh.Position)) < 150;
 					if (result)
 					{
 						objetoCerca = true;
@@ -618,12 +618,6 @@ namespace TGC.Group.Model
 					if (Personaje.tieneItem("Canoa"))
 					{
 						Personaje.EquiparCanoa();
-						if (!piezaLagoEntregada)
-						{
-							Personaje.agregarPieza(piezaAsociadaLago);
-							Personaje.agregarPista(pistaAsociadaLago);
-							piezaLagoEntregada = true;
-						}
 					}
 					else
 					{

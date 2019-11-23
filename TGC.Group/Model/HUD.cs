@@ -195,7 +195,6 @@ namespace TGC.Group.Model
 		public void seleccionarItem(Item item)
 		{
 			espaciosInventario.ForEach(espacio => espacio.deseleccionar());
-			//espaciosInventario.FindAll(espacioInventario => !espacioInventario.libre).ElementAt(indiceItem).seleccionar();
 			espaciosInventario.Find(espacio => espacio.itemGuardado.Equals(item)).seleccionar();
 		}
 
@@ -205,6 +204,7 @@ namespace TGC.Group.Model
 			RellenoBateria.Scaling = new TGCVector2(bateriaRestante * 0.5f / personaje.getIluminadorPrincipal().getDuracionTotal(), 1* 0.5f);
 			mensajesTemporales.ForEach(mensaje => mensaje.Update(elapsedtime));
 			mensajesTemporales = mensajesTemporales.FindAll(mensaje => !mensaje.tiempoCumplido());
+			//mensajesTemporales.ForEach(mensaje => Console.WriteLine(mensaje.getContenido()));
 		}
 
 		public void seleccionarPaginaActual(Pista pista) {
@@ -287,7 +287,7 @@ namespace TGC.Group.Model
 				if (Mensaje)
 				{
 
-					drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+					drawerText.drawText(MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 					drawer.DrawSprite(EspacioMensajeSprite);
 					CustomSprite imagenRecolectableColisionado = new CustomSprite
 					{
@@ -301,7 +301,6 @@ namespace TGC.Group.Model
 				{
 					if (Colisionado.interactuable)
 					{
-						Console.WriteLine("Colisionado: " + Colisionado.getMensajeColision());
 						drawerText.drawText(Colisionado.getMensajeColision(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 						drawer.DrawSprite(EspacioMensajeSprite);
 					}
