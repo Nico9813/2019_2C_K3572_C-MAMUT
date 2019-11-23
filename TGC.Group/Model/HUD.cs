@@ -287,7 +287,7 @@ namespace TGC.Group.Model
 				if (Mensaje)
 				{
 
-					drawerText.drawText(MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+					drawerText.drawText("Presionar [E] para agarrar " + MensajeRecolectable.getDescripcion(), (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
 					drawer.DrawSprite(EspacioMensajeSprite);
 					CustomSprite imagenRecolectableColisionado = new CustomSprite
 					{

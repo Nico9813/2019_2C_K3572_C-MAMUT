@@ -47,7 +47,7 @@ namespace TGC.Examples.Physics.CubePhysic
 
         public float strength;
         public float angle;
-        public float rotationStrength = 0.01f;
+        public float rotationStrength = 0.025f;
 
 		Personaje personajeActual;
 
@@ -72,6 +72,10 @@ namespace TGC.Examples.Physics.CubePhysic
         {
             this.terreno = terreno;
         }
+
+		public void cambiarVelocidad(float i) {
+			strength = i;
+		}
 
         public TGCVector3 getBodyPos()
         {
@@ -291,10 +295,10 @@ namespace TGC.Examples.Physics.CubePhysic
         }
         public void rotar(float angulo)
         {
-            director.TransformCoordinate(TGCMatrix.RotationY(-angulo * rotationStrength));
-            personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angulo * rotationStrength) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
+            director.TransformCoordinate(TGCMatrix.RotationY(-angulo * 0.01f));
+            personaje.Transform = TGCMatrix.Translation(TGCVector3.Empty) * TGCMatrix.RotationY(-angulo * 0.01f) * new TGCMatrix(personajeBody.InterpolationWorldTransform);
             personajeBody.WorldTransform = personaje.Transform.ToBsMatrix;
-            personaje.RotateY(-angulo * rotationStrength);
+            personaje.RotateY(-angulo * 0.01f);
         }
     }
 }

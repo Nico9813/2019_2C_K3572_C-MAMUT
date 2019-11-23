@@ -241,8 +241,6 @@ namespace TGC.Group.Model
 			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_2.png", null);
 			pistaAsociadaLago = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
 
-		
-            
             //Instancio la Cabania
             var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
             foreach (var Mesh in sceneCabania.Meshes)
@@ -255,21 +253,20 @@ namespace TGC.Group.Model
                 Objetos.Add(new SinEfecto(Mesh));
                 MeshARenderizar.Add(Mesh);
             }
+			cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
+
 
 			//Instancio el altar
-			var sceneCabania2 = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
-			foreach (var Mesh in sceneCabania2.Meshes)
+			var altar = loader.loadSceneFromFile(MediaDir + @"Iglesia-TgcScene.xml");
+			foreach (var Mesh in altar.Meshes)
 			{
-				Mesh.Move(-3800, 22, -3169);
-				Mesh.Scale = new TGCVector3(4f, 4f, 4f);
-				Mesh.RotateY(FastMath.QUARTER_PI);
+				Mesh.Move(-2000, 31, 2760);
 
-				Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 
 				Objetos.Add(new SinEfecto(Mesh));
 				MeshARenderizar.Add(Mesh);
 			}
-			cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
+			
 
 			//Instancia puente
             var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
@@ -416,15 +413,15 @@ namespace TGC.Group.Model
             var fogataMesh = scene6.Meshes[0];
             Fogata fogata1 = new Fogata(fogataMesh.createMeshInstance("Fogata1"), new TGCVector3(-3600, 25, -3450));
             Fogata fogata2 = new Fogata(fogataMesh.createMeshInstance("Fogata2"), new TGCVector3(-4100, 20, 2900));
-            //Fogata fogata3 = new Fogata(Canon.createMeshInstance("Fogata3"), new TGCVector3(350, 70, 0));
+            Fogata fogata3 = new Fogata(fogataMesh.createMeshInstance("Fogata3"), new TGCVector3(-1665, 40, -2971));
             //Fogata fogata4 = new Fogata(Canon.createMeshInstance("Fogata4"), new TGCVector3(-350, 70, 0));
             IluminacionEscenario.Add(fogata1);
             IluminacionEscenario.Add(fogata2);
-            //IluminacionEscenario.Add(fogata3);
+            IluminacionEscenario.Add(fogata3);
             //IluminacionEscenario.Add(fogata4);
             meshFogatas.Add(fogata1.mesh);
             meshFogatas.Add(fogata2.mesh);
-            //MeshARenderizar.Add(fogata3.mesh);
+			meshFogatas.Add(fogata3.mesh);
             //MeshARenderizar.Add(fogata4.mesh);
             
             int auxF = 0;
@@ -615,6 +612,7 @@ namespace TGC.Group.Model
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
 				{
+					Personaje.getItems().ForEach(item => Console.WriteLine(item.getDescripcion()));
 					if (Personaje.tieneItem("Canoa"))
 					{
 						Personaje.EquiparCanoa();
@@ -648,8 +646,7 @@ namespace TGC.Group.Model
 
                if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
                 {
-                    
-                    physicsExample.rotar((float) (0.5*Math.Cos(7*time)));
+                    physicsExample.rotar((float) (Math.Cos(7*time)));
                 }
                 
   
@@ -751,7 +748,7 @@ namespace TGC.Group.Model
 				//mesh.Effect = effect;
 				//mesh.Technique = "Spotlight";
 				//Cargar variables shader de la luz FOGATA
-				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
+				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("lightPositionFog", FogatasPos);
 
 				mesh.Effect.SetValue("lightIntensityFog", 250f);

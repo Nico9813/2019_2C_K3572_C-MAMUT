@@ -49,7 +49,7 @@ float materialSpecularExp; //Exponente de specular
 
 //Variables de Fogatas
 float3 lightColorFog; //Color RGB de las 4 luces
-float4 lightPositionFog[2]; //Posicion de las 4 luces
+float4 lightPositionFog[3]; //Posicion de las 4 luces
 float lightIntensityFog; //Intensidad de las 4 luces
 float lightAttenuationFog; //Factor de atenuacion de las 4 luces
 
@@ -154,7 +154,7 @@ float4 point_light_ps(PS_INPUT input) : COLOR0
     diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 1);
 
 	//Diffuse 2
-    //diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 2);
+    diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 2);
 
 	//Diffuse 3
     //diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 3);
@@ -296,6 +296,8 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
 	//Diffuse 1
     diffuseLight += computeDiffuseComponent(input.WorldPosition, Nn, 1);
 
+	//Diffuse 2
+	diffuseLight += computeDiffuseComponent(input.WorldPosition, Nn, 2);
 
 	//Componente Specular: (N dot H)^exp
     float3 n_dot_h = dot(Nn, Hn);
@@ -388,6 +390,10 @@ float4 ps_Sepia(PS_DIFFUSE_MAP input) : COLOR0
 
 	//Diffuse 1
     diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 1);
+
+	//Diffuse 1
+	diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, 2);
+
     //input.Texcoord += cos(time);
     float4 outputColor = tex2D(diffuseMap, input.Texcoord);
     outputColor.r = outputColor.r * abs(sin(1.5*time));
@@ -478,6 +484,9 @@ float4 ps_Agua(PS_DIFFUSE_MAP input) : COLOR0
 
 	//Diffuse 1
     diffuseLight += computeDiffuseComponent(input.WorldPosition, Nn, 1);
+
+	//Diffuse 1
+	diffuseLight += computeDiffuseComponent(input.WorldPosition, Nn, 2);
 
 
 	//Componente Specular: (N dot H)^exp
