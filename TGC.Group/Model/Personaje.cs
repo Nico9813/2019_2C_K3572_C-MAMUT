@@ -143,7 +143,10 @@ namespace TGC.Group.Model
 ;				}
 			}
 		}
-		
+
+		public void setVisionNoturna(bool estado) {
+			visionNocturna = estado;
+		}
 		public bool TieneCanoa() {
 			return canoa != null;
 		}

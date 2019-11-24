@@ -485,14 +485,14 @@ namespace TGC.Group.Model
             fog.StartDistance = 1000f;
             fog.EndDistance = 1200f;
 
-            
             SonidosInit();
-            
         }
 
 		public override void Update()
         {
 			PreUpdate();
+
+
 
 			if (!JuegoIniciado)
 			{
@@ -514,6 +514,7 @@ namespace TGC.Group.Model
 					JuegoIniciado = true;
 					HUD.Instance.MainMenu = false;
 					physicsExample.ModoCreativo = true;
+					//Personaje.setVisionNoturna(true);
 				}
 
 			}
@@ -818,6 +819,39 @@ namespace TGC.Group.Model
 				mesh.Effect.SetValue("materialSpecularExp", 9f);
 			}
 
+			if (Personaje.visionNocturna && !Personaje.estaEnPeligro()) {
+				foreach (var mesh in MeshARenderizar)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "VisionNocturna";
+
+				}
+
+				terreno.Effect = effect;
+				terreno.Technique = "VisionNocturna";
+
+				foreach (var mesh in meshFogatas)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "VisionNocturna";
+
+				}
+				foreach (var mesh in skyBox.Faces)
+				{
+					mesh.Effect = effect;
+					mesh.Technique = "VisionNocturna";
+				}
+				foreach (var mesh in arbolesMesh)
+				{
+					mesh.Technique = "VisionNocturna";
+				}
+				foreach (var item in Items)
+				{
+					item.mesh.Technique = "VisionNocturnaItems";
+				}
+				MeshPlano.Technique = "VisionNocturna";
+			}
+
 			physicsExample.Render();
 
 			foreach (TgcMesh meshFog in meshFogatas)
@@ -829,7 +863,6 @@ namespace TGC.Group.Model
             
             if (Personaje.estaEnPeligro()&&!Personaje.perdioJuego())
             {
-                
                 monstruoSilueta.Render();
             }
 
