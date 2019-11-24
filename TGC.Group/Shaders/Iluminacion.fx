@@ -315,8 +315,22 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
     finalColor.rgb += specularLight;
     finalColor = calcularNiebla(finalColor, input.WorldPosition.z, input.WorldPosition.x);
     finalColor.rgb *= 0.5;
-    return finalColor;
-    //return texelColor;//Esto para probar sirve para ver todo sin oscuridad
+
+	float distancia0 = sqrt(pow(input.WorldPosition.z - lightPositionFog[0].z, 2) + pow(input.WorldPosition.x - lightPositionFog[0].x, 2));
+	float distancia1 = sqrt(pow(input.WorldPosition.z - lightPositionFog[1].z, 2) + pow(input.WorldPosition.x - lightPositionFog[1].x, 2));
+	float distancia2 = sqrt(pow(input.WorldPosition.z - lightPositionFog[2].z, 2) + pow(input.WorldPosition.x - lightPositionFog[2].x, 2));
+	if (distancia0 < 450 || distancia1 < 450 || distancia2 < 450)
+	{
+		float distanciaMin = min(min(distancia0, distancia1), distancia2);
+		finalColor = saturate((15 / distanciaMin) * texelColor + finalColor);
+		if (finalColor.r == 1 && finalColor.g == 1 && finalColor.b == 1)
+			return texelColor;
+		else
+			return finalColor;
+	}
+	else
+		return finalColor;
+	//return texelColor;//Esto para probar sirve para ver todo sin oscuridad
 }
 
 /*

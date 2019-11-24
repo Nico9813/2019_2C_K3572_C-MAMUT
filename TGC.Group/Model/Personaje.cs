@@ -29,6 +29,7 @@ namespace TGC.Group.Model
 		public float tiempoDesprotegido;
 		public float tiempoLimiteDesprotegido = 9;
 		public Boolean ilumnacionActiva;
+		public Boolean permisosAdmin = false;
 		private Boolean objetoEquipado;
 		private Boolean perdio;
 		private Boolean itemSelecionadoActivo;
@@ -37,6 +38,8 @@ namespace TGC.Group.Model
 		public Boolean canoaEquipada = false;
 
 		public int pistaActual;
+
+		Canoa canoa = null;
 
 		public TgcMesh meshEnMano = null;
 
@@ -109,7 +112,7 @@ namespace TGC.Group.Model
 			}
 
 			if (Input.keyPressed(Key.G) && pistas.Count != 0) {
-				AbrirAgenda();
+				AbrirAgenda(0);
 			}
 
 			if (agendaActiva && Input.keyPressed(Key.Space)) {
@@ -135,16 +138,22 @@ namespace TGC.Group.Model
 				meshEnMano.Position = mesh.Position + new TGCVector3(50 * -director.X, 30, 50 * -director.Z);
 				meshEnMano.Render();
 				if (canoaEquipada) {
-					Item canoa = items.Find(a => a.getDescripcion().Equals("Canoa"));
 					canoa.mesh.Position = mesh.Position + new TGCVector3(50 * -director.X, 30, 50 * -director.Z);
 					canoa.mesh.Render();
 ;				}
 			}
 		}
 
+		public bool TieneCanoa() {
+			return canoa != null;
+		}
+
+		public void SetCanoa(Canoa canoa) {
+			this.canoa = canoa;
+		}
+
 		public void EquiparCanoa() {
 			canoaEquipada = true;
-			Canoa canoa = (Canoa)items.Find(a => a.getDescripcion().Equals("Canoa"));
 			canoa.ReiniciarPosicion(this);
 		}
 
@@ -157,17 +166,22 @@ namespace TGC.Group.Model
 			meshEnMano.RotateY(angulo);
 			if (canoaEquipada)
 			{
-				Item canoa = items.Find(a => a.getDescripcion().Equals("Canoa"));
 				canoa.mesh.RotateY(angulo);
 			}
 		}
 
-		public void AbrirAgenda() {
+		public void AbrirAgenda(int indice) {
 			agendaActiva = !agendaActiva;
 			HUD.Instance.Agenda = !HUD.Instance.Agenda;
-			HUD.Instance.seleccionarPaginaActual(pistas[0]);
+			HUD.Instance.seleccionarPaginaActual(pistas[indice]);
 			pistaActual = 0;
 			GameModel.sonidoNota.play(false);
+		}
+
+		public void RemoverItemPorNombre(String nombre) {
+			Item item = items.Find(a => a.getDescripcion().Equals(nombre));
+			items.Remove(item);
+			HUD.Instance.removerItem(item);
 		}
 
 		public void equiparMeshEnMano(TgcMesh mesh) {
@@ -209,10 +223,11 @@ namespace TGC.Group.Model
 			HUD.Instance.guardarItem(item);
 		}
 
-		public void agregarPista(Pista item)
+		public void agregarPista(Pista nuevaPista)
 		{
 			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pista, pulsa G para visualizarla"));
-			this.pistas.Add(item);
+			this.pistas.Add(nuevaPista);
+			AbrirAgenda(pistas.IndexOf(nuevaPista));
 		}
 
 		public void agregarPieza(Pieza pieza){

@@ -55,7 +55,9 @@ namespace TGC.Group.Model
 		private List<Colisionable> Objetos;
 		private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
-        List<TgcMesh> arbolesMesh;
+		TgcBoundingAxisAlignBox iglesiaBoundingBox;
+		List<TgcBoundingAxisAlignBox> lugaresSeguros;
+		List<TgcMesh> arbolesMesh;
 
         private List<Fogata> IluminacionEscenario;
 
@@ -126,7 +128,8 @@ namespace TGC.Group.Model
             Objetos = new List<Colisionable>();
             MeshARenderizar = new List<TgcMesh>();
             meshFogatas = new List<TgcMesh>();
-            IluminacionEscenario = new List<Fogata>();
+			lugaresSeguros = new List<TgcBoundingAxisAlignBox>();
+			IluminacionEscenario = new List<Fogata>();
             //Instancio la vegetacion
             var scene = loader.loadSceneFromFile(MediaDir + @"Pino-TgcScene.xml");
             var PinoOriginal = scene.Meshes[0];
@@ -217,7 +220,8 @@ namespace TGC.Group.Model
                 MeshARenderizar.Add(Arbol.mesh);
                 arbolesMesh.Add(Arbol.mesh);
             }
-            foreach (var mesh in arbolesMesh)
+
+			foreach (var mesh in arbolesMesh)
             {
                 mesh.AlphaBlendEnable = true;
             }
@@ -238,8 +242,6 @@ namespace TGC.Group.Model
             MeshPlano = Plano.toMesh("MeshPlano");
             Objetos.Add(new SinEfecto(MeshPlano));
 			MeshARenderizar.Add(MeshPlano);
-			piezaAsociadaLago = new Pieza(2,"Pieza 2", MediaDir + "\\2D\\windows\\windows_2.png", null);
-			pistaAsociadaLago = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
 
             //Instancio la Cabania
             var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
@@ -253,8 +255,6 @@ namespace TGC.Group.Model
                 Objetos.Add(new SinEfecto(Mesh));
                 MeshARenderizar.Add(Mesh);
             }
-			cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
-
 
 			//Instancio el altar
 			var altar = loader.loadSceneFromFile(MediaDir + @"Iglesia-TgcScene.xml");
@@ -266,14 +266,18 @@ namespace TGC.Group.Model
 				Objetos.Add(new SinEfecto(Mesh));
 				MeshARenderizar.Add(Mesh);
 			}
-			
+
+			cabaniaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-500, 20, 500), new TGCVector3(0, 1001, 1080));
+			lugaresSeguros.Add(cabaniaBoundingBox);
+			iglesiaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-2190, 20, 2400), new TGCVector3(-1700, 500, 3200));
+			lugaresSeguros.Add(iglesiaBoundingBox);
 
 			//Instancia puente
-            var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
+			var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
             foreach (var Mesh in sceneBridge.Meshes)
             {
-                Mesh.Move(-2561, 12, 159);
-                Mesh.Scale = new TGCVector3(4.5f, .75f, 1.35f);
+                Mesh.Move(-2600, 26, 100);
+                Mesh.Scale = new TGCVector3(5.1f, .50f, 1.6f);
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 
@@ -370,7 +374,7 @@ namespace TGC.Group.Model
 			var CanoaMesh = loader.loadSceneFromFile(MediaDir + "Canoa-TgcScene.xml").Meshes[0];
 			
 			rutaImagen = MediaDir + "\\2D\\canoa.png";
-			var Canoa = new Canoa(CanoaMesh, rutaImagen);
+			var Canoa = new Canoa(CanoaMesh, rutaImagen, MediaDir);
 
 			Canoa.mesh.Move(-2970, 40, 450);
 			Canoa.mesh.Transform = TGCMatrix.Translation(-2970, 40, 450);
@@ -481,7 +485,7 @@ namespace TGC.Group.Model
 					HUD.Instance.MainMenu = false;
 					var rutaImagen = MediaDir + "\\2D\\texto_inicial.png";
 					Personaje.agregarPista(new Pista(null,rutaImagen,null));
-					Personaje.AbrirAgenda();
+					Personaje.AbrirAgenda(0);
 				}
 			}
 			else {
@@ -613,7 +617,7 @@ namespace TGC.Group.Model
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
 				{
 					Personaje.getItems().ForEach(item => Console.WriteLine(item.getDescripcion()));
-					if (Personaje.tieneItem("Canoa"))
+					if (Personaje.TieneCanoa())
 					{
 						Personaje.EquiparCanoa();
 					}
@@ -751,7 +755,7 @@ namespace TGC.Group.Model
 				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("lightPositionFog", FogatasPos);
 
-				mesh.Effect.SetValue("lightIntensityFog", 250f);
+				mesh.Effect.SetValue("lightIntensityFog", 40f);
 				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
 				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
