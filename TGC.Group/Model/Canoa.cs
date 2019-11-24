@@ -14,6 +14,7 @@ namespace TGC.Group.Model
 		TGCVector3 rotacion_inicial;
 		Pieza piezaAsociada;
 		Pista pistaAsociada;
+		Item mapa;
 
 		public Canoa(TgcMesh mesh, string rutaImagen,string MediaDir) {
 			this.mesh = mesh;
@@ -21,6 +22,7 @@ namespace TGC.Group.Model
 			this.descripcion = "Canoa";
 			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_4.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_canoa.png", null);
+			mapa = new Mapa(null, MediaDir + "\\2D\\MapaHud.png");
 		}
 
 		public override void Agregarse(Personaje personaje)
@@ -39,6 +41,7 @@ namespace TGC.Group.Model
 			if (personaje.permisosAdmin){
 				personaje.removerItem(this);
 				personaje.SetCanoa(this);
+				personaje.agregarItem(mapa);
 				personaje.agregarPista(pistaAsociada);
 				personaje.agregarPieza(piezaAsociada);
 			} else {

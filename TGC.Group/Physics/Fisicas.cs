@@ -49,6 +49,8 @@ namespace TGC.Examples.Physics.CubePhysic
         public float angle;
         public float rotationStrength = 0.025f;
 
+		public bool ModoCreativo = false;
+
 		Personaje personajeActual;
 
         public void setPersonaje(Personaje personaje)
@@ -153,6 +155,14 @@ namespace TGC.Examples.Physics.CubePhysic
             dynamicsWorld.StepSimulation(1 / 60f, 100);
 
 			#region Comportamiento
+
+			if (input.keyDown(Key.Space) && ModoCreativo)
+			{
+				//Activa el comportamiento de la simulacion fisica para la capsula
+				personajeBody.ActivationState = ActivationState.ActiveTag;
+				personajeBody.AngularVelocity = TGCVector3.Empty.ToBulletVector3();
+				personajeBody.ApplyCentralImpulse(strength * 10 *(new TGCVector3(0,1,0)).ToBulletVector3());
+			}
 
 			if (input.keyDown(Key.W))
             {

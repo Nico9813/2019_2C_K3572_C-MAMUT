@@ -27,7 +27,7 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 9;
+		public float tiempoLimiteDesprotegido = 90;
 		public Boolean ilumnacionActiva;
 		public Boolean permisosAdmin = false;
 		private Boolean objetoEquipado;
@@ -116,7 +116,6 @@ namespace TGC.Group.Model
 			}
 
 			if (agendaActiva && Input.keyPressed(Key.Space)) {
-				pistas[pistaActual].esNueva = false;
 				pistaActual = (pistaActual + 1) % pistas.Count;
 				HUD.Instance.seleccionarPaginaActual(pistas[pistaActual]);
 			}
@@ -143,7 +142,7 @@ namespace TGC.Group.Model
 ;				}
 			}
 		}
-
+		
 		public bool TieneCanoa() {
 			return canoa != null;
 		}
@@ -163,10 +162,13 @@ namespace TGC.Group.Model
 		}
 
 		public void RotarManos(float angulo) {
-			meshEnMano.RotateY(angulo);
-			if (canoaEquipada)
+			if (meshEnMano != null)
 			{
-				canoa.mesh.RotateY(angulo);
+				meshEnMano.RotateY(angulo);
+				if (canoaEquipada)
+				{
+					canoa.mesh.RotateY(angulo);
+				}
 			}
 		}
 

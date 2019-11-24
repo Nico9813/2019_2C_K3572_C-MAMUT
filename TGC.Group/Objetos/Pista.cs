@@ -11,12 +11,10 @@ namespace TGC.Group.Objetos
 	public class Pista : Recolectable
 	{
 		String imagenHUD;
-		public bool esNueva;
 		public Pista(TgcMesh _mesh, String imagen, String imagenMostrable) {
 			rutaImagen = imagen;
 			this.mesh = _mesh;
 			imagenHUD = imagenMostrable;
-			esNueva = true;
 		}
 
 		public override void Agregarse(Personaje personaje)

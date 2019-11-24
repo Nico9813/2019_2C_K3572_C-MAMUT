@@ -191,13 +191,12 @@ namespace TGC.Group.Model
                 var Instance = PinoOriginal.createMeshInstance("Pino" + i);
                 Arbol = new SinEfecto(Instance);
                 Arbol.mesh.Move(0, 0, 0);
-                Arbol.mesh.Scale = new TGCVector3(0.05f * i, 0.05f * i, 0.05f * i);
+                Arbol.mesh.Scale += new TGCVector3(0.015f * i, 0.025f * i, 0.015f * i);
                 Arbol.mesh.Move(posicionesArboles[i]);
                 Arbol.mesh.Transform = TGCMatrix.Translation(posicionesArboles[i]);
                 Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
                 arbolesMesh.Add(Arbol.mesh);
-
             }
 
             for (var i = posicionesArboles.Count; i < posicionesArboles.Count + 100; i++)
@@ -213,8 +212,8 @@ namespace TGC.Group.Model
                 }
 
                 Arbol.mesh.Move(0, 0, 0);
-                Arbol.mesh.Scale = new TGCVector3(0.01f * i, 0.01f * i, 0.01f * i);
-                Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
+				Arbol.mesh.Scale += new TGCVector3(0.015f * i, 0.025f * i, 0.015f * i);
+				Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
                 Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
                 Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
@@ -248,7 +247,7 @@ namespace TGC.Group.Model
             foreach (var Mesh in sceneCabania.Meshes)
             {
                 Mesh.Move(-500, 20, 500);
-                Mesh.Scale = new TGCVector3(4.5f, 4.5f, 4.5f);
+                Mesh.Scale = new TGCVector3(3f, 3f, 3f);
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
 
@@ -318,7 +317,6 @@ namespace TGC.Group.Model
 			MeshARenderizar.Add(bug.mesh);
 			MeshARenderizar.Add(bug.meshMounstroMiniatura);
 
-
 			//Instancia de skybox
 			skyBox = new TgcSkyBox();
             skyBox.Center = TGCVector3.Empty;
@@ -363,12 +361,17 @@ namespace TGC.Group.Model
 			var PistaMesh = loader.loadSceneFromFile(MediaDir + "pista-TgcScene.xml").Meshes[0];
 			PistaMesh.Move(-250, 55, 741);
 			PistaMesh.Transform = TGCMatrix.Translation(-300, 55, 741);
-			PistaMesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+			PistaMesh.Scale = new TGCVector3(0.25f, 0.25f, 0.25f);
 			rutaImagen = MediaDir + "\\2D\\pista_pala.png";
 			var rutaMostrable = MediaDir + "\\2D\\EspacioPistaHUD.png";
 			var pista = new Pista(PistaMesh, rutaImagen, rutaMostrable);
 			Items.Add(pista);
 			MeshARenderizar.Add(pista.mesh);
+
+			var PistaGruta = PistaMesh.createMeshInstance("pista-gruta");
+			PistaMesh.Move(-1665, 65, -2971);
+			PistaMesh.Transform = TGCMatrix.Translation(-1665, 65, -2971);
+			PistaMesh.Scale = new TGCVector3(0.25f, 0.25f, 0.25f);
 
 			//Instancia de la canoa
 			var CanoaMesh = loader.loadSceneFromFile(MediaDir + "Canoa-TgcScene.xml").Meshes[0];
@@ -487,6 +490,14 @@ namespace TGC.Group.Model
 					Personaje.agregarPista(new Pista(null,rutaImagen,null));
 					Personaje.AbrirAgenda(0);
 				}
+
+				if (Input.keyPressed(Key.G))
+				{
+					JuegoIniciado = true;
+					HUD.Instance.MainMenu = false;
+					physicsExample.ModoCreativo = true;
+				}
+
 			}
 			else {
 				if (giroMuerte > 180)
@@ -551,6 +562,7 @@ namespace TGC.Group.Model
 						HUD.Instance.MensajeRecolectable = item;
 						if (Input.keyPressed(Key.E))
 						{
+							item.mesh.Technique = "Spotlight";
 							MeshARenderizar.Remove(item.mesh);
 							Items.Remove(item);
 							Personaje.agregarRecolectable(item);
@@ -672,6 +684,8 @@ namespace TGC.Group.Model
         {
 			PreRender();
 
+			foreach (var mesh in MeshARenderizar) mesh.UpdateMeshTransform();
+
 			skyBox.Render();
 
 			var direccionLuz = physicsExample.getDirector();
@@ -715,6 +729,10 @@ namespace TGC.Group.Model
 					mesh.Effect = effect;
 					mesh.Technique = "Sepia";
 				}
+				foreach (var item in Items)
+				{
+					item.mesh.Technique = "Item";
+				}
 			}
 			else
 			{
@@ -743,7 +761,11 @@ namespace TGC.Group.Model
                 {
                     mesh.Technique = "SpotlightAB";
                 }
-                MeshPlano.Technique = "Agua";
+				foreach (var item in Items)
+				{
+					item.mesh.Technique = "Item";
+				}
+				MeshPlano.Technique = "Agua";
 
 			}
 
