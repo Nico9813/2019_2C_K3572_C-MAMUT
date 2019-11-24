@@ -55,6 +55,7 @@ namespace TGC.Group.Model
 		private List<Colisionable> Objetos;
 		private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
+		private List<TgcMesh> puntosInteres;
 		TgcBoundingAxisAlignBox iglesiaBoundingBox;
 		List<TgcBoundingAxisAlignBox> lugaresSeguros;
 		List<TgcMesh> arbolesMesh;
@@ -81,6 +82,7 @@ namespace TGC.Group.Model
 		private TgcFpsCamera camaraInterna;
 		private Bateria bateria;
 		private Vela vela;
+
 
 		Bug bug;
 
@@ -213,12 +215,54 @@ namespace TGC.Group.Model
 
                 Arbol.mesh.Move(0, 0, 0);
 				Arbol.mesh.Scale += new TGCVector3(0.015f * i, 0.025f * i, 0.015f * i);
-				Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
-                Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2700) - 1339));
+				Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1500) + 98, 1, ((float)Math.Pow(i, Math.E) % 2300) - 1339));
+                Arbol.mesh.Transform = TGCMatrix.Translation(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1800) + 98, 1, ((float)Math.Pow(i, Math.E) % 2300) - 1339));
                 Objetos.Add(Arbol);
                 MeshARenderizar.Add(Arbol.mesh);
                 arbolesMesh.Add(Arbol.mesh);
             }
+
+			for (var i = posicionesArboles.Count + 100; i < posicionesArboles.Count + 100 + 20; i++)
+			{
+				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+
+				Arbol = new SinEfecto(Instance);
+
+				Arbol.mesh.Move(0, 0, 0);
+				Arbol.mesh.Scale += new TGCVector3(0.005f * i, 0.005f * i, 0.005f * i);
+
+				var centro = new TGCVector3(-450, 40, 2500);
+				var posicionFinal = centro;
+				posicionFinal.X += 450 * FastMath.Cos(FastMath.TWO_PI / 20 * i);
+				posicionFinal.Z += 450 * FastMath.Sin(FastMath.TWO_PI / 20 * i);
+
+				Arbol.mesh.Move(posicionFinal);
+				Arbol.mesh.Transform = TGCMatrix.Translation(posicionFinal);
+				Objetos.Add(Arbol);
+				MeshARenderizar.Add(Arbol.mesh);
+				arbolesMesh.Add(Arbol.mesh);
+			}
+
+			for (var i = posicionesArboles.Count + 100 + 20; i < posicionesArboles.Count + 100 + 20 + 20; i++)
+			{
+				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+
+				Arbol = new SinEfecto(Instance);
+
+				Arbol.mesh.Move(0, 0, 0);
+				Arbol.mesh.Scale += new TGCVector3(0.005f * i, 0.005f * i, 0.005f * i);
+
+				var centro = new TGCVector3(-450, 40, 2500);
+				var posicionFinal = centro;
+				posicionFinal.X += 700 * FastMath.Cos(FastMath.TWO_PI / 20 * i);
+				posicionFinal.Z += 700 * FastMath.Sin(FastMath.TWO_PI / 20 * i);
+
+				Arbol.mesh.Move(posicionFinal);
+				Arbol.mesh.Transform = TGCMatrix.Translation(posicionFinal);
+				Objetos.Add(Arbol);
+				MeshARenderizar.Add(Arbol.mesh);
+				arbolesMesh.Add(Arbol.mesh);
+			}
 
 			foreach (var mesh in arbolesMesh)
             {
@@ -246,7 +290,7 @@ namespace TGC.Group.Model
             var sceneCabania = loader.loadSceneFromFile(MediaDir + @"cabania-TgcScene.xml");
             foreach (var Mesh in sceneCabania.Meshes)
             {
-                Mesh.Move(-500, 20, 500);
+                Mesh.Move(-400, 20, 600);
                 Mesh.Scale = new TGCVector3(3f, 3f, 3f);
 
                 Mesh.Transform = TGCMatrix.Scaling(Mesh.Scale);
@@ -335,43 +379,17 @@ namespace TGC.Group.Model
 
             String rutaImagen;
 
-            //Instancia de baterias
-            var scene4 = loader.loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
-            var BateriaMesh = scene4.Meshes[0];
-            BateriaMesh.Move(-3400, 10, 530);
-            BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
-            BateriaMesh.Transform = TGCMatrix.Translation(-3400, 30, 530);
-            rutaImagen = MediaDir + "\\2D\\imgBateria.png";
-            bateria = new Bateria(BateriaMesh, rutaImagen);
-            Items.Add(bateria);
-            MeshARenderizar.Add(BateriaMesh);
+			//Instancia de baterias
+			instanciarBateria(new TGCVector3(3400, 10, 530));
 
 			//Instancia de velas
-			var scene5 = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
-            var VelasMesh = scene5.Meshes[0];
-            VelasMesh.Move(-3400, 10, 400);
-            VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
-            VelasMesh.Transform = TGCMatrix.Translation(-3400, 30, 400);
-            rutaImagen = MediaDir + "\\2D\\imgVela.png";
-            vela = new Vela(VelasMesh, rutaImagen);
-            Items.Add(vela);
-            MeshARenderizar.Add(VelasMesh);
+			instanciarVela(new TGCVector3(-280, 54, 729));
+			instanciarVela(new TGCVector3(-2077, 48, 2758));
+			instanciarVela(new TGCVector3(-1694, 42, -2988));
 
 			//Instancia de pista
-			var PistaMesh = loader.loadSceneFromFile(MediaDir + "pista-TgcScene.xml").Meshes[0];
-			PistaMesh.Move(-250, 55, 741);
-			PistaMesh.Transform = TGCMatrix.Translation(-300, 55, 741);
-			PistaMesh.Scale = new TGCVector3(0.25f, 0.25f, 0.25f);
-			rutaImagen = MediaDir + "\\2D\\pista_pala.png";
-			var rutaMostrable = MediaDir + "\\2D\\EspacioPistaHUD.png";
-			var pista = new Pista(PistaMesh, rutaImagen, rutaMostrable);
-			Items.Add(pista);
-			MeshARenderizar.Add(pista.mesh);
-
-			var PistaGruta = PistaMesh.createMeshInstance("pista-gruta");
-			PistaMesh.Move(-1665, 65, -2971);
-			PistaMesh.Transform = TGCMatrix.Translation(-1665, 65, -2971);
-			PistaMesh.Scale = new TGCVector3(0.25f, 0.25f, 0.25f);
+			instanciarPista(new TGCVector3(-300, 55, 741));
+			instanciarPista(new TGCVector3(-1665, 65, -2971));
 
 			//Instancia de la canoa
 			var CanoaMesh = loader.loadSceneFromFile(MediaDir + "Canoa-TgcScene.xml").Meshes[0];
@@ -901,9 +919,49 @@ namespace TGC.Group.Model
                 sonidoPisadas.stop();
             }
         }
-      
 
-        }
+		public void instanciarVela(TGCVector3 pos)
+		{
+			var scene5 = (new TgcSceneLoader()).loadSceneFromFile(MediaDir + "velas-TgcScene.xml");
+			var VelasMesh = scene5.Meshes[0];
+			VelasMesh.Move(pos);
+			VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
+			VelasMesh.Transform = TGCMatrix.Translation(pos);
+			string rutaImagen = MediaDir + "\\2D\\imgVela.png";
+			vela = new Vela(VelasMesh, rutaImagen);
+			Items.Add(vela);
+			MeshARenderizar.Add(VelasMesh);
+		}
+
+		public void instanciarPista(TGCVector3 pos)
+		{
+			var PistaMesh = (new TgcSceneLoader()).loadSceneFromFile(MediaDir + "pista-TgcScene.xml").Meshes[0];
+			PistaMesh.Move(pos);
+			PistaMesh.Transform = TGCMatrix.Translation(pos);
+			PistaMesh.Scale = new TGCVector3(0.25f, 0.25f, 0.25f);
+			var rutaImagen = MediaDir + "\\2D\\pista_pala.png";
+			var rutaMostrable = MediaDir + "\\2D\\EspacioPistaHUD.png";
+			var pista = new Pista(PistaMesh, rutaImagen, rutaMostrable);
+			Items.Add(pista);
+			MeshARenderizar.Add(pista.mesh);
+		}
+
+		public void instanciarBateria(TGCVector3 pos)
+		{
+			var scene4 = (new TgcSceneLoader()).loadSceneFromFile(MediaDir + "Bateria-TgcScene.xml");
+			var BateriaMesh = scene4.Meshes[0];
+			BateriaMesh.Move(pos);
+			BateriaMesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+			BateriaMesh.Transform = TGCMatrix.Translation(pos);
+			var rutaImagen = MediaDir + "\\2D\\imgBateria.png";
+			bateria = new Bateria(BateriaMesh, rutaImagen);
+			Items.Add(bateria);
+			MeshARenderizar.Add(BateriaMesh);
+		}
+
+		
+
+	}
 
 
     }

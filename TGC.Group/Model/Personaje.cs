@@ -36,6 +36,7 @@ namespace TGC.Group.Model
 		private Boolean agendaActiva;
 		public Boolean posicionModificada = false;
 		public Boolean canoaEquipada = false;
+		public Boolean visionNocturna = false;
 
 		public int pistaActual;
 
