@@ -85,11 +85,17 @@ namespace TGC.Group.Model
 
 		public void Update(TgcD3dInput Input, float elapsedTime)
 		{
+            
 			if (ilumnacionActiva == false)
 				tiempoDesprotegido += elapsedTime;
 			else tiempoDesprotegido = 0;
+            if (ilumnacionActiva)
+            {
+                iluminadorPrincipal.Update(this, elapsedTime);
+            }
 
-			if (tiempoDesprotegido >= tiempoLimiteDesprotegido)
+
+            if (tiempoDesprotegido >= tiempoLimiteDesprotegido)
 				this.perdio = true;
 
 			if (Input.keyPressed(Key.Tab))
@@ -328,7 +334,7 @@ namespace TGC.Group.Model
 		}
         public Boolean estaEnPeligro()
         {
-			return tiempoDesprotegido >= (0.1f * tiempoLimiteDesprotegido);
+			return tiempoDesprotegido >= (0.65f * tiempoLimiteDesprotegido);
         }
         public void setPerdioJuego(Boolean perdioJuego)
         {

@@ -21,11 +21,10 @@ namespace TGC.Group.Objetos
 			personaje.agregarBateria();
 			personaje.EquiparProximoItem();
 			personaje.removerItem(this);
+            personaje.EquiparProximoItem();
 		}
 
-		public override void update(Personaje personaje, float elapsedTime)
-		{
-		}
+		
 
 		internal override void desactivar(Personaje personaje)
 		{

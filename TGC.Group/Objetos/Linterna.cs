@@ -26,7 +26,7 @@ namespace TGC.Group.Objetos
 			//Mesh para la luz
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.White;
-			DuracionBateria = 9000000000;
+			DuracionBateria = 60;
 			BateriaConsumida = 0;
 			this.mesh = mesh;
             this.descripcion = "Linterna";
@@ -46,7 +46,7 @@ namespace TGC.Group.Objetos
 			personaje.quitarIluminacion();
 		}
 
-		public override void update(Personaje personaje, float elapsedTime)
+		public override void Update(Personaje personaje, float elapsedTime)
 		{
 			if (BateriaConsumida + elapsedTime <= DuracionBateria)
 			{

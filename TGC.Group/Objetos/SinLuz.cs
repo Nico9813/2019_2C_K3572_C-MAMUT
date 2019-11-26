@@ -24,7 +24,7 @@ namespace TGC.Group.Objetos
 			personaje.setIluminador(this,false);
 		}
 
-		public override void update(Personaje personaje, float elapsedTime)
+		public override void Update(Personaje personaje, float elapsedTime)
 		{
 
 		}

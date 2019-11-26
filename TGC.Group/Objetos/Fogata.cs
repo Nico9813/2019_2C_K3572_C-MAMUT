@@ -29,7 +29,7 @@ namespace TGC.Group.Objetos
 			throw new NotImplementedException();
 		}
 
-		public override void update(Personaje personaje, float elapsedTime)
+		public override void Update(Personaje personaje, float elapsedTime)
 		{
 			throw new NotImplementedException();
 		}

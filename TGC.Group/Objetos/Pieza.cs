@@ -35,10 +35,7 @@ namespace TGC.Group.Objetos
 			
 		}
 
-		public override void update(Personaje personaje, float elapsedTime)
-		{
-			
-		}
+		
 
 		internal override void desactivar(Personaje personaje)
 		{

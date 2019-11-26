@@ -21,7 +21,7 @@ namespace TGC.Group.Objetos
 			this.mesh = mesh;
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.Orange;
-			duracionVela = 5;
+			duracionVela = 10;
 			tiempoUsada = 0;
             this.descripcion = "Vela";
 			this.rutaImagen = rutaImagen;
@@ -36,7 +36,7 @@ namespace TGC.Group.Objetos
 			personaje.quitarIluminacion();
 		}
 
-		public override void update(Personaje personaje, float elapsedTime)
+		public override void Update(Personaje personaje, float elapsedTime)
 		{
 			if (tiempoUsada + elapsedTime <= duracionVela)
 			{
@@ -45,8 +45,9 @@ namespace TGC.Group.Objetos
 			else
 			{
 				personaje.quitarIluminacion();
-				personaje.itemSelecionado = new SinLuz();
+				personaje.setIluminador(new SinLuz(),false);
 				personaje.removerItem(this);
+                personaje.EquiparProximoItem();
 			}
 		}
 

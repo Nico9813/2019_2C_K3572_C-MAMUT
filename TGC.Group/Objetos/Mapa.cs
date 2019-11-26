@@ -20,7 +20,7 @@ namespace TGC.Group.Objetos
 			HUD.Instance.MapaPersonaje = true;
 		}
 
-		public override void update(Personaje personaje, float elapsedTime){}
+		
 
 		internal override void desactivar(Personaje personaje)
 		{
