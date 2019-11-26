@@ -686,7 +686,7 @@ namespace TGC.Group.Model
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, altarFinalBoundingBox))
 				{
-					if (Personaje.JuegoTerminado()||true) {
+					if (Personaje.JuegoTerminado()) {
 						HUD.Instance.MensajeExtra = true;
 						HUD.Instance.MensajeExtraContenido = ganoEnRealidad ? "Iniciando windows..." : "Press [F] for linux";
 
