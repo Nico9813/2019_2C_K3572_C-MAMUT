@@ -26,7 +26,7 @@ namespace TGC.Group.Objetos
 			//Mesh para la luz
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.White;
-			DuracionBateria = 60;
+			DuracionBateria = 90;
 			BateriaConsumida = 0;
 			this.mesh = mesh;
             this.descripcion = "Linterna";
