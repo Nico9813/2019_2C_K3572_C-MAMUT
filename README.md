@@ -14,9 +14,9 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 * [TGC.Core](https://www.nuget.org/packages/TGC.Core/) (se baja automáticamente al hacer build por primera vez)
 
 ## Integrantes ##
-TGC, Tgcito  |  Apellido, Nombre
+Gómez, Nicolás|  Medina, Federico| Tardieu, Ezequiel
 ------------ | -------------
-<img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/robotgc.png" height="500"> | <img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/trofeotp.png" height="500">
+<img https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/tree/master/readme/Nico.jpeg" height="500"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/tree/master/readme/Fede.jpeg" height="500"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/tree/master/readme/Eze.jpg" height="500"> 
 
 ## ScreenShot ##
 ![screenshot1](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
