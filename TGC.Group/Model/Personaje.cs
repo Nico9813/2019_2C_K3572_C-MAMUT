@@ -176,15 +176,20 @@ namespace TGC.Group.Model
 		}
 
 		public void RotarManos(float angulo) {
-			if (meshEnMano != null)
+			
+             foreach (var item in items)
+             {
+                if(item.mesh != null)
+                    item.mesh.RotateY(angulo);
+             }
+                    
+			
+			if (canoaEquipada)
 			{
-				meshEnMano.RotateY(angulo);
-				if (canoaEquipada)
-				{
-					canoa.mesh.RotateY(angulo);
-				}
+				canoa.mesh.RotateY(angulo);
 			}
-		}
+			}
+		
 
 		public void AbrirAgenda(int indice) {
 			agendaActiva = !agendaActiva;
