@@ -672,10 +672,16 @@ namespace TGC.Group.Model
 
 				//Cabania es lugar seguro
 
-				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, cabaniaBoundingBox))
-				{
-					Personaje.tiempoDesprotegido = 0;
-				}
+
+                foreach(var lugarSeguro in lugaresSeguros)
+                {
+                    if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, lugarSeguro))
+                    {
+                        Personaje.tiempoDesprotegido = 0;
+                    }
+
+                }
+			       
 
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, altarFinalBoundingBox))
@@ -931,12 +937,9 @@ namespace TGC.Group.Model
 				monstruo.Render();
 			}
 
-			DrawText.drawText("Personaje pos: " + TGCVector3.PrintVector3(physicsExample.getPersonaje().Position), 5, 20, Color.Red);
-			DrawText.drawText("Camera LookAt: " + TGCVector3.PrintVector3(camaraInterna.Position), 5, 40, Color.Red);
-			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 60, Color.GreenYellow);
-            DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 80, Color.Gold);
-            DrawText.drawText("MonstruoSilueta en: " + TGCVector3.PrintVector3(monstruo.Position),5, 100, Color.FloralWhite); 
-            DrawText.drawText("director en: " + TGCVector3.PrintVector3(physicsExample.getDirector()), 5, 120, Color.HotPink);
+			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 20, Color.GreenYellow);
+            DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 40, Color.Gold);
+            
             Personaje.Render(ElapsedTime, Input, physicsExample.getDirector());
 
 			quadtree.render(Frustum, true);
