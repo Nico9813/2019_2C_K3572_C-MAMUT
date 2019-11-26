@@ -97,6 +97,7 @@ namespace TGC.Group.Model
         private Effect effect;
         float time = 0;
 		float auxShader = 0;
+        float auxShaderMonstruoAparece = 0;
 		private TgcFog fog;
 
         private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
@@ -732,6 +733,8 @@ namespace TGC.Group.Model
             monstruoSilueta.Scale = new TGCVector3(0.7f, 0.7f, 0.7f);
             monstruoSilueta.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.7f, 0.7f, 0.7f));
 
+            auxShaderMonstruoAparece = FastMath.Min(0.5f, auxShaderMonstruoAparece + (float) auxShader/150);
+
             PostUpdate();
         }
 
@@ -793,8 +796,10 @@ namespace TGC.Group.Model
 			{
 				String tecnicaActual = (Personaje.visionNocturnaActivada) ? "VisionNocturna" : "Spotlight";
 				String tecnicaItemActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaItems" : "Item";
+                String tecnicaArbolActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaAB" : "SpotlightAB";
+                String tecnicaAguaActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaAgua" : "Agua";
 
-				foreach (var mesh in MeshARenderizar)
+                foreach (var mesh in MeshARenderizar)
 				{
 					mesh.Effect = effect;
 					mesh.Technique = tecnicaActual;
@@ -817,14 +822,14 @@ namespace TGC.Group.Model
 				}
                 foreach(var mesh in arbolesMesh)
                 {
-                    mesh.Technique = "SpotlightAB";
+                    mesh.Technique = tecnicaArbolActual;
                 }
 				foreach (var item in Items)
 				{
 					item.mesh.Technique = tecnicaItemActual;
 				}
 
-				MeshPlano.Technique = "Agua";
+				MeshPlano.Technique = tecnicaAguaActual;
 
 			}
 
@@ -857,6 +862,7 @@ namespace TGC.Group.Model
 				mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				mesh.Effect.SetValue("materialSpecularExp", 9f);
+                mesh.Effect.SetValue("auxMonstruoAparece", auxShaderMonstruoAparece);
 			}
 
 			physicsExample.Render();
@@ -883,7 +889,7 @@ namespace TGC.Group.Model
            
 			if (giroMuerte > 0)
 			{
-                monstruo.Technique = "Spotlight";
+                monstruo.Technique = "MonstruoAparece";
                 //monstruo.Technique = "NoMeQuieroIr";
 				monstruo.Render();
 			}

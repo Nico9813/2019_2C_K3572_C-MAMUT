@@ -18,7 +18,7 @@ float4x4 matWorldViewProj; //Matriz World * View * Projection
 float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 
 float aux = 0;
-
+float auxMonstruoAparece = 0;
 //Textura para DiffuseMap
 texture texDiffuseMap;
 sampler2D diffuseMap = sampler_state
@@ -850,3 +850,34 @@ technique VisionNocturnaItems
 	}
 }
 
+float4 ps_MonstruoAparece(PS_DIFFUSE_MAP input) : COLOR0
+{
+    float4 finalColor = tex2D(diffuseMap, input.Texcoord);
+    finalColor *= auxMonstruoAparece;
+    return finalColor;
+}
+technique MonstruoAparece
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_DiffuseMap();
+        PixelShader = compile ps_3_0 ps_MonstruoAparece();
+    }
+}
+technique VisionNocturnaAgua
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_Agua();
+        PixelShader = compile ps_3_0 ps_vision_nocturna();
+    }
+}
+
+technique VisionNocturnaAB
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_DiffuseMap_AB();
+        PixelShader = compile ps_3_0 ps_vision_nocturna();
+    }
+}
