@@ -37,6 +37,7 @@ namespace TGC.Group.Model
 		public Boolean posicionModificada = false;
 		public Boolean canoaEquipada = false;
 		public Boolean visionNocturna = false;
+		public Boolean visionNocturnaActivada = false;
 
 		public int pistaActual;
 
@@ -96,6 +97,13 @@ namespace TGC.Group.Model
 				EquiparProximoItem();
 			}
 
+			if (Input.keyPressed(Key.N))
+			{
+				if (visionNocturna) {
+					visionNocturnaActivada = !visionNocturnaActivada;
+				}
+			}
+
 			if (Input.keyPressed(Key.R))
 			{
 				if (itemSelecionadoActivo)
@@ -115,6 +123,8 @@ namespace TGC.Group.Model
 			if (Input.keyPressed(Key.G) && pistas.Count != 0) {
 				AbrirAgenda(0);
 			}
+
+
 
 			if (agendaActiva && Input.keyPressed(Key.Space)) {
 				pistaActual = (pistaActual + 1) % pistas.Count;

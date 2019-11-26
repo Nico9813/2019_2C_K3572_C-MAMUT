@@ -391,6 +391,16 @@ namespace TGC.Group.Model
 			instanciarPista(new TGCVector3(-300, 55, 741));
 			instanciarPista(new TGCVector3(-1665, 65, -2971));
 
+			//Instancia de las gafas
+			var Gafas = new VisionNocturna(MediaDir);
+
+			Gafas.mesh.Move(new TGCVector3(-1650, 65, -2950));
+			Gafas.mesh.Scale = new TGCVector3(0.02f, 0.02f, 0.02f);
+			Gafas.mesh.Transform = TGCMatrix.Translation(-1650, 65, -2950);
+
+			Items.Add(Gafas);
+			MeshARenderizar.Add(Gafas.mesh);
+
 			//Instancia de la canoa
 			var CanoaMesh = loader.loadSceneFromFile(MediaDir + "Canoa-TgcScene.xml").Meshes[0];
 			
@@ -479,9 +489,9 @@ namespace TGC.Group.Model
             monstruoSilueta = loader.loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
             monstruoSilueta.Effect = effect;
             monstruoSilueta.Technique = "Silueta";
-            monstruoSilueta.RotateY(FastMath.PI_HALF);
+			monstruoSilueta.RotateY(FastMath.PI);
 
-            fog = new TgcFog();
+			fog = new TgcFog();
             fog.StartDistance = 1000f;
             fog.EndDistance = 1200f;
 
@@ -583,10 +593,9 @@ namespace TGC.Group.Model
 					}
 				}
 
-								if (Input.keyPressed(Key.K))
+				if (Input.keyPressed(Key.K))
 				{
 					physicsExample.ModoCreativo = true;
-					Personaje.setVisionNoturna(true);
 				}
 
 				HUD.Instance.Mensaje = itemCerca;
@@ -673,21 +682,17 @@ namespace TGC.Group.Model
                 if(TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-1125, 0, 179), new TGCVector3(-900, 100, 276))))
                     ultimaPosTierra = new TGCVector3(1000, 80, 1200);
 
-
-
-
 				if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
 				{
 					physicsExample.rotar((float)(0.1 * (Math.Cos(40 * time))));
 				}
                 
-  
                 quadtree.actualizarModelos(MeshARenderizar);
 			}
 
             SonidosUpdate();
-            var desplazamientoSilueta = -2000 * physicsExample.getDirector()*((Personaje.tiempoLimiteDesprotegido-Personaje.tiempoDesprotegido)/ Personaje.tiempoLimiteDesprotegido);
-            monstruoSilueta.Position = camaraInterna.Position;
+			var desplazamientoSilueta = -2000 * physicsExample.getDirector() * (FastMath.Min(0.65f, 0.35f + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido) / Personaje.tiempoLimiteDesprotegido));
+			monstruoSilueta.Position = camaraInterna.Position;
             
             monstruoSilueta.Move(desplazamientoSilueta);
             monstruoSilueta.Scale = new TGCVector3(0.7f, 0.7f, 0.7f);
@@ -752,26 +757,29 @@ namespace TGC.Group.Model
 			}
 			else
 			{
+				String tecnicaActual = (Personaje.visionNocturnaActivada) ? "VisionNocturna" : "Spotlight";
+				String tecnicaItemActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaItems" : "Item";
+
 				foreach (var mesh in MeshARenderizar)
 				{
 					mesh.Effect = effect;
-					mesh.Technique = "Spotlight";
+					mesh.Technique = tecnicaActual;
 
 				}
 
 				terreno.Effect = effect;
-				terreno.Technique = "Spotlight";
+				terreno.Technique = tecnicaActual;
 
 				foreach (var mesh in meshFogatas)
 				{
 					mesh.Effect = effect;
-					mesh.Technique = "Spotlight";
+					mesh.Technique = tecnicaActual;
 
 				}
 				foreach (var mesh in skyBox.Faces)
 				{
 					mesh.Effect = effect;
-					mesh.Technique = "Spotlight";
+					mesh.Technique = tecnicaActual;
 				}
                 foreach(var mesh in arbolesMesh)
                 {
@@ -779,7 +787,7 @@ namespace TGC.Group.Model
                 }
 				foreach (var item in Items)
 				{
-					item.mesh.Technique = "Item";
+					item.mesh.Technique = tecnicaItemActual;
 				}
 				MeshPlano.Technique = "Agua";
 
@@ -814,39 +822,6 @@ namespace TGC.Group.Model
 				mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				mesh.Effect.SetValue("materialSpecularExp", 9f);
-			}
-
-			if (Personaje.visionNocturna && !Personaje.estaEnPeligro()) {
-				foreach (var mesh in MeshARenderizar)
-				{
-					mesh.Effect = effect;
-					mesh.Technique = "VisionNocturna";
-
-				}
-
-				terreno.Effect = effect;
-				terreno.Technique = "VisionNocturna";
-
-				foreach (var mesh in meshFogatas)
-				{
-					mesh.Effect = effect;
-					mesh.Technique = "VisionNocturna";
-
-				}
-				foreach (var mesh in skyBox.Faces)
-				{
-					mesh.Effect = effect;
-					mesh.Technique = "VisionNocturna";
-				}
-				foreach (var mesh in arbolesMesh)
-				{
-					mesh.Technique = "VisionNocturna";
-				}
-				foreach (var item in Items)
-				{
-					item.mesh.Technique = "VisionNocturnaItems";
-				}
-				MeshPlano.Technique = "VisionNocturna";
 			}
 
 			physicsExample.Render();

@@ -52,8 +52,8 @@ namespace TGC.Group.Model
 		public Recolectable MensajeRecolectable;
 		public Colisionable Colisionado;
 
-		int factorAncho;
-		int factorAlto;
+		float factorAncho;
+		float factorAlto;
 
 		private readonly static HUD instance = new HUD();
 
@@ -75,8 +75,8 @@ namespace TGC.Group.Model
 			var altoOriginal = 1017;
 			var anchoOriginal = 1920;
 
-			factorAncho = D3DDevice.Instance.Device.Viewport.Width / anchoOriginal;
-			factorAlto = D3DDevice.Instance.Device.Viewport.Height / altoOriginal;
+			factorAncho = width / anchoOriginal;
+			factorAlto = height / altoOriginal;
 
 			BarraBateria = new CustomSprite
 			{
