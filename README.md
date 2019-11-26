@@ -14,9 +14,10 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 * [TGC.Core](https://www.nuget.org/packages/TGC.Core/) (se baja automáticamente al hacer build por primera vez)
 
 ## Integrantes ##
-Gómez, Nicolás|  Medina, Federico| Tardieu, Ezequiel
------------- | -------------
-<img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Nico.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Fede.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Eze.jpg" height="350"> 
+Gómez, Nicolás | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Nico.jpeg" height="350"> 
+Medina, Federico | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Fede.jpeg" height="350">
+Tardieu, Ezequiel | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Eze.jpg" height="350"> 
+
 
 ## ScreenShot ##
 ![screenshot1](https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/screenshot1.png)
