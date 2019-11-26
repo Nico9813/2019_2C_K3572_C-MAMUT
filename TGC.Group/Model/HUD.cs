@@ -52,6 +52,9 @@ namespace TGC.Group.Model
 		public Recolectable MensajeRecolectable;
 		public Colisionable Colisionado;
 
+		int factorAncho;
+		int factorAlto;
+
 		private readonly static HUD instance = new HUD();
 
 		private HUD(){}
@@ -69,11 +72,17 @@ namespace TGC.Group.Model
 			personaje = _personaje;
 			drawer = new Drawer2D();
 
+			var altoOriginal = 1017;
+			var anchoOriginal = 1920;
+
+			factorAncho = D3DDevice.Instance.Device.Viewport.Width / anchoOriginal;
+			factorAlto = D3DDevice.Instance.Device.Viewport.Height / altoOriginal;
+
 			BarraBateria = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\BarraBateria.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.02f, height * 0.85f),
-				Scaling = new TGCVector2(0.5f, 0.5f),
+				Scaling = new TGCVector2(0.5f * factorAncho, 0.5f * factorAlto),
 				Color = Color.DarkMagenta,
 			};
 
@@ -81,7 +90,7 @@ namespace TGC.Group.Model
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\Bateria.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.045f, height * 0.85f),
-				Scaling = new TGCVector2(0.5f, 0.5f),
+				Scaling = new TGCVector2(0.5f * factorAncho, 0.5f * factorAlto),
 				Color = Color.DarkGoldenrod,
 			};
 
@@ -89,14 +98,14 @@ namespace TGC.Group.Model
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\menuControles.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.32f, height * 0.20f),
-				Scaling = new TGCVector2(0.6f, 0.6f),
+				Scaling = new TGCVector2(0.6f * factorAncho, 0.6f * factorAlto),
 			};
 
 			MapaPersonajeSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\mapa.jpg", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.3f, height * 0.20f),
-				Scaling = new TGCVector2(0.6f, 0.6f),
+				Scaling = new TGCVector2(0.6f * factorAncho, 0.6f * factorAlto),
 			};
 
 			EspacioMensajeSprite = new CustomSprite
@@ -109,14 +118,14 @@ namespace TGC.Group.Model
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioPista.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.4f, height * 0.3f),
-				Scaling = new TGCVector2(1.5f, 1.5f),
+				Scaling = new TGCVector2(1.5f * factorAncho, 1.5f * factorAlto),
 			};
 
 			mainMenuSprite = new CustomSprite
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\logo.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.28f, height * 0.02f),
-				Scaling = new TGCVector2(0.8f, 0.5f),
+				Scaling = new TGCVector2(0.8f * factorAncho, 0.5f * factorAlto),
 			};
 
 			espaciosInventario = new List<EspacioObjeto>();
@@ -151,7 +160,7 @@ namespace TGC.Group.Model
 					{
 						Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioObjeto.png", D3DDevice.Instance.Device),
 						Position = new TGCVector2(x0, y0),
-						Scaling = new TGCVector2(1.2f, 1.2f),
+						Scaling = new TGCVector2(1.2f * factorAncho, 1.2f * factorAlto),
 					};
 					espaciosPiezas.Add(new EspacioObjeto(spriteActual));
 				}
@@ -266,7 +275,7 @@ namespace TGC.Group.Model
 					{
 						Bitmap = new CustomBitmap(paginaActual.rutaImagen, D3DDevice.Instance.Device),
 						Position = AgendaSprite.Position,
-						Scaling = new TGCVector2(1.5f, 1.5f),
+						Scaling = new TGCVector2(1.5f * factorAncho, 1.5f * factorAlto),
 					};
 					drawerText.drawText("Presionar [Espacio] para pasar entre notas ", (int)AgendaSprite.Position.X + 50, (int)AgendaSprite.Position.Y + 400, Color.White);
 					drawerText.drawText("Presionar [G] para cerrar la agenda ", (int)AgendaSprite.Position.X + 50, (int)AgendaSprite.Position.Y + 420, Color.White);

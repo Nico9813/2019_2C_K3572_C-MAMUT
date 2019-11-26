@@ -508,15 +508,6 @@ namespace TGC.Group.Model
 					Personaje.agregarPista(new Pista(null,rutaImagen,null));
 					Personaje.AbrirAgenda(0);
 				}
-
-				if (Input.keyPressed(Key.G))
-				{
-					JuegoIniciado = true;
-					HUD.Instance.MainMenu = false;
-					physicsExample.ModoCreativo = true;
-					//Personaje.setVisionNoturna(true);
-				}
-
 			}
 			else {
 				if (giroMuerte > 180)
@@ -590,6 +581,12 @@ namespace TGC.Group.Model
 						}
 						break;
 					}
+				}
+
+								if (Input.keyPressed(Key.K))
+				{
+					physicsExample.ModoCreativo = true;
+					Personaje.setVisionNoturna(true);
 				}
 
 				HUD.Instance.Mensaje = itemCerca;
@@ -676,13 +673,13 @@ namespace TGC.Group.Model
                 if(TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, new TgcBoundingAxisAlignBox(new TGCVector3(-1125, 0, 179), new TGCVector3(-900, 100, 276))))
                     ultimaPosTierra = new TGCVector3(1000, 80, 1200);
 
-               
-               
 
-               if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
-                {
-                    physicsExample.rotar((float) (Math.Cos(7*time)));
-                }
+
+
+				if (Personaje.estaEnPeligro() && !Personaje.perdioJuego())
+				{
+					physicsExample.rotar((float)(0.1 * (Math.Cos(40 * time))));
+				}
                 
   
                 quadtree.actualizarModelos(MeshARenderizar);
