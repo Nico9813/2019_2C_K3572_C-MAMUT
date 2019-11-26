@@ -8,7 +8,7 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Objetos
 {
-	public class Pieza : Recolectable
+	public class Pieza : Item
 	{
 		public String descripcion;
 		public int numeroPieza;
@@ -20,7 +20,6 @@ namespace TGC.Group.Objetos
 			if (rutaMesh != null) {
 				mesh = (new TgcSceneLoader()).loadSceneFromFile(rutaMesh).Meshes[0];
 			}
-			
 		}
 		public override String getRutaImagen()
 		{
@@ -29,6 +28,21 @@ namespace TGC.Group.Objetos
 		public override String getDescripcion() { return descripcion; }
 		public override void Agregarse(Personaje personaje) {
 			personaje.agregarPieza(this);
+		}
+
+		public override void accion(Personaje personaje)
+		{
+			
+		}
+
+		public override void update(Personaje personaje, float elapsedTime)
+		{
+			
+		}
+
+		internal override void desactivar(Personaje personaje)
+		{
+			
 		}
 	}
 }

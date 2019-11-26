@@ -16,7 +16,7 @@ namespace TGC.Group.Model
 		Item itemAsociado;
 		bool usado;
 		public ArbolDirectorio(String MediaDir) {
-			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_2.png", null);
+			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_1.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_bug.png", null);
 			itemAsociado = new Herramienta("Red", null, MediaDir + "\\2D\\SUDO.png");
 			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"Palmera2-TgcScene.xml").Meshes[0];

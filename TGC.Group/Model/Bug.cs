@@ -22,7 +22,7 @@ namespace TGC.Group.Model
 			meshMounstroMiniatura = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"monstruo-TgcScene.xml").Meshes[0];
 			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"Buggy-TgcScene.xml").Meshes[0];
 
-			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_3.png", null);
+			piezaAsociada = new Pieza(2, "Pieza 2", MediaDir + "\\2D\\windows\\windows_2.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_sudo.png", null);
 
 			mesh.Position = new TGCVector3(-450, 40, 2500);

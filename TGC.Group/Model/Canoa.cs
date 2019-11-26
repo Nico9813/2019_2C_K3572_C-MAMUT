@@ -20,7 +20,7 @@ namespace TGC.Group.Model
 			this.mesh = mesh;
 			this.rutaImagen = rutaImagen;
 			this.descripcion = "Canoa";
-			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_4.png", null);
+			piezaAsociada = new Pieza(3, "Pieza 3", MediaDir + "\\2D\\windows\\windows_3.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_canoa.png", null);
 			mapa = new Mapa(null, MediaDir + "\\2D\\MapaHud.png");
 		}

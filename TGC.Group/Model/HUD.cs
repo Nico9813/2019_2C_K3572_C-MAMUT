@@ -48,9 +48,11 @@ namespace TGC.Group.Model
 		public bool Agenda = false;
 		public bool Mensaje = false;
 		public bool MensajeColisionable = false;
+		public bool MensajeExtra= false;
 
 		public Recolectable MensajeRecolectable;
 		public Colisionable Colisionado;
+		public String MensajeExtraContenido;
 
 		float factorAncho;
 		float factorAlto;
@@ -293,6 +295,12 @@ namespace TGC.Group.Model
 						Position = EspacioMensajeSprite.Position,
 					};
 					drawer.DrawSprite(imagenRecolectableColisionado);
+				}
+
+				if (MensajeExtra) {
+
+					drawerText.drawText(MensajeExtraContenido, (int)EspacioMensajeSprite.Position.X + 100, (int)EspacioMensajeSprite.Position.Y + 25, Color.White);
+					drawer.DrawSprite(EspacioMensajeSprite);
 				}
 
 				if (MensajeColisionable)

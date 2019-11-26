@@ -15,7 +15,7 @@ namespace TGC.Group.Model
 		Item itemAsociado;
 		bool usado;
 		public Servidor(String MediaDir) {
-			piezaAsociada = new Pieza(0, "Pieza 0", MediaDir + "\\2D\\windows\\windows_1.png", null);
+			piezaAsociada = new Pieza(0, "Pieza 0", MediaDir + "\\2D\\windows\\windows_0.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_hacha.png", null);
 			TgcMesh meshHacha = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"Hacha-TgcScene.xml").Meshes[0];
 			itemAsociado = new Herramienta("Hacha" , meshHacha, MediaDir + "\\2D\\hacha.png");

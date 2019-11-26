@@ -27,7 +27,7 @@ namespace TGC.Group.Model
 		public Item itemSelecionado;
 		private Linterna linterna;
 		public float tiempoDesprotegido;
-		public float tiempoLimiteDesprotegido = 90;
+		public float tiempoLimiteDesprotegido = 20;
 		public Boolean ilumnacionActiva;
 		public Boolean permisosAdmin = false;
 		private Boolean objetoEquipado;
@@ -190,7 +190,7 @@ namespace TGC.Group.Model
 			agendaActiva = !agendaActiva;
 			HUD.Instance.Agenda = !HUD.Instance.Agenda;
 			HUD.Instance.seleccionarPaginaActual(pistas[indice]);
-			pistaActual = 0;
+			pistaActual = indice;
 			GameModel.sonidoNota.play(false);
 		}
 
@@ -227,12 +227,7 @@ namespace TGC.Group.Model
 			objetoColisiano.Agregarse(this);
 		}
 
-		public void ModificarPosicion(TGCVector3 newPos) {
-			mesh.Position = newPos;
-			mesh.Move(0,0,0);
-			//mesh.Move(newPos);
-			posicionModificada = true;
-		}
+
 		public void agregarItem(Item item) {
 			this.items.Add(item);
 			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Se agrego al inventario el item " + item.getDescripcion()));
@@ -247,9 +242,18 @@ namespace TGC.Group.Model
 		}
 
 		public void agregarPieza(Pieza pieza){
-			this.piezas.Add(pieza);
-			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pieza de la imagen"));
-			HUD.Instance.guardarPieza(pieza);
+			if (!piezas.Contains(pieza)){
+				this.piezas.Add(pieza);
+				HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pieza de la imagen"));
+				HUD.Instance.guardarPieza(pieza);
+				if (JuegoTerminado()) {
+					agregarPista(new Pista(null, mediaDir + "\\2D\\pista_final.png" , null));
+				}
+			}
+		}
+
+		public bool JuegoTerminado() {
+			return piezas.Count.Equals(9);
 		}
 
 		public bool tieneItem(String descripcionItem) {

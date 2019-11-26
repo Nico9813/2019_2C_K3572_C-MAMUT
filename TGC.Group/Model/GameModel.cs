@@ -55,8 +55,8 @@ namespace TGC.Group.Model
 		private List<Colisionable> Objetos;
 		private List<TgcMesh> MeshARenderizar;
         private List<TgcMesh> meshFogatas;
-		private List<TgcMesh> puntosInteres;
 		TgcBoundingAxisAlignBox iglesiaBoundingBox;
+		TgcBoundingAxisAlignBox altarFinalBoundingBox;
 		List<TgcBoundingAxisAlignBox> lugaresSeguros;
 		List<TgcMesh> arbolesMesh;
 
@@ -108,7 +108,13 @@ namespace TGC.Group.Model
         public static TgcStaticSound sonidoAgua;
         public static TgcStaticSound sonidoNota;
         public static TgcStaticSound sonidoPickup;
-        public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
+		public static TgcStaticSound sonidoAmbiente;
+		public static TgcStaticSound sonidoAgitacion;
+		public static TgcStaticSound sonidoMonstruoAcechando;
+		public static TgcStaticSound sonidoMuertePersonaje;
+		bool murioPersonaje = false;
+		public static TgcStaticSound sonidoMonstruoAparece;
+		public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
 
         public bool terminoJuego = false;
 
@@ -127,7 +133,8 @@ namespace TGC.Group.Model
 
             Items = new List<Recolectable>();
             Piezas = new List<Pieza>();
-            Objetos = new List<Colisionable>();
+
+			Objetos = new List<Colisionable>();
             MeshARenderizar = new List<TgcMesh>();
             meshFogatas = new List<TgcMesh>();
 			lugaresSeguros = new List<TgcBoundingAxisAlignBox>();
@@ -315,6 +322,9 @@ namespace TGC.Group.Model
 			iglesiaBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-2190, 20, 2400), new TGCVector3(-1700, 500, 3200));
 			lugaresSeguros.Add(iglesiaBoundingBox);
 
+			altarFinalBoundingBox = new TgcBoundingAxisAlignBox(new TGCVector3(-2177, 20, 2800), new TGCVector3(-1820, 500, 3023));
+
+
 			//Instancia puente
 			var sceneBridge = loader.loadSceneFromFile(MediaDir + @"Bridge-TgcScene.xml");
             foreach (var Mesh in sceneBridge.Meshes)
@@ -389,7 +399,13 @@ namespace TGC.Group.Model
 
 			//Instancia de pista
 			instanciarPista(new TGCVector3(-300, 55, 741));
-			instanciarPista(new TGCVector3(-1665, 65, -2971));
+
+			//Instancia de Piezas
+			instanciarPieza(4, new TGCVector3(-1665, 65, -2971));
+			instanciarPieza(5, new TGCVector3(-3460, 40, -3402));
+			instanciarPieza(6, new TGCVector3(2654, 40, -3043));
+			instanciarPieza(7, new TGCVector3(4082, 40, 1301));
+			instanciarPieza(8, new TGCVector3(-4004, 40, 2830));
 
 			//Instancia de las gafas
 			var Gafas = new VisionNocturna(MediaDir);
@@ -501,8 +517,6 @@ namespace TGC.Group.Model
 		public override void Update()
         {
 			PreUpdate();
-
-
 
 			if (!JuegoIniciado)
 			{
@@ -651,6 +665,25 @@ namespace TGC.Group.Model
 					Personaje.tiempoDesprotegido = 0;
 				}
 
+
+				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, altarFinalBoundingBox))
+				{
+					if (Personaje.JuegoTerminado()) {
+						HUD.Instance.MensajeExtra = true;
+						HUD.Instance.MensajeExtraContenido = "Pres [F] for linux";
+
+						/*
+						 * GIRAR
+						 * MUERE PINGUINO
+						 * 
+						 */
+					}
+				}
+				else {
+					HUD.Instance.MensajeExtra = false;
+				}
+				
+
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, Plano.BoundingBox))
 				{
 					Personaje.getItems().ForEach(item => Console.WriteLine(item.getDescripcion()));
@@ -692,7 +725,7 @@ namespace TGC.Group.Model
 
             SonidosUpdate();
 			var desplazamientoSilueta = -2000 * physicsExample.getDirector() * (FastMath.Min(0.65f, 0.35f + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido) / Personaje.tiempoLimiteDesprotegido));
-			monstruoSilueta.Position = camaraInterna.Position;
+			monstruoSilueta.Position = Personaje.mesh.Position + new TGCVector3(0, 20, 0);
             
             monstruoSilueta.Move(desplazamientoSilueta);
             monstruoSilueta.Scale = new TGCVector3(0.7f, 0.7f, 0.7f);
@@ -789,6 +822,7 @@ namespace TGC.Group.Model
 				{
 					item.mesh.Technique = tecnicaItemActual;
 				}
+
 				MeshPlano.Technique = "Agua";
 
 			}
@@ -803,8 +837,8 @@ namespace TGC.Group.Model
 
 				mesh.Effect.SetValue("lightIntensityFog", 40f);
 				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
-				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 
 				//Cargo variables Shader Linterna/Vela "SpotLight"
@@ -878,6 +912,8 @@ namespace TGC.Group.Model
             //Hacer que el Listener del sonido 3D siga al personaje
             DirectSound.ListenerTracking = Personaje.mesh;
             
+
+
             foreach (var mesh in meshFogatas)
             {
                 Tgc3dSound sonidoFogata;
@@ -904,7 +940,22 @@ namespace TGC.Group.Model
             sonidoPickup = new TgcStaticSound();
             sonidoPickup.loadSound(MediaDir + "Sound\\pickup.wav", DirectSound.DsDevice);
 
-            foreach (var s in sonidos)
+			sonidoAmbiente = new TgcStaticSound();
+			sonidoAmbiente.loadSound(MediaDir + "Sound\\ambiente.wav", DirectSound.DsDevice);
+
+			sonidoAgitacion = new TgcStaticSound();
+			sonidoAgitacion.loadSound(MediaDir + "Sound\\agitacion.wav", DirectSound.DsDevice);
+
+			sonidoMonstruoAcechando = new TgcStaticSound();
+			sonidoMonstruoAcechando.loadSound(MediaDir + "Sound\\monstruoAcechando.wav", DirectSound.DsDevice);
+
+			sonidoMuertePersonaje = new TgcStaticSound();
+			sonidoMuertePersonaje.loadSound(MediaDir + "Sound\\muertePersonaje.wav", DirectSound.DsDevice);
+
+			sonidoMonstruoAparece = new TgcStaticSound();
+			sonidoMonstruoAparece.loadSound(MediaDir + "Sound\\monstruoAparece.wav", DirectSound.DsDevice);
+
+			foreach (var s in sonidos)
             {
                 s.play(true);
             }
@@ -923,7 +974,27 @@ namespace TGC.Group.Model
             {
                 sonidoPisadas.stop();
             }
-        }
+
+			if (JuegoIniciado)
+			{
+				sonidoAmbiente.play(true);
+				if (Personaje.estaEnPeligro() && !murioPersonaje)
+				{
+					sonidoAgitacion.play(true);
+					if ((Personaje.tiempoDesprotegido / 10) % 1 < 0.2f)
+						sonidoMonstruoAcechando.play(false);
+				}
+
+				else
+					sonidoAgitacion.stop();
+				if (Personaje.perdioJuego() && !murioPersonaje)
+				{
+					sonidoMonstruoAparece.play(false);
+					sonidoMuertePersonaje.play(false);
+					murioPersonaje = true;
+				}
+			}
+		}
 
 		public void instanciarVela(TGCVector3 pos)
 		{
@@ -937,6 +1008,20 @@ namespace TGC.Group.Model
 			Items.Add(vela);
 			MeshARenderizar.Add(VelasMesh);
 		}
+
+		public void instanciarPieza(int numero_pieza, TGCVector3 pos)
+		{
+			var pieza = new Pieza(numero_pieza, "Pieza " + numero_pieza, 
+				MediaDir + "\\2D\\windows\\windows_" + numero_pieza + ".png", MediaDir + "\\windows-TgcScene.xml");
+
+			pieza.mesh.Move(pos);
+			pieza.mesh.Transform = TGCMatrix.Translation(pos);
+			pieza.mesh.Scale = new TGCVector3(0.02f, 0.02f, 0.02f);
+
+			Items.Add(pieza);
+			MeshARenderizar.Add(pieza.mesh);
+		}
+
 
 		public void instanciarPista(TGCVector3 pos)
 		{
