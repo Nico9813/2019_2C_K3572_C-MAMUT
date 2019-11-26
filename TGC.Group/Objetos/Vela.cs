@@ -21,7 +21,7 @@ namespace TGC.Group.Objetos
 			this.mesh = mesh;
 			lightMesh = TGCBox.fromSize(new TGCVector3(0.1f, 0.1f, 0.1f), Color.Red);
 			colorLuz = Color.Orange;
-			duracionVela = 30;
+			duracionVela = 40;
 			tiempoUsada = 0;
             this.descripcion = "Vela";
 			this.rutaImagen = rutaImagen;
