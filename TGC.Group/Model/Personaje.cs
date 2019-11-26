@@ -330,5 +330,9 @@ namespace TGC.Group.Model
         {
 			return tiempoDesprotegido >= (0.1f * tiempoLimiteDesprotegido);
         }
+        public void setPerdioJuego(Boolean perdioJuego)
+        {
+            perdio = perdioJuego;
+        }
 	}
 }

@@ -28,6 +28,7 @@ using Effect = Microsoft.DirectX.Direct3D.Effect;
 using TGC.Core.Fog;
 using TGC.Core.Sound;
 using Device = Microsoft.DirectX.Direct3D.Device;
+using System.Windows.Forms;
 
 namespace TGC.Group.Model
 {
@@ -100,6 +101,8 @@ namespace TGC.Group.Model
         float auxShaderMonstruoAparece = 0;
 		private TgcFog fog;
 
+        private bool salirDelJuego = false;
+
         private TGCVector3 ultimaPosTierra = new TGCVector3(-3800, 80, 160);
 
 
@@ -115,11 +118,14 @@ namespace TGC.Group.Model
 		public static TgcStaticSound sonidoMuertePersonaje;
 		bool murioPersonaje = false;
 		public static TgcStaticSound sonidoMonstruoAparece;
-		public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
+        public static TgcStaticSound sonidoMonstruoMuere;
+        public static TgcStaticSound sonidoWindowsInicia;
+        public static TgcStaticSound sonidoWindowsError;
+        public Tgc3dSound sonidoBug;//sonido que actualiza la posicion
 
         public bool terminoJuego = false;
 
-
+        private bool ganoEnRealidad = false;
 
         public override void Init()
         {
@@ -669,16 +675,37 @@ namespace TGC.Group.Model
 
 				if (TgcCollisionUtils.testAABBAABB(Personaje.mesh.BoundingBox, altarFinalBoundingBox))
 				{
-					if (Personaje.JuegoTerminado()) {
+					if (Personaje.JuegoTerminado()||true) {
 						HUD.Instance.MensajeExtra = true;
-						HUD.Instance.MensajeExtraContenido = "Pres [F] for linux";
+						HUD.Instance.MensajeExtraContenido = ganoEnRealidad ? "Iniciando windows..." : "Press [F] for linux";
 
-                        /*
-						 * GIRAR
-						 * MUERE PINGUINO
-						 * 
-						 */
-                        HUD.Instance.PantallaAzul = true;
+                        if(ganoEnRealidad && auxShader > 5)
+                        {
+                            foreach(Key key in Enum.GetValues(typeof(Key)))
+                            {
+                                if (Input.keyPressed(key))
+                                {
+                                    salirDelJuego = true;
+                                }
+                            }
+                        }
+
+                        if (Input.keyPressed(Key.F)&&!ganoEnRealidad)
+                        {
+                            
+                            sonidoWindowsInicia.play(false);
+                            ganoEnRealidad = true;
+                            murioPersonaje = true;
+                            Personaje.setPerdioJuego(true);
+                           
+
+                        }
+                        if (auxShader > 4 && auxShader<5 && ganoEnRealidad)
+                        {
+                            HUD.Instance.PantallaAzul = true;
+                            sonidoWindowsError.play(false);
+                        }
+
                     }
 				}
 				else {
@@ -741,6 +768,8 @@ namespace TGC.Group.Model
         public override void Render()
         {
 			PreRender();
+
+          
 
 			foreach (var mesh in MeshARenderizar) mesh.UpdateMeshTransform();
 
@@ -889,8 +918,9 @@ namespace TGC.Group.Model
            
 			if (giroMuerte > 0)
 			{
-                monstruo.Technique = "MonstruoAparece";
-                //monstruo.Technique = "NoMeQuieroIr";
+                
+                monstruo.Technique = ganoEnRealidad ? "NoMeQuieroIr" : "MonstruoAparece";
+               
 				monstruo.Render();
 			}
 
@@ -906,13 +936,22 @@ namespace TGC.Group.Model
 
 			bug.Update(time);
 
-			PostRender();
-		}
+            
+
+            PostRender();
+            if (salirDelJuego)
+            {
+                Application.Exit(); 
+                System.Windows.Forms.Application.ExitThread();
+                System.Environment.Exit(0);
+            }
+        }
 		public override void Dispose()
         {
             skyBox.Dispose();
             physicsExample.Dispose();
             monstruo.Dispose();
+            
         }
         public void SonidosInit()
         {
@@ -963,7 +1002,16 @@ namespace TGC.Group.Model
 			sonidoMonstruoAparece = new TgcStaticSound();
 			sonidoMonstruoAparece.loadSound(MediaDir + "Sound\\monstruoAparece.wav", DirectSound.DsDevice);
 
-			foreach (var s in sonidos)
+            sonidoMonstruoMuere = new TgcStaticSound();
+            sonidoMonstruoMuere.loadSound(MediaDir + "Sound\\monstruoAparece.wav", DirectSound.DsDevice);
+
+            sonidoWindowsInicia = new TgcStaticSound();
+            sonidoWindowsInicia.loadSound(MediaDir + "Sound\\windowsInicia.wav", DirectSound.DsDevice);
+
+            sonidoWindowsError = new TgcStaticSound();
+            sonidoWindowsError.loadSound(MediaDir + "Sound\\error.wav", DirectSound.DsDevice);
+
+            foreach (var s in sonidos)
             {
                 s.play(true);
             }
@@ -974,7 +1022,8 @@ namespace TGC.Group.Model
         {
             sonidoBug.Position = bug.mesh.Position;
 
-            if(physicsExample.personajeBody.ActivationState == ActivationState.ActiveTag)
+
+            if (physicsExample.personajeBody.ActivationState == ActivationState.ActiveTag)
             {
                 sonidoPisadas.play(true);
             }
@@ -995,7 +1044,7 @@ namespace TGC.Group.Model
 
 				else
 					sonidoAgitacion.stop();
-				if (giroMuerte > 179 && !murioPersonaje)
+				if (giroMuerte > 179 && !murioPersonaje && !ganoEnRealidad)
 				{
                     
 					sonidoMonstruoAparece.play(false);
