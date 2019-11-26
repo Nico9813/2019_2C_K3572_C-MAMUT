@@ -24,6 +24,7 @@ namespace TGC.Group.Model
 		public override void accion(Personaje personaje)
 		{
 			personaje.removerItem(this);
+			personaje.EquiparProximoItem();
 			personaje.visionNocturna = true;
 			personaje.agregarPista(pistaAsociada);
 		}

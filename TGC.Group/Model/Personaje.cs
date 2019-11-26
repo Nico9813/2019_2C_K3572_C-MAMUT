@@ -241,6 +241,9 @@ namespace TGC.Group.Model
 
 		public void agregarPista(Pista nuevaPista)
 		{
+			for (var i = 0; i < pistas.Count; i++) {
+				Console.WriteLine("Pista " + i + " Descripcion: " + pistas[i].getDescripcion());
+			}
 			HUD.Instance.mensajesTemporales.Add(new MensajeTemporal("Has encontrado una nueva pista, pulsa G para visualizarla"));
 			this.pistas.Add(nuevaPista);
 			AbrirAgenda(pistas.IndexOf(nuevaPista));

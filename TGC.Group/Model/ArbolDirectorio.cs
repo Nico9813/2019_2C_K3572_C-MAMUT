@@ -18,7 +18,7 @@ namespace TGC.Group.Model
 		public ArbolDirectorio(String MediaDir) {
 			piezaAsociada = new Pieza(1, "Pieza 1", MediaDir + "\\2D\\windows\\windows_1.png", null);
 			pistaAsociada = new Pista(null, MediaDir + "\\2D\\pista_bug.png", null);
-			itemAsociado = new Herramienta("Red", null, MediaDir + "\\2D\\SUDO.png");
+			itemAsociado = new Herramienta("Red", null, MediaDir + "\\2D\\redHud.png");
 			mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + @"Palmera2-TgcScene.xml").Meshes[0];
 			mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
 			mesh.setColor(System.Drawing.Color.Yellow);

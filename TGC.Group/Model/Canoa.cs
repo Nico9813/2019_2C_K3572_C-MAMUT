@@ -39,9 +39,10 @@ namespace TGC.Group.Model
 		public override void accion(Personaje personaje)
 		{
 			if (personaje.permisosAdmin){
-				personaje.removerItem(this);
-				personaje.SetCanoa(this);
 				personaje.agregarItem(mapa);
+				personaje.removerItem(this);
+				personaje.EquiparProximoItem();
+				personaje.SetCanoa(this);
 				personaje.agregarPista(pistaAsociada);
 				personaje.agregarPieza(piezaAsociada);
 			} else {

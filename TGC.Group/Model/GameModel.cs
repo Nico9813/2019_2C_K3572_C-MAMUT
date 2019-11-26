@@ -531,7 +531,6 @@ namespace TGC.Group.Model
 					HUD.Instance.MainMenu = false;
 					var rutaImagen = MediaDir + "\\2D\\texto_inicial.png";
 					Personaje.agregarPista(new Pista(null,rutaImagen,null));
-					Personaje.AbrirAgenda(0);
 				}
 			}
 			else {
@@ -839,8 +838,8 @@ namespace TGC.Group.Model
 
 				mesh.Effect.SetValue("lightIntensityFog", 40f);
 				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
-				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
-				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
+				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
 
 				//Cargo variables Shader Linterna/Vela "SpotLight"
