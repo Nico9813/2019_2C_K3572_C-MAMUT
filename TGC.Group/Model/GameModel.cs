@@ -32,7 +32,7 @@ using System.Windows.Forms;
 
 namespace TGC.Group.Model
 {
-
+	//No les conviene copiarse de este tp, menos si cursaron disenio
     public class GameModel : TgcExample
     {
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
@@ -935,18 +935,18 @@ namespace TGC.Group.Model
                 monstruo.Technique = ganoEnRealidad ? "NoMeQuieroIr" : "MonstruoAparece";
                
 				monstruo.Render();
+				HUD.Instance.Perdio = true;
+				
 			}
 
 			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 20, Color.GreenYellow);
-            DrawText.drawText("Monstruo aparece en: " + (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString(), 5, 40, Color.Gold);
+            DrawText.drawText("Monstruo aparece en: " + ((Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido > 0) ? (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString() : "GG"), 5, 40, Color.Gold);
             
             Personaje.Render(ElapsedTime, Input, physicsExample.getDirector());
 
 			quadtree.render(Frustum, true);
 
 			bug.Update(time);
-
-            
 
             PostRender();
             if (salirDelJuego)

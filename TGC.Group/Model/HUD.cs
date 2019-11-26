@@ -34,6 +34,7 @@ namespace TGC.Group.Model
 		private CustomSprite paginaActualSprite;
 		private CustomSprite mainMenuSprite;
 		private CustomSprite nuevaPistaSprite;
+		private CustomSprite GameOverSprite;
 
 		public Pista paginaActual;
 
@@ -49,6 +50,7 @@ namespace TGC.Group.Model
 		public bool Mensaje = false;
 		public bool MensajeColisionable = false;
 		public bool MensajeExtra= false;
+		public bool Perdio = false;
 
 		public Recolectable MensajeRecolectable;
 		public Colisionable Colisionado;
@@ -137,8 +139,14 @@ namespace TGC.Group.Model
                 Position = new TGCVector2(0f, 0f),
                 Scaling = new TGCVector2(1.9f * factorAncho, 2f * factorAlto),
             };
+			GameOverSprite = new CustomSprite
+			{
+				Bitmap = new CustomBitmap(MediaDir + "\\2D\\GAMEOVER.png", D3DDevice.Instance.Device),
+				Position = new TGCVector2(width / 8f, height / 5f),
+				Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
+			};
 
-            espaciosInventario = new List<EspacioObjeto>();
+			espaciosInventario = new List<EspacioObjeto>();
 			espaciosPiezas = new List<EspacioObjeto>();
 			CustomSprite spriteActual;
 
@@ -278,6 +286,11 @@ namespace TGC.Group.Model
 				{
 
 				}
+
+				if (Perdio) {
+					drawer.DrawSprite(GameOverSprite);
+				}
+
                 if (PantallaAzul)
                 {
                     drawer.DrawSprite(pantallaAzulSprite);
