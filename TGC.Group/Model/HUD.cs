@@ -11,7 +11,7 @@ using TGC.Group.Objetos;
 
 namespace TGC.Group.Model
 {
-	class HUD
+    class HUD
 	{
 		TgcText2D drawerText = new TgcText2D();
 
@@ -53,11 +53,13 @@ namespace TGC.Group.Model
 		public Recolectable MensajeRecolectable;
 		public Colisionable Colisionado;
 		public String MensajeExtraContenido;
+        private CustomSprite pantallaAzulSprite;
+        public bool PantallaAzul = false;
 
-		float factorAncho;
-		float factorAlto;
+        float factorAncho;
+        float factorAlto;
 
-		private readonly static HUD instance = new HUD();
+        private readonly static HUD instance = new HUD();
 
 		private HUD(){}
 
@@ -129,30 +131,37 @@ namespace TGC.Group.Model
 				Position = new TGCVector2(width * 0.28f, height * 0.02f),
 				Scaling = new TGCVector2(0.8f * factorAncho, 0.5f * factorAlto),
 			};
+            pantallaAzulSprite = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(MediaDir + "\\2D\\BSODEndgame.png", D3DDevice.Instance.Device),
+                Position = new TGCVector2(0f, 0f),
+                Scaling = new TGCVector2(1.9f * factorAncho, 2f * factorAlto),
+            };
 
-			espaciosInventario = new List<EspacioObjeto>();
+            espaciosInventario = new List<EspacioObjeto>();
 			espaciosPiezas = new List<EspacioObjeto>();
 			CustomSprite spriteActual;
 
 			float y0 = height * 0.10f;
 			float x0 = 0;
-			float dy = 60;
+			float dy = 60 * factorAlto;
 			float dx = 0;
 
 			for (int i = 0; i < MAXIMO_ITEMS; i++) {
 				y0 = y0 + dy;
-				spriteActual = new CustomSprite
-				{
-					Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioObjeto.png", D3DDevice.Instance.Device),
-					Position = new TGCVector2(0, y0),
+                spriteActual = new CustomSprite
+                {
+                    Bitmap = new CustomBitmap(MediaDir + "\\2D\\EspacioObjeto.png", D3DDevice.Instance.Device),
+                    Position = new TGCVector2(0, y0),
+                    Scaling = new TGCVector2(factorAncho, factorAlto),
 				};
 				espaciosInventario.Add(new EspacioObjeto(spriteActual));
 			}
 
-			y0 = height * 0.05f;
-			x0 =  width * 0.80f;
-			dy = 80;
-			dx = 80;
+			y0 = height * 0.05f ;
+			x0 =  width * 0.80f ;
+			dy = 80 * factorAlto;
+			dx = 80 * factorAncho;
 
 			for (int j = 0; j < 3; j++) {
 				for (int i = 0; i < MAXIMO_PIEZAS / 3; i++)
@@ -176,7 +185,7 @@ namespace TGC.Group.Model
 			try
 			{
 				espacioInventarioActual = espaciosInventario.Find(espacio => espacio.libre);
-				espacioInventarioActual.asociarObjeto(item);
+				espacioInventarioActual.asociarObjeto(item,factorAncho,factorAlto);
 			}
 			catch (ArgumentNullException e) {
 				//INVENTARIO LLENO
@@ -187,7 +196,7 @@ namespace TGC.Group.Model
 		{
 			EspacioObjeto espacioInventarioActual;
 			espacioInventarioActual = espaciosPiezas.ElementAt(pieza.numeroPieza);
-			espacioInventarioActual.asociarObjeto(pieza);
+			espacioInventarioActual.asociarObjeto(pieza,factorAncho,factorAlto);
 		}
 
 		public void removerItem(Item item) {
@@ -269,8 +278,11 @@ namespace TGC.Group.Model
 				{
 
 				}
-
-				if (Agenda)
+                if (PantallaAzul)
+                {
+                    drawer.DrawSprite(pantallaAzulSprite);
+                }
+                if (Agenda)
 				{
 					drawer.DrawSprite(AgendaSprite);
 					paginaActualSprite = new CustomSprite
@@ -342,13 +354,14 @@ namespace TGC.Group.Model
 			libre = true;
 			spriteEspacioInventario = espacio;
 		}
-		public void asociarObjeto(Recolectable item)
+		public void asociarObjeto(Recolectable item,float factorAncho, float factorAlto)
 		{
 			itemGuardado = item;
-			spriteItem = new CustomSprite
-			{
-				Bitmap = new CustomBitmap(item.getRutaImagen(), D3DDevice.Instance.Device),
-				Position = spriteEspacioInventario.Position,
+            spriteItem = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(item.getRutaImagen(), D3DDevice.Instance.Device),
+                Position = spriteEspacioInventario.Position,
+                Scaling = new TGCVector2(factorAncho, factorAlto),
 			};
 			libre = false;
 		}

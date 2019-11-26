@@ -673,12 +673,13 @@ namespace TGC.Group.Model
 						HUD.Instance.MensajeExtra = true;
 						HUD.Instance.MensajeExtraContenido = "Pres [F] for linux";
 
-						/*
+                        /*
 						 * GIRAR
 						 * MUERE PINGUINO
 						 * 
 						 */
-					}
+                        HUD.Instance.PantallaAzul = true;
+                    }
 				}
 				else {
 					HUD.Instance.MensajeExtra = false;
