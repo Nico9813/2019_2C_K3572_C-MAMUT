@@ -150,7 +150,9 @@ namespace TGC.Group.Model
             var scene = loader.loadSceneFromFile(MediaDir + @"Pino-TgcScene.xml");
             var PinoOriginal = scene.Meshes[0];
             List<TGCVector3> posicionesArboles = new List<TGCVector3>();
-
+            posicionesArboles.Add(new TGCVector3(-3877, 1, -678));
+            posicionesArboles.Add(new TGCVector3(-3517, 1, -1982));
+            posicionesArboles.Add(new TGCVector3(-3118, 1, -1524));
             posicionesArboles.Add(new TGCVector3(1, 1, 1));
             posicionesArboles.Add(new TGCVector3(-3442, 1, -2736));
             posicionesArboles.Add(new TGCVector3(-3689, 1, -3039));
@@ -169,8 +171,8 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-3352, 1, -1761));
             posicionesArboles.Add(new TGCVector3(-3244, 1, -2394));
             posicionesArboles.Add(new TGCVector3(-3978, 1, -2572));
-            posicionesArboles.Add(new TGCVector3(-3517, 1, -1982));
-            posicionesArboles.Add(new TGCVector3(-3118, 1, -1524));
+            
+            
             posicionesArboles.Add(new TGCVector3(-3349, 1, -980));
             posicionesArboles.Add(new TGCVector3(-4110, 1, -407));
             posicionesArboles.Add(new TGCVector3(-3304, 1, -1774));
@@ -185,7 +187,7 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(951, 1, 637));
             posicionesArboles.Add(new TGCVector3(1361, 1, 404));
             posicionesArboles.Add(new TGCVector3(1361, 1, 440));
-            posicionesArboles.Add(new TGCVector3(-3877, 1, -678));
+            
             posicionesArboles.Add(new TGCVector3(-3997, 1, -1079));
             posicionesArboles.Add(new TGCVector3(-3996, 1, -1617));
             posicionesArboles.Add(new TGCVector3(-3968, 1, -1952));
@@ -198,13 +200,14 @@ namespace TGC.Group.Model
             posicionesArboles.Add(new TGCVector3(-2793, 1, -476));
 
 
-            var indiceArbolDirectorio = (new Random()).Next(posicionesArboles.Count, posicionesArboles.Count + 100);
+            var indiceArbolDirectorio = (new Random()).Next(posicionesArboles.Count+100, posicionesArboles.Count+119);
             arbolesMesh = new List<TgcMesh>();
             Colisionable Arbol;
 
             for (var i = 0; i < posicionesArboles.Count; i++)
             {
                 var Instance = PinoOriginal.createMeshInstance("Pino" + i);
+
                 Arbol = new SinEfecto(Instance);
                 Arbol.mesh.Move(0, 0, 0);
                 Arbol.mesh.Scale += new TGCVector3(0.015f * i, 0.025f * i, 0.015f * i);
@@ -218,15 +221,7 @@ namespace TGC.Group.Model
             for (var i = posicionesArboles.Count; i < posicionesArboles.Count + 100; i++)
             {
                 var Instance = PinoOriginal.createMeshInstance("Pino" + i);
-                if (i == indiceArbolDirectorio)
-                {
-                    Arbol = new ArbolDirectorio(MediaDir);
-                }
-                else
-                {
-                    Arbol = new SinEfecto(Instance);
-                }
-
+                Arbol = new SinEfecto(Instance);
                 Arbol.mesh.Move(0, 0, 0);
 				Arbol.mesh.Scale += new TGCVector3(0.015f * i, 0.025f * i, 0.015f * i);
 				Arbol.mesh.Move(new TGCVector3(((float)Math.Pow(i, Math.PI) % 1500) + 98, 1, ((float)Math.Pow(i, Math.E) % 2300) - 1339));
@@ -240,9 +235,16 @@ namespace TGC.Group.Model
 			{
 				var Instance = PinoOriginal.createMeshInstance("Pino" + i);
 
-				Arbol = new SinEfecto(Instance);
+                if (i == indiceArbolDirectorio)
+                {
+                    Arbol = new ArbolDirectorio(MediaDir);
+                }
+                else
+                {
+                    Arbol = new SinEfecto(Instance);
+                }
 
-				Arbol.mesh.Move(0, 0, 0);
+                Arbol.mesh.Move(0, 0, 0);
 				Arbol.mesh.Scale += new TGCVector3(0.005f * i, 0.005f * i, 0.005f * i);
 
 				var centro = new TGCVector3(-450, 40, 2500);
@@ -410,6 +412,9 @@ namespace TGC.Group.Model
 			//Instancia de Piezas
 			instanciarPieza(4, new TGCVector3(-1665, 65, -2971));
 			instanciarPieza(5, new TGCVector3(-3460, 40, -3402));
+            instanciarVela(new TGCVector3(-3470, 40, -3985));
+            instanciarVela(new TGCVector3(-353, 40, 3120));
+            instanciarBateria(new TGCVector3(1207, 40, -575));
 			instanciarPieza(6, new TGCVector3(2654, 40, -3043));
 			instanciarPieza(7, new TGCVector3(4082, 40, 1301));
 			instanciarPieza(8, new TGCVector3(-4004, 40, 2830));
