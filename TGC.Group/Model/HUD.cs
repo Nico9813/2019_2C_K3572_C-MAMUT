@@ -92,7 +92,7 @@ namespace TGC.Group.Model
 			{
 				Bitmap = new CustomBitmap(MediaDir + "\\2D\\Bateria.png", D3DDevice.Instance.Device),
 				Position = new TGCVector2(width * 0.045f, height * 0.85f),
-				Scaling = new TGCVector2(0.5f * factorAncho, 0.5f * factorAlto),
+				Scaling = new TGCVector2(5f * factorAncho, 5f * factorAlto),
 				Color = Color.DarkGoldenrod,
 			};
 
@@ -205,7 +205,7 @@ namespace TGC.Group.Model
 		public void Update(float elapsedtime)
 		{
 			float bateriaRestante = personaje.getIluminadorPrincipal().getDuracionRestante();
-			RellenoBateria.Scaling = new TGCVector2(bateriaRestante * 0.5f / personaje.getIluminadorPrincipal().getDuracionTotal(), 1* 0.5f);
+			RellenoBateria.Scaling = new TGCVector2(factorAncho* bateriaRestante * 0.5f / personaje.getIluminadorPrincipal().getDuracionTotal(), factorAlto* 0.5f);
 			mensajesTemporales.ForEach(mensaje => mensaje.Update(elapsedtime));
 			mensajesTemporales = mensajesTemporales.FindAll(mensaje => !mensaje.tiempoCumplido());
 			//mensajesTemporales.ForEach(mensaje => Console.WriteLine(mensaje.getContenido()));

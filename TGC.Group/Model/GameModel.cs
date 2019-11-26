@@ -518,6 +518,7 @@ namespace TGC.Group.Model
         {
 			PreUpdate();
 
+
 			if (!JuegoIniciado)
 			{
 				HUD.Instance.MainMenu = true;
@@ -879,10 +880,11 @@ namespace TGC.Group.Model
 				monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f, 0.8f, 0.8f));
 			}
 
-
+           
 			if (giroMuerte > 0)
 			{
-				monstruo.Technique = "NoMeQuieroIr";
+                monstruo.Technique = "Spotlight";
+                //monstruo.Technique = "NoMeQuieroIr";
 				monstruo.Render();
 			}
 
@@ -987,8 +989,9 @@ namespace TGC.Group.Model
 
 				else
 					sonidoAgitacion.stop();
-				if (Personaje.perdioJuego() && !murioPersonaje)
+				if (giroMuerte > 179 && !murioPersonaje)
 				{
+                    
 					sonidoMonstruoAparece.play(false);
 					sonidoMuertePersonaje.play(false);
 					murioPersonaje = true;
