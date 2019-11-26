@@ -16,14 +16,13 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 ## Integrantes ##
 Gómez, Nicolás|  Medina, Federico| Tardieu, Ezequiel
 ------------ | -------------
-<img https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/tree/master/readme/Nico.jpeg" height="500"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/tree/master/readme/Fede.jpeg" height="500"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/tree/master/readme/Eze.jpg" height="500"> 
+<img https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Nico.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Fede.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Eze.jpg" height="350"> 
 
 ## ScreenShot ##
-![screenshot1](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot2](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot3](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot4](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot5](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
+![screenshot1](https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/screenshot1.png)
+![screenshot2](https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/screenshot2.png)
+![screenshot3](https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/screenshot3.png)
+
 
 ## Game Play ##
-[![Watch the video](https://img.youtube.com/vi/qESIu8ozanU/0.jpg)](https://www.youtube.com/playlist?list=PLRM4L32DjvnazuMl8wZlbpEYL5Qh63ulG)
+[![Watch the video](https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/screenshot4.png)](https://www.youtube.com/watch?v=XCAtfYSE55E)
