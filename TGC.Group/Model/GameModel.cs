@@ -695,12 +695,13 @@ namespace TGC.Group.Model
                             }
                         }
 
-                        if (Input.keyPressed(Key.F)&&!ganoEnRealidad)
+                        if (Input.keyPressed(Key.F))
                         {
                             
                             sonidoWindowsInicia.play(false);
                             ganoEnRealidad = true;
                             murioPersonaje = true;
+                            monstruo.Render();
                             Personaje.setPerdioJuego(true);
                            
 
@@ -919,11 +920,12 @@ namespace TGC.Group.Model
 				monstruo.Scale = new TGCVector3(0.8f, 0.8f, 0.8f);
 				monstruo.Transform = TGCMatrix.Translation(camaraInterna.Position.X, camaraInterna.Position.Y, camaraInterna.Position.Z) * TGCMatrix.Scaling(new TGCVector3(0.8f, 0.8f, 0.8f));
 			}
-
+            
            
-			if (giroMuerte > 0)
+			if (giroMuerte > 175)
 			{
-                
+
+                monstruo.Effect = effect;
                 monstruo.Technique = ganoEnRealidad ? "NoMeQuieroIr" : "MonstruoAparece";
                
 				monstruo.Render();
