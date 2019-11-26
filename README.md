@@ -16,7 +16,7 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 ## Integrantes ##
 Gómez, Nicolás|  Medina, Federico| Tardieu, Ezequiel
 ------------ | -------------
-<img https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Nico.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Fede.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Eze.jpg" height="350"> 
+<img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Nico.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Fede.jpeg" height="350"> | <img src="https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/Eze.jpg" height="350"> 
 
 ## ScreenShot ##
 ![screenshot1](https://github.com/Nico9813/2019_2C_K3572_C-MAMUT/blob/master/readme/screenshot1.png)
