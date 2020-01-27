@@ -165,7 +165,30 @@ float4 point_light_ps(PS_INPUT input) : COLOR0
 
     return texelColor;
 }
+float4 ps_general(PS_INPUT input) : COLOR0
+{
+    float4 texelColor = tex2D(diffuseMap, input.Texcoord);
 
+    return texelColor;
+
+}
+float4 ps_general_agua(PS_INPUT input) : COLOR0
+{
+    input.Texcoord += 0.5 * cos(time);
+    float4 texelColor = tex2D(diffuseMap, input.Texcoord);
+
+    return texelColor;
+
+}
+
+technique TecnicaDefault
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_general();
+        PixelShader = compile ps_3_0 ps_general();
+    }
+}
 
 /*
 * Technique Solo fogatas
@@ -869,7 +892,7 @@ technique VisionNocturnaAgua
     pass Pass_0
     {
         VertexShader = compile vs_3_0 vs_Agua();
-        PixelShader = compile ps_3_0 ps_vision_nocturna();
+        PixelShader = compile ps_3_0 ps_general_agua();
     }
 }
 
@@ -878,6 +901,6 @@ technique VisionNocturnaAB
     pass Pass_0
     {
         VertexShader = compile vs_3_0 vs_DiffuseMap_AB();
-        PixelShader = compile ps_3_0 ps_vision_nocturna();
+        PixelShader = compile ps_3_0 ps_general();
     }
 }

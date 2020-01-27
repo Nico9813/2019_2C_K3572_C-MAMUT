@@ -95,7 +95,7 @@ namespace TGC.Group.Model
         private Vector4[] FogatasPos;
         TgcBoundingAxisAlignBox cabaniaBoundingBox;
 
-        private Effect effect;
+        private Effect effect, effectpp;
         float time = 0;
 		float auxShader = 0;
         float auxShaderMonstruoAparece = 0;
@@ -126,12 +126,22 @@ namespace TGC.Group.Model
         public bool terminoJuego = false;
 
         private bool ganoEnRealidad = false;
+        private Surface depthStencil; // Depth-stencil buffer
+       
+   
+        private Surface pOldRT;
+        private Surface pOldDS;
+        private Texture renderTarget2D;
+        private VertexBuffer screenQuadVB;
 
         public override void Init()
         {
+            postProcesadoInit();
             var loader = new TgcSceneLoader();
 
             effect = TGCShaders.Instance.LoadEffect(ShadersDir + "Iluminacion.fx");
+          
+           
 
             BackgroundColor = Color.Black;
             var d3dDevice = D3DDevice.Instance.Device;
@@ -622,6 +632,8 @@ namespace TGC.Group.Model
 				if (Input.keyPressed(Key.K))
 				{
 					physicsExample.ModoCreativo = true;
+                    Personaje.tiempoLimiteDesprotegido = 1000;
+                    
 				}
 
 				HUD.Instance.Mensaje = itemCerca;
@@ -781,9 +793,20 @@ namespace TGC.Group.Model
         {
 			PreRender();
 
-          
+            ClearTextures();
 
-			foreach (var mesh in MeshARenderizar) mesh.UpdateMeshTransform();
+            effectpp.Technique = "DefaultTechnique";
+            //Cargamos el Render Targer al cual se va a dibujar la escena 3D. Antes nos guardamos el surface original
+            //En vez de dibujar a la pantalla, dibujamos a un buffer auxiliar, nuestro Render Target.
+            pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+            var pSurf = renderTarget2D.GetSurfaceLevel(0);
+            D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
+            pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+            D3DDevice.Instance.Device.DepthStencilSurface = depthStencil;
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            
+            foreach (var mesh in MeshARenderizar) mesh.UpdateMeshTransform();
 
 			skyBox.Render();
 
@@ -835,8 +858,8 @@ namespace TGC.Group.Model
 			}
 			else
 			{
-				String tecnicaActual = (Personaje.visionNocturnaActivada) ? "VisionNocturna" : "Spotlight";
-				String tecnicaItemActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaItems" : "Item";
+				String tecnicaActual = (Personaje.visionNocturnaActivada) ? "TecnicaDefault" : "Spotlight";
+				String tecnicaItemActual = (Personaje.visionNocturnaActivada) ? "TecnicaDefault" : "Item";
                 String tecnicaArbolActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaAB" : "SpotlightAB";
                 String tecnicaAguaActual = (Personaje.visionNocturnaActivada) ? "VisionNocturnaAgua" : "Agua";
 
@@ -948,6 +971,31 @@ namespace TGC.Group.Model
 
 			bug.Update(time);
 
+            pSurf.Dispose();
+
+
+            D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+            D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
+            //Cargamos para renderizar el unico modelo que tenemos, un Quad que ocupa toda la pantalla, con la textura de todo lo dibujado antes
+            D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
+            D3DDevice.Instance.Device.SetStreamSource(0, screenQuadVB, 0);
+
+            if (Personaje.visionNocturnaActivada) effectpp.Technique = "VisionNocturnaTechnique";
+            else effectpp.Technique = "DefaultTechnique";
+
+            //Cargamos parametros en el shader de Post-Procesado
+            effectpp.SetValue("render_target2D", renderTarget2D);
+            
+
+            //Limiamos la pantalla y ejecutamos el render del shader
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            effectpp.Begin(FX.None);
+            effectpp.BeginPass(0);
+            D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+            effectpp.EndPass();
+            effectpp.End();
+            
             PostRender();
             if (salirDelJuego)
             {
@@ -963,6 +1011,42 @@ namespace TGC.Group.Model
             monstruo.Dispose();
             
         }
+
+        public void postProcesadoInit()
+        {
+            //Se crean 2 triangulos (o Quad) con las dimensiones de la pantalla con sus posiciones ya transformadas
+            // x = -1 es el extremo izquiedo de la pantalla, x = 1 es el extremo derecho
+            // Lo mismo para la Y con arriba y abajo
+            // la Z en 1 simpre
+            CustomVertex.PositionTextured[] screenQuadVertices =
+            {
+                new CustomVertex.PositionTextured(-1, 1, 1, 0, 0),
+                new CustomVertex.PositionTextured(1, 1, 1, 1, 0),
+                new CustomVertex.PositionTextured(-1, -1, 1, 0, 1),
+                new CustomVertex.PositionTextured(1, -1, 1, 1, 1)
+            };
+            //vertex buffer de los triangulos
+            screenQuadVB = new VertexBuffer(typeof(CustomVertex.PositionTextured), 4, D3DDevice.Instance.Device, Usage.Dynamic | Usage.WriteOnly,
+                CustomVertex.PositionTextured.Format, Pool.Default);
+            screenQuadVB.SetData(screenQuadVertices, 0, LockFlags.None);
+
+            //Creamos un Render Targer sobre el cual se va a dibujar la pantalla
+            renderTarget2D = new Texture(D3DDevice.Instance.Device, D3DDevice.Instance.Device.PresentationParameters.BackBufferWidth,
+                D3DDevice.Instance.Device.PresentationParameters.BackBufferHeight, 1, Usage.RenderTarget, Format.X8R8G8B8, Pool.Default);
+
+            //Creamos un DepthStencil que debe ser compatible con nuestra definicion de renderTarget2D.
+            depthStencil = D3DDevice.Instance.Device.CreateDepthStencilSurface(D3DDevice.Instance.Device.PresentationParameters.BackBufferWidth,
+                    D3DDevice.Instance.Device.PresentationParameters.BackBufferHeight, DepthFormat.D24S8, MultiSampleType.None, 0, true);
+            //Cargar shader con efectos de Post-Procesado
+            effectpp = TGCShaders.Instance.LoadEffect(ShadersDir + "PostProcess.fx");
+
+            //Configurar Technique dentro del shader
+            effectpp.Technique = "OndasTechnique";
+            effectpp.SetValue("render_target2D", renderTarget2D);
+
+        }
+    
+
         public void SonidosInit()
         {
             DirectSound.InitializeD3DDevice(new System.Windows.Forms.Control());

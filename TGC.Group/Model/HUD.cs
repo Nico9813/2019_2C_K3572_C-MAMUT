@@ -36,7 +36,12 @@ namespace TGC.Group.Model
 		private CustomSprite nuevaPistaSprite;
 		private CustomSprite GameOverSprite;
 
-		public Pista paginaActual;
+        private CustomSprite batroja;
+        private CustomSprite batnaranja;
+        private CustomSprite batamarilla;
+        private CustomSprite batverde;
+
+        public Pista paginaActual;
 
 		public List<MensajeTemporal> mensajesTemporales = new List<MensajeTemporal>();
 
@@ -145,8 +150,32 @@ namespace TGC.Group.Model
 				Position = new TGCVector2(width / 8f, height / 5f),
 				Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
 			};
+            batroja = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(MediaDir + "\\2D\\batroja.png", D3DDevice.Instance.Device),
+                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
+            };
+            batnaranja = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(MediaDir + "\\2D\\batnaranja.png", D3DDevice.Instance.Device),
+                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
+            };
+            batamarilla = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(MediaDir + "\\2D\\batamarilla.png", D3DDevice.Instance.Device),
+                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
+            };
+            batverde = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(MediaDir + "\\2D\\batverde.png", D3DDevice.Instance.Device),
+                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
+            };
 
-			espaciosInventario = new List<EspacioObjeto>();
+            espaciosInventario = new List<EspacioObjeto>();
 			espaciosPiezas = new List<EspacioObjeto>();
 			CustomSprite spriteActual;
 
@@ -290,6 +319,14 @@ namespace TGC.Group.Model
 				if (Perdio) {
 					drawer.DrawSprite(GameOverSprite);
 				}
+                if (personaje.visionNocturnaActivada)
+                {
+                    var relacionVisionNocturna = (personaje.tiempoLimiteVisionNocturna - personaje.tiempoVisionNocturna) / personaje.tiempoLimiteVisionNocturna;
+                    if (relacionVisionNocturna > 0.75f) drawer.DrawSprite(batverde);
+                    if (relacionVisionNocturna > 0.5f && relacionVisionNocturna < 0.75f) drawer.DrawSprite(batamarilla);
+                    if (relacionVisionNocturna > 0.25f && relacionVisionNocturna < 0.5f) drawer.DrawSprite(batnaranja);
+                    if (relacionVisionNocturna < 0.25f) drawer.DrawSprite(batroja);
+                }
 
                 if (PantallaAzul)
                 {

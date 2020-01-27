@@ -187,3 +187,27 @@ technique BlurTechnique
         PixelShader = compile ps_3_0 ps_blur();
     }
 }
+/**************************************************************************************/
+/* Vision Nocturna */
+/**************************************************************************************/
+
+
+
+//Pixel Shader de Oscurecer
+float4 ps_vision_nocturna(PS_INPUT_DEFAULT Input) : COLOR0
+{
+	//Obtener color segun textura
+    float4 color = tex2D(RenderTarget, Input.Texcoord);
+
+    return (color * 0.60 + float4(0, 0.9, 0, 1) * 0.40);
+
+}
+
+technique VisionNocturnaTechnique
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_default();
+        PixelShader = compile ps_3_0 ps_vision_nocturna();
+    }
+}

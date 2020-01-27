@@ -28,7 +28,10 @@ namespace TGC.Group.Model
 		private Linterna linterna;
 		public float tiempoDesprotegido;
 		public float tiempoLimiteDesprotegido = 30;
-		public Boolean ilumnacionActiva;
+        public float tiempoVisionNocturna;
+        public float tiempoLimiteVisionNocturna = 10;
+
+        public Boolean ilumnacionActiva;
 		public Boolean permisosAdmin = false;
 		private Boolean objetoEquipado;
 		private Boolean perdio;
@@ -49,12 +52,12 @@ namespace TGC.Group.Model
 			mesh = meshPersonaje;
 			iluminadorPrincipal = new SinLuz();
 			mediaDir = MediaDir;
+            tiempoVisionNocturna = 0;
+            //var VelasMesh = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml").Meshes[0];
+            //VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
+            //linterna.vaciarBateria();
 
-			//var VelasMesh = loader.loadSceneFromFile(MediaDir + "velas-TgcScene.xml").Meshes[0];
-			//VelasMesh.Scale = new TGCVector3(0.03f, 0.03f, 0.03f);
-			//linterna.vaciarBateria();
-
-			items = new List<Item>();
+            items = new List<Item>();
 			piezas = new List<Pieza>();
 			pistas = new List<Pista>();
 
@@ -85,7 +88,7 @@ namespace TGC.Group.Model
 
 		public void Update(TgcD3dInput Input, float elapsedTime)
 		{
-            
+             
 			if (ilumnacionActiva == false)
 				tiempoDesprotegido += elapsedTime;
 			else tiempoDesprotegido = 0;
@@ -109,7 +112,12 @@ namespace TGC.Group.Model
 					visionNocturnaActivada = !visionNocturnaActivada;
 				}
 			}
-
+            if (visionNocturnaActivada)
+            {
+                tiempoDesprotegido = 0;
+                tiempoVisionNocturna += elapsedTime;
+            }
+            if (tiempoVisionNocturna >= tiempoLimiteVisionNocturna) visionNocturnaActivada = false;
 			if (Input.keyPressed(Key.R))
 			{
 				if (itemSelecionadoActivo)
