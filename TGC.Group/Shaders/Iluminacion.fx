@@ -302,8 +302,10 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
 					: 0.0;
 
 	//Calcular intensidad de la luz segun la atenuacion por distancia y si esta adentro o fuera del cono de luz
-    float intensity = lightIntensityPj * spotAtten / distAtten;
-
+    float intensity = lightIntensityPj * spotAtten / max(distAtten / 2, 200);
+  
+    
+    
 	//Obtener texel de la textura
     float4 texelColor = tex2D(diffuseMap, input.Texcoord);
 
@@ -342,7 +344,7 @@ float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
 	float distancia0 = sqrt(pow(input.WorldPosition.z - lightPositionFog[0].z, 2) + pow(input.WorldPosition.x - lightPositionFog[0].x, 2));
 	float distancia1 = sqrt(pow(input.WorldPosition.z - lightPositionFog[1].z, 2) + pow(input.WorldPosition.x - lightPositionFog[1].x, 2));
 	float distancia2 = sqrt(pow(input.WorldPosition.z - lightPositionFog[2].z, 2) + pow(input.WorldPosition.x - lightPositionFog[2].x, 2));
-	if (distancia0 < 450 || distancia1 < 450 || distancia2 < 450)
+    if (distancia0 < 450 || distancia1 < 450 || distancia2 < 450)
 	{
 		float distanciaMin = min(min(distancia0, distancia1), distancia2);
 		finalColor = saturate((15 / distanciaMin) * texelColor + finalColor);
@@ -494,7 +496,7 @@ float4 ps_Agua(PS_DIFFUSE_MAP input) : COLOR0
 					: 0.0;
 
 	//Calcular intensidad de la luz segun la atenuacion por distancia y si esta adentro o fuera del cono de luz
-    float intensity = lightIntensityPj * spotAtten / distAtten;
+    float intensity = lightIntensityPj * spotAtten / max(distAtten / 2, 200);;
 
 	//Obtener texel de la textura
     input.Texcoord += 0.5*cos(time);
@@ -602,7 +604,7 @@ float4 ps_Item(PS_DIFFUSE_MAP input) : COLOR0
 					: 0.0;
 
 	//Calcular intensidad de la luz segun la atenuacion por distancia y si esta adentro o fuera del cono de luz
-	float intensity = lightIntensityPj * spotAtten / distAtten;
+    float intensity = lightIntensityPj * spotAtten / max(distAtten / 2, 200);;
 
 	//Obtener texel de la textura
 	float4 texelColor = tex2D(diffuseMap, input.Texcoord);
@@ -729,7 +731,7 @@ float4 ps_vision_nocturna_items(PS_DIFFUSE_MAP input) : COLOR0
 					: 0.0;
 
 	//Calcular intensidad de la luz segun la atenuacion por distancia y si esta adentro o fuera del cono de luz
-	float intensity = lightIntensityPj * spotAtten / distAtten;
+    float intensity = lightIntensityPj * spotAtten / max(distAtten / 2, 200);;
 
 	//Obtener texel de la textura
 	float4 texelColor = tex2D(diffuseMap, input.Texcoord);

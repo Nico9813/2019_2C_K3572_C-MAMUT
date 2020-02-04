@@ -902,11 +902,11 @@ namespace TGC.Group.Model
 				//mesh.Effect = effect;
 				//mesh.Technique = "Spotlight";
 				//Cargar variables shader de la luz FOGATA
-				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.White));
-				mesh.Effect.SetValue("lightPositionFog", FogatasPos);
+				mesh.Effect.SetValue("lightColorFog", ColorValue.FromColor(Color.Orange));
+                mesh.Effect.SetValue("lightPositionFog", FogatasPos);
 
-				mesh.Effect.SetValue("lightIntensityFog", 40f);
-				mesh.Effect.SetValue("lightAttenuationFog", 0.65f);
+				mesh.Effect.SetValue("lightIntensityFog", 50f);
+				mesh.Effect.SetValue("lightAttenuationFog", 0.35f);
 				mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(0, 1, 2)));
 				//mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
 				mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(255, 244, 191)));
@@ -914,13 +914,13 @@ namespace TGC.Group.Model
 				//Cargo variables Shader Linterna/Vela "SpotLight"
 				mesh.Effect.SetValue("lightColorPj", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
 				//Cargar variables shader de la luz
-				mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos));
+				mesh.Effect.SetValue("lightPositionPj", TGCVector3.Vector3ToFloat4Array(lightPos - lightDir*20));
 				mesh.Effect.SetValue("eyePositionPj", TGCVector3.Vector3ToFloat4Array(Camara.Position));
 				mesh.Effect.SetValue("spotLightDir", TGCVector3.Vector3ToFloat3Array(lightDir));
-				mesh.Effect.SetValue("lightIntensityPj", 500f);
-				mesh.Effect.SetValue("lightAttenuationPj", 0.3f);
+				mesh.Effect.SetValue("lightIntensityPj", 150f);
+				mesh.Effect.SetValue("lightAttenuationPj", 1.7f);
 				mesh.Effect.SetValue("spotLightAngleCos", FastMath.ToRad(3));
-				mesh.Effect.SetValue("spotLightExponent", 80f);
+				mesh.Effect.SetValue("spotLightExponent", 25f);
 
 				//Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
 				mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Personaje.getIluminadorPrincipal().getColor()));
@@ -983,6 +983,8 @@ namespace TGC.Group.Model
             if (Personaje.visionNocturnaActivada) effectpp.Technique = "VisionNocturnaTechnique";
             else effectpp.Technique = "DefaultTechnique";
 
+            if (Personaje.estaEnPeligro() && !Personaje.perdioJuego()) effectpp.Technique = "VisionNocturnaTechnique";
+            else effectpp.Technique = "DefaultTechnique";
             //Cargamos parametros en el shader de Post-Procesado
             effectpp.SetValue("render_target2D", renderTarget2D);
             
