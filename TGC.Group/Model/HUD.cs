@@ -153,25 +153,25 @@ namespace TGC.Group.Model
             batroja = new CustomSprite
             {
                 Bitmap = new CustomBitmap(MediaDir + "\\2D\\batroja.png", D3DDevice.Instance.Device),
-                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Position = new TGCVector2(width / 22f, height / 1.25f),
                 Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
             };
             batnaranja = new CustomSprite
             {
                 Bitmap = new CustomBitmap(MediaDir + "\\2D\\batnaranja.png", D3DDevice.Instance.Device),
-                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Position = new TGCVector2(width / 22f, height / 1.25f),
                 Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
             };
             batamarilla = new CustomSprite
             {
                 Bitmap = new CustomBitmap(MediaDir + "\\2D\\batamarilla.png", D3DDevice.Instance.Device),
-                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Position = new TGCVector2(width / 22f, height / 1.25f),
                 Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
             };
             batverde = new CustomSprite
             {
                 Bitmap = new CustomBitmap(MediaDir + "\\2D\\batverde.png", D3DDevice.Instance.Device),
-                Position = new TGCVector2(width / 8f, height / 1.5f),
+                Position = new TGCVector2(width / 22f, height / 1.25f),
                 Scaling = new TGCVector2(0.4f * factorAncho, 0.4f * factorAlto),
             };
 

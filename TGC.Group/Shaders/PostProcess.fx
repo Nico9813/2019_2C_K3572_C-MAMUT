@@ -5,7 +5,8 @@
 /**************************************************************************************/
 /* DEFAULT */
 /**************************************************************************************/
-
+float time;
+float tiempoEnPeligro;
 //Input del Vertex Shader
 struct VS_INPUT_DEFAULT
 {
@@ -197,9 +198,19 @@ technique BlurTechnique
 float4 ps_vision_nocturna(PS_INPUT_DEFAULT Input) : COLOR0
 {
 	//Obtener color segun textura
+    //Input.Texcoord = ceil(Input.Texcoord * 350) / 350;
     float4 color = tex2D(RenderTarget, Input.Texcoord);
-
-    return (color * 0.60 + float4(0, 0.9, 0, 1) * 0.40);
+    if (sqrt(pow(Input.Texcoord.x - 0.5, 2) + pow(Input.Texcoord.y - 0.5, 2)) < 0.5)
+    {
+        if (Input.Texcoord.y * 10000 * abs(cos(time)) % 12 > 11)
+            discard;
+        return (color * 0.40 + float4(0, 0.25, 0, 1) * 0.60);
+    }
+        
+        
+    
+    else
+        return (color * 0.10 + float4(0, 0, 0, 1) * 0.90);
 
 }
 
@@ -209,5 +220,28 @@ technique VisionNocturnaTechnique
     {
         VertexShader = compile vs_3_0 vs_default();
         PixelShader = compile ps_3_0 ps_vision_nocturna();
+    }
+}
+//Pixel Shader de Oscurecer
+float4 ps_terror(PS_INPUT_DEFAULT Input) : COLOR0
+{
+	//Obtener color segun textura
+    float pixelado = max(500, 10000 / (tiempoEnPeligro * 5));
+
+    Input.Texcoord = ceil(Input.Texcoord * pixelado) / pixelado;
+    float4 color = tex2D(RenderTarget, Input.Texcoord);
+    color.r = color.r * (abs(sin(1.5 * time) - 0.5) + 0.5);
+    color.g *= 0.1;
+    color.b *= 0.1;
+    return color;
+
+}
+
+technique TerrorTechnique
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_default();
+        PixelShader = compile ps_3_0 ps_terror();
     }
 }

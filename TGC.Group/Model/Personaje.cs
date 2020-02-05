@@ -29,7 +29,7 @@ namespace TGC.Group.Model
 		public float tiempoDesprotegido;
 		public float tiempoLimiteDesprotegido = 30;
         public float tiempoVisionNocturna;
-        public float tiempoLimiteVisionNocturna = 10;
+        public float tiempoLimiteVisionNocturna = 40;
 
         public Boolean ilumnacionActiva;
 		public Boolean permisosAdmin = false;
@@ -156,7 +156,7 @@ namespace TGC.Group.Model
 
 		public void Render(float ElapsedTime, TgcD3dInput input, TGCVector3 director)
 		{
-			HUD.Instance.Render();
+			
 			this.mesh.Render();
 			if (meshEnMano != null) {
 				meshEnMano.Position = mesh.Position + new TGCVector3(50 * -director.X, 30, 50 * -director.Z);
@@ -342,7 +342,7 @@ namespace TGC.Group.Model
 		}
         public Boolean estaEnPeligro()
         {
-			return tiempoDesprotegido >= (0.65f * tiempoLimiteDesprotegido);
+			return tiempoDesprotegido >= (0.1f * tiempoLimiteDesprotegido);
         }
         public void setPerdioJuego(Boolean perdioJuego)
         {

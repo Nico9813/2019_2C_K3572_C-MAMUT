@@ -633,6 +633,7 @@ namespace TGC.Group.Model
 				{
 					physicsExample.ModoCreativo = true;
                     Personaje.tiempoLimiteDesprotegido = 1000;
+                    Personaje.setVisionNoturna(true);
                     
 				}
 
@@ -831,29 +832,29 @@ namespace TGC.Group.Model
                 foreach (var mesh in MeshARenderizar)
 				{
 					mesh.Effect = effect;
-					mesh.Technique = "Sepia";
+					//mesh.Technique = "Sepia";
 				}
 
 				monstruo.Effect = effect;
-				monstruo.Technique = "Sepia";
+				//monstruo.Technique = "Sepia";
 
 				terreno.Effect = effect;
-				terreno.Technique = "Sepia";
+				//terreno.Technique = "Sepia";
 
 				foreach (var mesh in meshFogatas)
 				{
 					mesh.Effect = effect;
-					mesh.Technique = "Sepia";
+					//mesh.Technique = "Sepia";
 
 				}
 				foreach (var mesh in skyBox.Faces)
 				{
 					mesh.Effect = effect;
-					mesh.Technique = "Sepia";
+					//mesh.Technique = "Sepia";
 				}
 				foreach (var item in Items)
 				{
-					item.mesh.Technique = "Item";
+					//item.mesh.Technique = "Item";
 				}
 			}
 			else
@@ -962,9 +963,7 @@ namespace TGC.Group.Model
 				
 			}
 
-			DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 20, Color.GreenYellow);
-            DrawText.drawText("Monstruo aparece en: " + ((Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido > 0) ? (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString() : "GG"), 5, 40, Color.Gold);
-            
+			
             Personaje.Render(ElapsedTime, Input, physicsExample.getDirector());
 
 			quadtree.render(Frustum, true);
@@ -980,14 +979,14 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
             D3DDevice.Instance.Device.SetStreamSource(0, screenQuadVB, 0);
 
+            effectpp.Technique = "DefaultTechnique";
             if (Personaje.visionNocturnaActivada) effectpp.Technique = "VisionNocturnaTechnique";
-            else effectpp.Technique = "DefaultTechnique";
+            if (Personaje.estaEnPeligro() && !Personaje.perdioJuego()) effectpp.Technique = "TerrorTechnique";
+            effectpp.SetValue("tiempoEnPeligro", Personaje.tiempoDesprotegido);
 
-            if (Personaje.estaEnPeligro() && !Personaje.perdioJuego()) effectpp.Technique = "VisionNocturnaTechnique";
-            else effectpp.Technique = "DefaultTechnique";
             //Cargamos parametros en el shader de Post-Procesado
             effectpp.SetValue("render_target2D", renderTarget2D);
-            
+            effectpp.SetValue("time", time);
 
             //Limiamos la pantalla y ejecutamos el render del shader
             D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
@@ -997,7 +996,10 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
             effectpp.EndPass();
             effectpp.End();
-            
+            HUD.Instance.Render();
+            DrawText.drawText("Modelos Renderizados" + quadtree.cantModelosRenderizados(), 5, 20, Color.GreenYellow);
+            DrawText.drawText("Monstruo aparece en: " + ((Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido > 0) ? (Personaje.tiempoLimiteDesprotegido - Personaje.tiempoDesprotegido).ToString() : "GG"), 5, 40, Color.Gold);
+
             PostRender();
             if (salirDelJuego)
             {
