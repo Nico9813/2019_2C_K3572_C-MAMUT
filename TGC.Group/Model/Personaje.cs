@@ -342,7 +342,7 @@ namespace TGC.Group.Model
 		}
         public Boolean estaEnPeligro()
         {
-			return tiempoDesprotegido >= (0.1f * tiempoLimiteDesprotegido);
+			return tiempoDesprotegido >= (0.55f * tiempoLimiteDesprotegido);
         }
         public void setPerdioJuego(Boolean perdioJuego)
         {

@@ -227,12 +227,13 @@ float4 ps_terror(PS_INPUT_DEFAULT Input) : COLOR0
 {
 	//Obtener color segun textura
     float pixelado = max(500, 10000 / (tiempoEnPeligro * 5));
-
-    Input.Texcoord = ceil(Input.Texcoord * pixelado) / pixelado;
+    Input.Texcoord.x = Input.Texcoord.x + 0.007 * sin(2 * Input.Texcoord.x * tiempoEnPeligro);
+    Input.Texcoord.y = Input.Texcoord.y + 0.007 * cos(4 * Input.Texcoord.y * tiempoEnPeligro);
+    //Input.Texcoord = ceil(Input.Texcoord * pixelado) / pixelado;
     float4 color = tex2D(RenderTarget, Input.Texcoord);
     color.r = color.r * (abs(sin(1.5 * time) - 0.5) + 0.5);
-    color.g *= 0.1;
-    color.b *= 0.1;
+    color.g *= 0.4;
+    color.b *= 0.4;
     return color;
 
 }
